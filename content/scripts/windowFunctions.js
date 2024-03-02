@@ -43,7 +43,7 @@ window.showTabPanel = function(tab) {
         handle: ".title-bar",
 	containment: 'body',
     });
-    $(".window.glass.active").resizable({
+    $("background").resizable({
 		handles: 'n, e, s, w, ne, se, sw, nw',
 	    	containment: 'body',
 	    	animate: true,
