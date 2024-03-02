@@ -1,0 +1,33 @@
+body {
+    background-image: url('https://cdn.discordapp.com/attachments/958072385746133062/1174501772245598320/ezgif-2-01f3bb489f.jpg?ex=65f24083&is=65dfcb83&hm=3f339a18db73883854c6eb3bbf992294872dbb126d230fe7a9ac245badf66cab&');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-width: 10em;
+    margin: 0;
+}
+
+/* Apply the title bar color only to elements with the .color class */
+.color::before,
+.color > .title-bar {
+    background-color: var(--title-color);
+}
+
+#colorWindow {
+    position: absolute;
+    top: 1%;
+    left: 1%;
+    z-index: 10;
+}
+
+[role="tabpanel"] {
+    display: none !important;
+}
+
+[role="tabpanel"]:not([hidden]) {
+    display: block !important;
+}
