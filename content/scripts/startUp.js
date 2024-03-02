@@ -1,9 +1,15 @@
-document.getElementById('playButton').addEventListener('click', function() {
-    var sound = document.getElementById('startup');
-    sound.play().then(() => {
-        // Hide the button after successful play
-        this.style.display = 'none';
+var music = document.getElementById('startup');
+music.volume = 0.2; // Set the volume to 20%
+
+var promise = music.play();
+
+if (promise !== undefined) {
+    promise.then(() => {
+        // Autoplay started successfully
+        console.log("Playback started successfully.");
     }).catch(error => {
-        console.error("Error playing the sound:", error);
+        // Autoplay was prevented.
+        console.log("Playback was prevented. Error:", error);
+        // Show a UI element to let the user manually start playback
     });
-});
+}
