@@ -17,4 +17,4 @@ setTimeout(() => {
             music.muted = false;
         });
     }
-}, 3000);
+}, 30);
