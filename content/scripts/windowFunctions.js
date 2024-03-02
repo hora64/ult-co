@@ -44,7 +44,6 @@ window.showTabPanel = function(tab) {
     });
     $(".window.glass.active").resizable({
 		handle: ".title-bar",
-		containment: 'body',
 		minHeight: 80,
 		minWidth: 138,
 		maxHeight: $(window).height(),
