@@ -3,14 +3,19 @@
 	<script>
 		const Webamp = window.Webamp;
 		const webamp = new Webamp({
+
+		});
+		const options = {
 			initialSkin: {
 				url: "/content/assets/webamp/skins/frutigeraero.wsz"
 			},
 			availableSkins: [{
 				url: "/content/assets/webamp/skins/frutigeraero.wsz",
 				name: "Frutiger Aero"
-			}]
-		});
+			}],
+			enableDoubleSizeMode: true,
+    			enableHotkeys: true,
+		}
 		// If you want to handle the case when Webamp is not supported
 		if (!Webamp.browserIsSupported()) {
 			alert("Webamp is not supported in your browser.");
