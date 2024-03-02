@@ -42,8 +42,8 @@ window.showTabPanel = function(tab) {
     $(".window.glass.active").draggable({
         handle: ".title-bar"
     });
-	$(".window.glass.active").resizable({
-		handles: 'n, e, s, w, ne, se, sw, nw',
+    $(".window.glass.active").resizable({
+		handle: ".title-bar",
 		containment: 'body',
 		minHeight: 80,
 		minWidth: 138,
