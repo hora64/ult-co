@@ -4,12 +4,14 @@
         const Webamp = window.Webamp;
         const webamp = new Webamp({
   initialSkin: {
-    // NOTE: Your skin file must be served from the same domain as your HTML
-    // file, or served with permissive CORS HTTP headers:
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-    // Can be downloaded from https://github.com/captbaritone/webamp/raw/master/skins/TopazAmp1-2.wsz
     url: "/content/assets/webamp/skins/frutigeraero.wsz"
   },
+    availableSkins: [
+          {
+            url: "/content/assets/webamp/skins/frutigeraero.wsz",
+            name: "Frutiger Aero",
+          }
+        ]
 });
 
         // If you want to handle the case when Webamp is not supported
