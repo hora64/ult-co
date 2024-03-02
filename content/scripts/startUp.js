@@ -1,8 +1,9 @@
-document.addEventListener('DOMContentLoaded', (event) => {
+document.getElementById('playButton').addEventListener('click', function() {
     var sound = document.getElementById('startup');
-    sound.play().catch(error => {
-        // Autoplay policy might prevent the sound from playing until a user interaction
-        console.error("Autoplay was prevented.", error);
-        // You can implement a user interaction requirement here, if necessary.
+    sound.play().then(() => {
+        // Hide the button after successful play
+        this.style.display = 'none';
+    }).catch(error => {
+        console.error("Error playing the sound:", error);
     });
 });
