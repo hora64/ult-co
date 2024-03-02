@@ -42,7 +42,14 @@ window.showTabPanel = function(tab) {
     $(".window.glass.active").draggable({
         handle: ".title-bar"
     });
-
+	$(".window.glass.active").resizable({
+		handles: 'n, e, s, w, ne, se, sw, nw',
+		containment: 'body',
+		minHeight: 80,
+		minWidth: 138,
+		maxHeight: $(window).height(),
+		maxWidth: $(window).width()
+	});
     // Function to apply the color from sliders
     function applyColor() {
         var red = $('#red-slider').val(),
