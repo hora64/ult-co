@@ -1,51 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>ult & co.</title>
-		<link rel="shortcut icon" href="content/assets/icons/bluefavicon.ico" type="image/x-icon" />
-		<meta property="og:site_name" content="ult & co." />
-		<meta property="og:type" content="website" />
-		<meta property="og:title" content="ult & co." />
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="https://unpkg.com/7.css">
-		<link rel="stylesheet" href="content/css/styles.css">
-	</head>
-	<body>
-		<div id="app-settings">
-			<!-- Settings window will be loaded here -->
-		</div>
-		<div id="app-webamp">
-			<!-- WebAmp will be loaded here -->
-		</div>
-		<div class="background">
-			<!-- Your background HTML content here -->
-		</div>
-		<div class="ui-sfx">
-        		<audio id="startup" src="content/assets/audio/7startup.mp3"></audio>
-			<script src="content/scripts/startUp.js"></script>
-		</div>	    
-		<!-- Point to the specific version of the Webamp bundle -->
-		<script src="https://unpkg.com/webamp@1.5.0/built/webamp.bundle.min.js"></script>
-		<!-- jQuery and jQuery UI for other dynamic behaviors -->
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-		<!-- Your custom JavaScript file -->
-		<script src="content/scripts/windowFunctions.js"></script>
-		<script>
-			$(document).ready(function() {
-				// Load the settings window into the element with the ID 'app'
-				$("#app-settings").load("content/windows/settings-window.html", function() {
-					// Once the settings window has been loaded into #app,
-					// load the tabs into the element with the specific ID within the settings window content.
-					// Make sure to replace 'tabsContainer' with the actual ID of the container in your settings-window.html
-				});
-				$("#app-webamp").load("content/windows/webAmp.html", function() {
-					// Once the settings window has been loaded into #app,
-					// load the tabs into the element with the specific ID within the settings window content.
-					// Make sure to replace 'tabsContainer' with the actual ID of the container in your settings-window.html
-				});
-			});
-		</script>
-	</body>
+<head>
+    <title>ult & co.</title>
+    <link rel="shortcut icon" href="content/assets/icons/bluefavicon.ico" type="image/x-icon" />
+    <meta property="og:site_name" content="ult & co." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ult & co." />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/7.css">
+    <link rel="stylesheet" href="content/css/styles.css">
+</head>
+<body>
+    <div id="app-settings">
+        <!-- Settings window will be loaded here -->
+    </div>
+    <div id="app-webamp">
+        <!-- WebAmp will be loaded here -->
+    </div>
+    <div class="background">
+        <!-- Your background HTML content here -->
+    </div>
+    <div class="ui-sfx">
+        <audio id="startupSound" src="content/assets/audio/7startup.mp3" preload="auto"></audio>
+    </div>
+    <!-- Point to the specific version of the Webamp bundle -->
+    <script src="https://unpkg.com/webamp@1.5.0/built/webamp.bundle.min.js"></script>
+    <!-- jQuery and jQuery UI for other dynamic behaviors -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!-- Your custom JavaScript file -->
+    <script src="content/scripts/windowFunctions.js"></script>
+    <script src="content/scripts/startUp.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#app-settings").load("content/windows/settings-window.html", function() {
+                // Settings window loaded
+            });
+            $("#app-webamp").load("content/windows/webAmp.html", function() {
+                // WebAmp loaded
+            });
+        });
+    </script>
+</body>
 </html>
