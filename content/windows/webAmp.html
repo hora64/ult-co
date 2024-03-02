@@ -1,25 +1,21 @@
 <body>
-    <div id="winamp-container"></div>
-    <script>
-        const Webamp = window.Webamp;
-        const webamp = new Webamp({
-  initialSkin: {
-    url: "/content/assets/webamp/skins/frutigeraero.wsz"
-  },
-    availableSkins: [
-          {
-            url: "/content/assets/webamp/skins/frutigeraero.wsz",
-            name: "Frutiger Aero",
-          }
-        ]
-});
-
-        // If you want to handle the case when Webamp is not supported
-        if (!Webamp.browserIsSupported()) {
-            alert("Webamp is not supported in your browser.");
-        }
-webamp.renderWhenReady(document.getElementById('winamp-container'));
-    
-    </script>
+	<div id="winamp-container"></div>
+	<script>
+		const Webamp = window.Webamp;
+		const webamp = new Webamp({
+			initialSkin: {
+				url: "/content/assets/webamp/skins/frutigeraero.wsz"
+			},
+			availableSkins: [{
+				url: "/content/assets/webamp/skins/frutigeraero.wsz",
+				name: "Frutiger Aero"
+			}]
+		});
+		// If you want to handle the case when Webamp is not supported
+		if (!Webamp.browserIsSupported()) {
+			alert("Webamp is not supported in your browser.");
+		}
+		webamp.renderWhenReady(document.getElementById('winamp-container'));
+	</script>
 </body>
 <script src="https://unpkg.com/webamp@1.5.0/built/webamp.bundle.min.js"></script>
