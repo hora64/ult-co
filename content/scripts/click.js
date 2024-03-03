@@ -1,10 +1,11 @@
 var b = document.body;
 var imgurl = [
-  'https://cdn.discordapp.com/attachments/958072385746133062/1212568134410706954/ult__co._Frutiger_Aero_Blue.png?ex=65f24f13&is=65dfda13&hm=a4eedcf61218f215254e4979d58e86638232a357dcbd7780f5f306925ae7b014&',
-  'https://cdn.discordapp.com/attachments/958072385746133062/1212568134741925908/ult__co._Frutiger_Aero_Lime.png?ex=65f24f13&is=65dfda13&hm=c959eef9d40b804d2e85877c48c58fd12785afc7d254b373b4d3c2db202702d1&',
-  'https://cdn.discordapp.com/attachments/958072385746133062/1212568135144706140/ult__co._Frutiger_Aero_Pink.png?ex=65f24f13&is=65dfda13&hm=ab468404951191d572053a91ca4823804a29c76ca5cda62f0a49470657694600&',
-  'https://cdn.discordapp.com/attachments/958072385746133062/1212568135471726602/ult__co._Frutiger_Aero_Purple.png?ex=65f24f13&is=65dfda13&hm=57edf6bf5a9980a59615163c5733b8df1ebcfcbc1298f803949b574dd266e60f&',
-  'https://cdn.discordapp.com/attachments/958072385746133062/1212568135815929897/ult__co._Frutiger_Aero_Red.png?ex=65f24f14&is=65dfda14&hm=09d6d40e5a804615980c6ecf9aa431778cd3e8239ce5c60723ef5861938321ca&'
+  'content/assets/images/png/ultcoFrutigerAeroBlue_px1024.png',
+  'content/assets/images/png/ultcoFrutigerAeroRed_px1024.png',
+  'content/assets/images/png/ultcoFrutigerAeroLime_px1024.png',
+  'content/assets/images/png/ultcoFrutigerAeroPink_px1024.png',
+  'content/assets/images/png/ultcoFrutigerAeroPurple_px1024.png',
+  'content/assets/images/png/ultcoFrutigerAeroGrey_px1024.png'
 ];
 var size = [9, 18];
 
