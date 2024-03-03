@@ -1,30 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Set custom cursor for all input elements and buttons
-    const inputsAndButtons = document.querySelectorAll('input, button');
+    // Custom cursor URL
+    const customCursorURL = 'url("content/assets/images/cur/chrome/chrome.cur"), default';
 
-    inputsAndButtons.forEach(element => {
+    // Apply custom cursor to all input elements, buttons, and input[type="range"] sliders
+    const interactiveElements = document.querySelectorAll('input, button');
+
+    // Function to change cursor on mouse enter
+    function changeCursorOnHover(element) {
         element.addEventListener('mouseenter', () => {
-            // Change cursor when hovering
-            document.body.style.cursor = 'url("content/assets/images/cur/chrome/chrome.cur"), default';
+            document.body.style.cursor = customCursorURL;
         });
 
         element.addEventListener('mouseleave', () => {
-            // Reset cursor when not hovering
-            document.body.style.cursor = 'default';
+            document.body.style.cursor = 'default'; // Reset to default cursor when not hovering
         });
+    }
+
+    // Apply custom cursor change on hover to all selected elements
+    interactiveElements.forEach(changeCursorOnHover);
+
+    // Change cursor on mouse down for draggable interactions and reset on mouse up
+    document.addEventListener('mousedown', () => {
+        document.body.style.cursor = customCursorURL;
     });
 
-    // For dragging interactions (primarily affects input[type="range"])
-    inputsAndButtons.forEach(element => {
-        element.addEventListener('mousedown', () => {
-            // Change cursor when starting to drag/click
-            document.body.style.cursor = 'url("content/assets/images/cur/chrome/chrome.cur"), default';
-        });
-
-        // Consider resetting the cursor on mouseup globally to cover cases
-        // where the mouse is released outside the element
-        document.addEventListener('mouseup', () => {
-            document.body.style.cursor = 'default'; // Reset to default after mouse release
-        });
+    document.addEventListener('mouseup', () => {
+        document.body.style.cursor = 'default'; // Reset to default cursor after mouse release
     });
 });
