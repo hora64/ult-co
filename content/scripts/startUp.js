@@ -1,21 +1,25 @@
 function playStartupSound() {
     var music = document.getElementById('startup');
     if (music) {
+        // Set volume to 20% of maximum
         music.volume = 0.2;
+        // Attempt to play the audio
         var promise = music.play();
 
         if (promise !== undefined) {
             promise.then(_ => {
-                console.log('start up sound');
-                // Successfully started playback
+                // Audio playback successful
+                console.log('Startup sound played successfully');
             }).catch(error => {
-                console.error('Failed to play start up sound:', error);
+                // Audio playback failed
+                console.error('Failed to play startup sound:', error);
             });
         }
     }
 }
 
-// Ensures the event listener is properly added after the document is fully loaded
+// Wait for the full page content to load
 window.addEventListener('DOMContentLoaded', (event) => {
-    document.body.addEventListener('click', playStartupSound, {once: true});
+    // Set a delay before attempting to play the sound
+    setTimeout(playStartupSound, 5000); // 5000 milliseconds = 5 seconds
 });
