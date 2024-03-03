@@ -51,7 +51,10 @@ $(document).ready(function() {
         handle: ".title-bar",
         containment: 'window',
     });
-
+    $(".7window").resizable({
+        // Optional: specify handles if you want resizing from specific sides only
+        handles: "n, e, s, w, ne, se, sw, nw"
+    });
     // Event handler for the color sliders
     $('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
 
