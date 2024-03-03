@@ -62,7 +62,7 @@ function getStyle(x, y, size, rotation) {
 
 
 function bro(x, y) {
-  for (var i = 5; i < 9; i++) {
+  for (var i = 1; i < rand(5, 9); i++) {
     heart(x, y);
   }
 }
