@@ -41,6 +41,7 @@ window.showTabPanel = function(tab) {
     // Make the window draggable
 $(".window.glass.active").draggable({
     handle: ".title-bar",
+    containment: 'window',
     drag: function(event, ui) {
         // Get the element's dimensions
         const width = $(this).outerWidth();
