@@ -51,7 +51,7 @@ function heart(x, y) {
 }
 
 function bro(x, y) {
-  for (var i = 0; i < 5; i++) {
+  for (var i = 5; i < 9; i++) {
     heart(x, y);
   }
 }
