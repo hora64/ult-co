@@ -50,7 +50,7 @@ $(document).ready(function() {
     $(".window-7.glass.active").draggable({
         handle: ".title-bar",
         cancel: '.inhalt',
-		containment: 'body',
+		containment: 'background',
 		scroll: false,
     });
     $(".7window").resizable({
