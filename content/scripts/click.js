@@ -23,8 +23,8 @@ function lerp(a, b, f) {
 
 
 
-var rotationMin = 5; // Minimum rotation in degrees
-var rotationMax = 15; // Maximum rotation in degrees
+var rotationMin = 15; // Minimum rotation in degrees
+var rotationMax = 45; // Maximum rotation in degrees
 
 function heart(x, y) {
     var s = getSize();
