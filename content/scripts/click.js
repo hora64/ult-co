@@ -24,7 +24,7 @@ function lerp(a, b, f) {
 function getRotation() {
   // Generate a smaller range of angles for a subtler rotation effect.
   // For example, using angles between -45 and 45 degrees.
-  return `rotate(${rand(-45, 45)}deg)`;
+  return `rotate(${rand(-15, 15)}deg)`;
 }
 
 
