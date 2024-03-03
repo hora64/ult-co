@@ -22,8 +22,11 @@ function lerp(a, b, f) {
 }
 
 function getRotation() {
-  return `rotate(${rand(0, 360)}deg)`;
+  // Generate a smaller range of angles for a subtler rotation effect.
+  // For example, using angles between -45 and 45 degrees.
+  return `rotate(${rand(-45, 45)}deg)`;
 }
+
 
 function heart(x, y) {
   var s = getSize();
