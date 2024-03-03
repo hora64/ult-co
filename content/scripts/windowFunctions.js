@@ -1,12 +1,12 @@
-// Vanilla JS window control functions
+// Vanilla JS window control functions targeting ".window-7" class
 function minimizeWindow(button) {
-    const window = button.closest('.window');
+    const window = button.closest('.window-7');
     const windowBody = window.querySelector('.window-body');
     windowBody.style.display = windowBody.style.display === 'none' ? '' : 'none';
 }
 
 function maximizeWindow(button) {
-    const window = button.closest('.window');
+    const window = button.closest('.window-7');
     const windowBody = window.querySelector('.window-body');
     windowBody.style.display = '';
     if (window.style.maxWidth === '100%') {
@@ -19,11 +19,11 @@ function maximizeWindow(button) {
 }
 
 function closeWindow(button) {
-    const window = button.closest('.window');
+    const window = button.closest('.window-7');
     window.style.display = 'none';
 }
 
-// Function to show tab panel
+// Function to show tab panel, assuming it applies globally and not just to ".window-7"
 window.showTabPanel = function(tab) {
     var selectedPanelId = tab.getAttribute('aria-controls');
     document.querySelectorAll('[role="tabpanel"]').forEach(function(panel) {
@@ -36,7 +36,7 @@ window.showTabPanel = function(tab) {
     tab.setAttribute('aria-selected', 'true');
 };
 
-// Moved applyColor outside to make it globally accessible
+// Global function to apply color from sliders
 function applyColor() {
     var red = document.getElementById('red-slider').value,
         green = document.getElementById('green-slider').value,
@@ -44,10 +44,10 @@ function applyColor() {
     document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
 }
 
-// Using jQuery for DOM ready and event binding
+// jQuery for DOM ready, event binding, and additional functionality
 $(document).ready(function() {
-    // Make the window draggable
-    $(".window.glass.active").draggable({
+    // Make the ".window-7.glass.active" draggable
+    $(".window-7.glass.active").draggable({
         handle: ".title-bar",
         containment: 'window',
     });
@@ -55,6 +55,6 @@ $(document).ready(function() {
     // Event handler for the color sliders
     $('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
 
-    // Activate the first tab
+    // Activate the first tab, assuming tabs are global and not just within ".window-7"
     $('[role="tab"]:first').click();
 });
