@@ -47,8 +47,7 @@ function applyColor() {
 // jQuery for DOM ready, event binding, and additional functionality
 $(document).ready(function() {
     // Make the ".window-7.glass.active" draggable
-    $(".window-7.glass.active").draggable({
-        handle: ".title-bar",
+    $(".7window").draggable({
         cancel: '.inhalt',
 		containment: 'background',
 		scroll: false,
