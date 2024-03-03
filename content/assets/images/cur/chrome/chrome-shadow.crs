@@ -1,0 +1,9 @@
+﻿[AppStarting]
+Path=chrome-working.ani
+
+[Arrow]
+Path=chrome.cur
+
+[Wait]
+Path=chrome-busy.ani
+
