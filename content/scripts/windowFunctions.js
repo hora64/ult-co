@@ -36,16 +36,20 @@ window.showTabPanel = function(tab) {
     tab.setAttribute('aria-selected', 'true');
 };
 
-
 (function($) {
     // Make the window draggable
     $(".window.glass.active").draggable({
         handle: ".title-bar",
-        containment: 'window', // Restrict dragging to within the viewport
-    });
-
+	containment: 'background',
+    }).resizable({
+		handles: 'n, e, s, w, ne, se, sw, nw',
+	    	containment: 'body',
+	    	animate: true,
+		minHeight: 80,
+		minWidth: 138,
+		maxHeight: $(window).height(),
+		maxWidth: $(window).width()
 });
-
     // Function to apply the color from sliders
     function applyColor() {
         var red = $('#red-slider').val(),
