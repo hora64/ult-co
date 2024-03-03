@@ -41,9 +41,8 @@ window.showTabPanel = function(tab) {
     // Make the window draggable
     $(".window.glass.active").draggable({
         handle: ".title-bar",
-        containment: 'window', // Use 'window' to keep the draggable element inside the viewport
+        containment: 'window' // Restrict dragging to within the viewport
     });
-})(jQuery);
 
 });
 
