@@ -36,27 +36,25 @@ window.showTabPanel = function(tab) {
     tab.setAttribute('aria-selected', 'true');
 };
 
-// Corrected jQuery usage
-(function($) {
+// Moved applyColor outside to make it globally accessible
+function applyColor() {
+    var red = document.getElementById('red-slider').value,
+        green = document.getElementById('green-slider').value,
+        blue = document.getElementById('blue-slider').value;
+    document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
+}
+
+// Using jQuery for DOM ready and event binding
+$(document).ready(function() {
     // Make the window draggable
-    $(function() { // Ensure DOM is ready
-        $(".window.glass.active").draggable({
-            handle: ".title-bar",
-            containment: 'window', // Restrict dragging to within the viewport
-        });
-
-        // Function to apply the color from sliders
-        function applyColor() {
-            var red = $('#red-slider').val(),
-                green = $('#green-slider').val(),
-                blue = $('#blue-slider').val();
-            document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
-        }
-
-        // Event handler for the color sliders
-        $('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
-
-        // Activate the first tab on document ready
-        $('[role="tab"]:first').click();
+    $(".window.glass.active").draggable({
+        handle: ".title-bar",
+        containment: 'window',
     });
-})(jQuery);
+
+    // Event handler for the color sliders
+    $('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
+
+    // Activate the first tab
+    $('[role="tab"]:first').click();
+});
