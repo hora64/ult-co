@@ -49,7 +49,9 @@ $(document).ready(function() {
     // Make the ".window-7.glass.active" draggable
     $(".window-7.glass.active").draggable({
         handle: ".title-bar",
-        containment: 'window',
+        cancel: '.inhalt',
+		containment: 'body',
+		scroll: false,
     });
     $(".7window").resizable({
         // Optional: specify handles if you want resizing from specific sides only
