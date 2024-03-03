@@ -36,35 +36,27 @@ window.showTabPanel = function(tab) {
     tab.setAttribute('aria-selected', 'true');
 };
 
+// Corrected jQuery usage
 (function($) {
     // Make the window draggable
-    $(".window.glass.active").draggable({
-        handle: ".title-bar",
-	containment: 'background',
-    }).resizable({
-		handles: 'n, e, s, w, ne, se, sw, nw',
-	    	containment: 'body',
-	    	animate: true,
-		minHeight: 80,
-		minWidth: 138,
-		maxHeight: $(window).height(),
-		maxWidth: $(window).width()
-});
-    // Function to apply the color from sliders
-    function applyColor() {
-        var red = $('#red-slider').val(),
-            green = $('#green-slider').val(),
-            blue = $('#blue-slider').val();
-        document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
-    }
+    $(function() { // Ensure DOM is ready
+        $(".window.glass.active").draggable({
+            handle: ".title-bar",
+            containment: 'window', // Restrict dragging to within the viewport
+        });
 
+        // Function to apply the color from sliders
+        function applyColor() {
+            var red = $('#red-slider').val(),
+                green = $('#green-slider').val(),
+                blue = $('#blue-slider').val();
+            document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
+        }
 
-    // Event handler for the color sliders
-    $('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
+        // Event handler for the color sliders
+        $('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
 
-    // Activate the first tab on document ready
-    $(document).ready(function() {
+        // Activate the first tab on document ready
         $('[role="tab"]:first').click();
     });
-
 })(jQuery);
