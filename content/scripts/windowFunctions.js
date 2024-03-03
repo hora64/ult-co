@@ -39,18 +39,31 @@ window.showTabPanel = function(tab) {
 
 (function($) {
     // Make the window draggable
-    $(".window.glass.active").draggable({
-        handle: ".title-bar",
-	containment: 'html',
-    }).resizable({
-		handles: 'n, e, s, w, ne, se, sw, nw',
-	    	containment: 'html',
-	    	animate: true,
-		minHeight: 80,
-		minWidth: 138,
-		maxHeight: $(window).height(),
-		maxWidth: $(window).width()
+$(".window.glass.active").draggable({
+    handle: ".title-bar",
+    drag: function(event, ui) {
+        // Get the element's dimensions
+        const width = $(this).outerWidth();
+        const height = $(this).outerHeight();
+
+        // Get the window's dimensions
+        const winWidth = $(window).width();
+        const winHeight = $(window).height();
+
+        // Calculate boundaries
+        const maxX = winWidth - width;
+        const maxY = winHeight - height;
+
+        // Prevent dragging beyond the left or top boundaries
+        if (ui.position.left < 0) ui.position.left = 0;
+        if (ui.position.top < 0) ui.position.top = 0;
+
+        // Prevent dragging beyond the right or bottom boundaries
+        if (ui.position.left > maxX) ui.position.left = maxX;
+        if (ui.position.top > maxY) ui.position.top = maxY;
+    }
 });
+
     // Function to apply the color from sliders
     function applyColor() {
         var red = $('#red-slider').val(),
