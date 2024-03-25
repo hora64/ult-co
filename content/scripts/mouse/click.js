@@ -1,10 +1,10 @@
 var config = {
-	"icons": ["content/assets/images/icons/png/px1024/ultcoFrutigerAeroBlue_px1024.png",
-		"content/assets/images/icons/png/px1024/ultcoFrutigerAeroRed_px1024.png",
-		"content/assets/images/icons/png/px1024/ultcoFrutigerAeroLime_px1024.png",
-		"content/assets/images/icons/png/px1024/ultcoFrutigerAeroPink_px1024.png",
-		"content/assets/images/icons/png/px1024/ultcoFrutigerAeroPurple_px1024.png",
-		"content/assets/images/icons/png/px1024/ultcoFrutigerAeroGrey_px1024.png"
+	"icons": ["content/assets/images/png/px1024/ultcoFrutigerAeroBlue_px1024.png",
+		"content/assets/images/png/px1024/ultcoFrutigerAeroRed_px1024.png",
+		"content/assets/images/png/px1024/ultcoFrutigerAeroLime_px1024.png",
+		"content/assets/images/png/px1024/ultcoFrutigerAeroPink_px1024.png",
+		"content/assets/images/png/px1024/ultcoFrutigerAeroPurple_px1024.png",
+		"content/assets/images/png/px1024/ultcoFrutigerAeroGrey_px1024.png"
 	],
 	"size": {
 		"min": 9,
