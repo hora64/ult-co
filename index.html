@@ -37,8 +37,11 @@
     <div id="app-webamp">
         <!-- WebAmp will be loaded here -->
     </div>
-    <div class="background">
+    <div class="background" oncontextmenu="showSettingsMenu(event)" onmouseleave="hideSettingsMenu()">
         <!-- Your background HTML content here -->
+    </div>
+    <div id="settingsMenu" class="settings-menu" style="display: none;">
+        <iframe src="" frameborder="0" width="320" height="320"></iframe>
     </div>
     <div class="ui-sfx">
         <audio id="startup" src="content/assets/audio/7startup.mp3" preload="auto"></audio>
@@ -59,6 +62,26 @@
                 // WebAmp loaded
             });
         });
+
+        var settingsMenu = document.getElementById('settingsMenu');
+
+        function showSettingsMenu(event) {
+            event.preventDefault(); // Prevent default right-click behavior
+
+            // Position settings menu at the cursor
+            settingsMenu.style.top = event.clientY + 'px';
+            settingsMenu.style.left = event.clientX + 'px';
+
+            // Load settings menu content
+            $("#settingsMenu iframe").attr("src", "content/windows/settingsMenu.html");
+
+            settingsMenu.style.display = 'block';
+        }
+
+        function hideSettingsMenu() {
+            // Hide settings menu when mouse leaves the background
+            settingsMenu.style.display = 'none';
+        }
     </script>
 </body>
 
