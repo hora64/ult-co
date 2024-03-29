@@ -66,7 +66,7 @@ function applyColor() {
 		document.getElementById('red-slider').value = colors.red;
 		document.getElementById('green-slider').value = colors.green;
 		document.getElementById('blue-slider').value = colors.blue;
-
+		console.log('Saved Colors:', colors);
 		// Apply the loaded color settings immediately
 		updateColorTheme();
 	}
@@ -92,10 +92,10 @@ function applyColor() {
 // Function to apply the wallpaper
 function applyWallpaper() {
 	var savedWallpaper = localStorage.getItem('selectedWallpaper');
-	console.log('Saved Wallpaper:', savedWallpaper);
 	if (savedWallpaper) {
 		$('body').css('background-image', 'url(' + savedWallpaper + ')');
 		$('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
+		console.log('Saved Wallpaper:', savedWallpaper);
 	}
 
 	$('input[name="wallpaperselect"]').change(function() {
