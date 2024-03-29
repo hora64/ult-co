@@ -34,15 +34,15 @@
 			<fieldset>
 				<legend>Select a wallpaper</legend>
 				<div class="field-row">
-					<input id="wallpaperoption1" type="radio" name="wallpaperselect">
+					<input id="wallpaperoption1" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero.jpg">
 					<label for="wallpaperoption1">Wallpaper #1</label>
 				</div>
 				<div class="field-row">
-					<input id="wallpaperoption2" type="radio" name="wallpaperselect">
+					<input id="wallpaperoption2" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/Windows7Wallpaper.jpg">
 					<label for="wallpaperoption2">Wallpaper #2</label>
 				</div>
 				<div class="field-row">
-					<input id="wallpaperoption3" type="radio" name="wallpaperselect">
+					<input id="wallpaperoption3" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero2.jpg">
 					<label for="wallpaperoption3">Wallpaper #3</label>
 				</div>
 			</fieldset>
@@ -54,3 +54,12 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <!-- Your custom JavaScript file -->
 <script src="content/scripts/windowFunctions.js"></script>
+<script>
+	$(document).ready(function() {
+		// Listen for any changes to the wallpaper selection
+		$('input[name="wallpaperselect"]').change(function() {
+			var newWallpaper = $(this).val(); // Get the value of the selected option
+			$('body').css('background-image', 'url(' + newWallpaper + ')'); // Update the background image
+		});
+	});
+</script>
