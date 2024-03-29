@@ -52,7 +52,7 @@ window.showTabPanel = function(tab) {
         document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
         // Save the color settings to localStorage
         localStorage.setItem('colorSettings', JSON.stringify({red, green, blue}));
-        console.log(localStorage.getItem('selectedWallpaper'));
+        console.log(localStorage.getItem('colorSettings'));
     }
 
     // Event handler for the color sliders
