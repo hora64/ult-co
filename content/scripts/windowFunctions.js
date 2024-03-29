@@ -40,7 +40,7 @@ window.showTabPanel = function(tab) {
 	// Make the window draggable
 	$(".window.glass.active").draggable({
 		handle: ".title-bar",
-		containment: 'window', // Restrict dragging to within the viewport
+		containment: 'window' // Restrict dragging to within the viewport
 	});
 
 // Function to apply the color from sliders
