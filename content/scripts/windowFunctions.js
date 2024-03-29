@@ -57,19 +57,30 @@ window.showTabPanel = function(tab) {
     // Event handler for the color sliders
     $('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
 
-    // Activate the first tab and apply saved color settings on document ready
+    // Load and apply saved wallpaper and color settings on document ready
     $(document).ready(function() {
-        $('[role="tab"]:first').click();
+        var savedWallpaper = localStorage.getItem('selectedWallpaper');
+        if(savedWallpaper) {
+            $('body').css('background-image', 'url(' + savedWallpaper + ')');
+            $('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
+        }
 
-        // Load and apply saved color settings
         var savedColorSettings = localStorage.getItem('colorSettings');
         if(savedColorSettings) {
             var colors = JSON.parse(savedColorSettings);
             $('#red-slider').val(colors.red);
             $('#green-slider').val(colors.green);
             $('#blue-slider').val(colors.blue);
-            // Apply the loaded color settings
-            applyColor();
+            applyColor(); // Apply the loaded color settings
         }
+
+        // Save the selected wallpaper to localStorage on change
+        $('input[name="wallpaperselect"]').change(function() {
+            var newWallpaper = $(this).val();
+            $('body').css('background-image', 'url(' + newWallpaper + ')');
+            localStorage.setItem('selectedWallpaper', newWallpaper);
+        });
+
+        $('[role="tab"]:first').click(); // Activate the first tab
     });
 })(jQuery);
