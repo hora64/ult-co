@@ -1,59 +1,75 @@
 // Vanilla JS window control functions
 function minimizeWindow(button) {
-	const window = button.closest('.window');
-	const windowBody = window.querySelector('.window-body');
-	windowBody.style.display = windowBody.style.display === 'none' ? '' : 'none';
+    const window = button.closest('.window');
+    const windowBody = window.querySelector('.window-body');
+    windowBody.style.display = windowBody.style.display === 'none' ? '' : 'none';
 }
 
 function maximizeWindow(button) {
-	const window = button.closest('.window');
-	const windowBody = window.querySelector('.window-body');
-	windowBody.style.display = '';
-	if (window.style.maxWidth === '100%') {
-		window.style.maxWidth = '';
-		window.style.height = '';
-	} else {
-		window.style.maxWidth = '100%';
-		window.style.height = '100%';
-	}
+    const window = button.closest('.window');
+    const windowBody = window.querySelector('.window-body');
+    windowBody.style.display = '';
+    if (window.style.maxWidth === '100%') {
+        window.style.maxWidth = '';
+        window.style.height = '';
+    } else {
+        window.style.maxWidth = '100%';
+        window.style.height = '100%';
+    }
 }
 
 function closeWindow(button) {
-	const window = button.closest('.window');
-	window.style.display = 'none';
+    const window = button.closest('.window');
+    window.style.display = 'none';
 }
+
 // Function to show tab panel
 window.showTabPanel = function(tab) {
-	var selectedPanelId = tab.getAttribute('aria-controls');
-	document.querySelectorAll('[role="tabpanel"]').forEach(function(panel) {
-		panel.hidden = true;
-	});
-	document.getElementById(selectedPanelId).hidden = false;
-	document.querySelectorAll('[role="tab"]').forEach(function(tab) {
-		tab.setAttribute('aria-selected', 'false');
-	});
-	tab.setAttribute('aria-selected', 'true');
+    var selectedPanelId = tab.getAttribute('aria-controls');
+    document.querySelectorAll('[role="tabpanel"]').forEach(function(panel) {
+        panel.hidden = true;
+    });
+    document.getElementById(selectedPanelId).hidden = false;
+    document.querySelectorAll('[role="tab"]').forEach(function(tab) {
+        tab.setAttribute('aria-selected', 'false');
+    });
+    tab.setAttribute('aria-selected', 'true');
 };
 
-
 (function($) {
-	// Make the window draggable
-	$(".window.glass.active").draggable({
-		handle: ".title-bar",
-		containment: 'window' // Restrict dragging to within the viewport
-	});
+    // Make the window draggable
+    $(".window.glass.active").draggable({
+        handle: ".title-bar",
+        containment: 'window' // Restrict dragging to within the viewport
+    });
 
-// Function to apply the color from sliders
-function applyColor() {
-	var red = $('#red-slider').val(),
-		green = $('#green-slider').val(),
-		blue = $('#blue-slider').val();
-	document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
-}
-// Event handler for the color sliders
-$('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
-// Activate the first tab on document ready
-$(document).ready(function() {
-$('[role="tab"]:first').click();
-});
+    // Function to apply the color from sliders and save to localStorage
+    function applyColor() {
+        var red = $('#red-slider').val(),
+            green = $('#green-slider').val(),
+            blue = $('#blue-slider').val();
+        // Update the CSS variable
+        document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
+        // Save the color settings to localStorage
+        localStorage.setItem('colorSettings', JSON.stringify({red, green, blue}));
+    }
+
+    // Event handler for the color sliders
+    $('#red-slider, #green-slider, #blue-slider').on('input', applyColor);
+
+    // Activate the first tab and apply saved color settings on document ready
+    $(document).ready(function() {
+        $('[role="tab"]:first').click();
+
+        // Load and apply saved color settings
+        var savedColorSettings = localStorage.getItem('colorSettings');
+        if(savedColorSettings) {
+            var colors = JSON.parse(savedColorSettings);
+            $('#red-slider').val(colors.red);
+            $('#green-slider').val(colors.green);
+            $('#blue-slider').val(colors.blue);
+            // Apply the loaded color settings
+            applyColor();
+        }
+    });
 })(jQuery);
