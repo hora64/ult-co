@@ -55,16 +55,20 @@
 <!-- Your custom JavaScript file -->
 <script src="content/scripts/windowFunctions.js"></script>
 <script>
-    $(document).ready(function() {
-        $('input[name="wallpaperselect"]').change(function() {
-            var newWallpaper = $(this).val();
-            $('body').css('background-image', 'url(' + newWallpaper + ')');
-        });
-
-        // Initialize with the selected wallpaper on page load
-        var initialWallpaper = $('input[name="wallpaperselect"]:checked').val();
-        $('body').css('background-image', 'url(' + initialWallpaper + ')');
+$(document).ready(function() {
+    // Listen for changes to the wallpaper selection
+    $('input[name="wallpaperselect"]').change(function() {
+        var newWallpaper = $(this).val();
+        $('body').css('background-image', 'url(' + newWallpaper + ')');
+        // Save the selected wallpaper to localStorage
+        localStorage.setItem('selectedWallpaper', newWallpaper);
     });
 
-    // Function to dynamically apply color based on slider values
+    // Load the saved wallpaper, if any, when the page loads
+    var savedWallpaper = localStorage.getItem('selectedWallpaper');
+    if(savedWallpaper) {
+        $('body').css('background-image', 'url(' + savedWallpaper + ')');
+        $('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
+    }
+});
 </script>
