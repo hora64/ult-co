@@ -113,4 +113,12 @@ $(function() {
         handle: ".title-bar",
         containment: 'window'
     });
+
+    // Make the window resizable
+    $(".window.glass.active").resizable({
+        handles: "n, e, s, w, ne, se, sw, nw",
+        minHeight: 150,
+        minWidth: 200
+    });
 });
+
