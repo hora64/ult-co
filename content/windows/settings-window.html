@@ -1,53 +1,94 @@
 <div class="background">
-	<div class="window color glass active" id="settingsWindow" style="width: 320px; height: 300px;">
-		<div class="title-bar">
-			<div class="title-bar-text">Website customization</div>
-			<div class="title-bar-controls">
-				<button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
-				<button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
-				<button aria-label="Close" onclick="closeWindow(this)"></button>
-			</div>
-		</div>
-		<div class="window-body has-space has-scrollbar" style="width: 295px; height: 250px; overflow: auto">
-			<!-- Combined content section -->
-			<fieldset>
-				<legend>Adjust the sliders to change the color of the window.</legend>
-				<div class="field-row">
-					<label for="red-slider">
-						<img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Red">
-					</label>
-					<input id="red-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-				</div>
-				<div class="field-row">
-					<label for="green-slider">
-						<img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Green">
-					</label>
-					<input id="green-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-				</div>
-				<div class="field-row">
-					<label for="blue-slider">
-						<img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Blue">
-					</label>
-					<input id="blue-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-				</div>
-			</fieldset>
-			<fieldset>
-				<legend>Select a wallpaper</legend>
-				<div class="field-row">
-					<input id="wallpaperoption1" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero.jpg" checked>
-					<label for="wallpaperoption1">Wallpaper #1</label>
-				</div>
-				<div class="field-row">
-					<input id="wallpaperoption2" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/Windows7Wallpaper.jpg">
-					<label for="wallpaperoption2">Wallpaper #2</label>
-				</div>
-				<div class="field-row">
-					<input id="wallpaperoption3" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero2.jpg">
-					<label for="wallpaperoption3">Wallpaper #3</label>
-				</div>
-			</fieldset>
-		</div>
-	</div>
+  <div class="window color glass active" id="settingsWindow" style="width: 320px; height: 300px;">
+    <div class="title-bar">
+      <div class="title-bar-text">Website customization</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
+        <button aria-label="Close" onclick="closeWindow(this)"></button>
+      </div>
+    </div>
+    <div class="window-body has-space has-scrollbar" style="width: 295px; height: 250px; overflow: auto">
+      <!-- Combined content section -->
+      <fieldset>
+        <legend>Adjust the sliders to change the color of the window.</legend>
+        <div class="field-row">
+          <label for="red-slider">
+            <img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Red">
+          </label>
+          <input id="red-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+        </div>
+        <div class="field-row">
+          <label for="green-slider">
+            <img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Green">
+          </label>
+          <input id="green-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+        </div>
+        <div class="field-row">
+          <label for="blue-slider">
+            <img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Blue">
+          </label>
+          <input id="blue-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Select a wallpaper</legend>
+        <div class="field-row">
+          <input id="wallpaperoption1" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero.jpg" checked>
+          <label for="wallpaperoption1">Wallpaper #1</label>
+        </div>
+        <div class="field-row">
+          <input id="wallpaperoption2" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/Windows7Wallpaper.jpg">
+          <label for="wallpaperoption2">Wallpaper #2</label>
+        </div>
+        <div class="field-row">
+          <input id="wallpaperoption3" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero2.jpg">
+          <label for="wallpaperoption3">Wallpaper #3</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Select a Favicon</legend>
+        <div class="field-row">
+          <input id="faviconOption1" type="radio" name="faviconSelect" value="content/assets/images/icons/FrutigerAeroRed_px64.ico" checked>
+          <label for="faviconOption1">
+            <img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Favicon #1">
+          </label>
+        </div>
+        <div class="field-row">
+          <input id="faviconOption2" type="radio" name="faviconSelect" value="content/assets/images/icons/FrutigerAeroLime_px64.ico">
+          <label for="faviconOption2">
+            <img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Favicon #2">
+          </label>
+        </div>
+        <div class="field-row">
+          <input id="faviconOption3" type="radio" name="faviconSelect" value="content/assets/images/icons/FrutigerAeroBlue_px64.ico">
+          <label for="faviconOption3">
+            <img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Favicon #3">
+          </label>
+        </div>
+        <div class="field-row">
+          <input id="faviconOption3" type="radio" name="faviconSelect" value="content/assets/images/icons/FrutigerAeroPink_px64.ico">
+          <label for="faviconOption3">
+            <img src="content/assets/images/png/px16/ultcoFrutigerAeroPink_px16.png" alt="Favicon #4">
+          </label>
+        </div>
+        <div class="field-row">
+          <input id="faviconOption3" type="radio" name="faviconSelect" value="content/assets/images/icons/FrutigerAeroPurple_px64.ico">
+          <label for="faviconOption3">
+            <img src="content/assets/images/png/px16/ultcoFrutigerAeroPurple_px16.png" alt="Favicon #5">
+          </label>
+        </div>
+        <div>
+          <div class="field-row">
+            <input id="faviconOption3" type="radio" name="faviconSelect" value="content/assets/images/icons/FrutigerAeroGrey_px64.ico">
+            <label for="faviconOption3">
+              <img src="content/assets/images/png/px16/ultcoFrutigerAeroGrey_px16.png" alt="Favicon #6">
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
 </div>
 <!-- jQuery and jQuery UI for other dynamic behaviors -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
