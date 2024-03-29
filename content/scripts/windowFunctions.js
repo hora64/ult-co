@@ -85,6 +85,7 @@ window.showTabPanel = function(tab) {
             var newWallpaper = $(this).val();
             $('body').css('background-image', 'url(' + newWallpaper + ')');
             localStorage.setItem('selectedWallpaper', newWallpaper);
+            console.log(localStorage.getItem('selectedWallpaper'));
         });
 
         $('[role="tab"]:first').click(); // Activate the first tab
