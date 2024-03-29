@@ -1,5 +1,5 @@
 <div class="background">
-	<div class="window color glass active" id="settingsWindow" style="width: 320px; height: 320px;">
+	<div class="window color glass active has-scrollbar" id="settingsWindow" style="width: 320px; height: 320px; overflow: auto">
 		<div class="title-bar">
 			<div class="title-bar-text">Website Customization</div>
 			<div class="title-bar-controls">
@@ -15,7 +15,7 @@
 					<button role="tab" aria-controls="tab-B" aria-selected="false" onclick="showTabPanel(this)">Tab B</button>
 					<button role="tab" aria-controls="tab-C" disabled>Tab C</button>
 				</menu>
-				<article role="tabpanel" id="colorSettings" class="has-scrollbar" style="width: 300px; height: 150px; overflow: auto">
+				<article role="tabpanel" id="colorSettings">
 					<fieldset>
 						<legend>Adjust the sliders to change the color of the window.</legend>
 						<div class="field-row">
@@ -35,7 +35,7 @@
 						<legend>Select A Wallpaper</legend>
 						<div class="field-row">
 							<input id="wallpaperoption1" type="radio" name="wallpaperselect">
-							<label for="wallpaperoption1">Wallpaper #1/label>
+							<label for="wallpaperoption1">Wallpaper #1</label>
 						</div>
 						<div class="field-row">
 							<input id="wallpaperoption2" type="radio" name="wallpaperselect">
