@@ -81,7 +81,7 @@ function applyColor() {
 	}
 
 	// Wrap updateColorTheme with debounce
-	const debouncedUpdateColorTheme = debounce(updateColorTheme, 250);
+	const debouncedUpdateColorTheme = debounce(updateColorTheme, 100);
 
 	// Setup event listeners for the color sliders
 	document.getElementById('red-slider').addEventListener('input', debouncedUpdateColorTheme);
