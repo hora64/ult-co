@@ -12,8 +12,8 @@
 			<section class="tabs">
 				<menu role="tablist" aria-label="Website Settings">
 					<button role="tab" aria-controls="colorSettings" aria-selected="true" onclick="showTabPanel(this)">Window Color</button>
-					<button role="tab" aria-controls="tab-C" aria-selected="false" onclick="showTabPanel(this)">Tab C</button>
-					<button role="tab" aria-controls="tab-D" disabled>Tab C</button>
+					<button role="tab" aria-controls="tab-B" aria-selected="false" onclick="showTabPanel(this)">Tab B</button>
+					<button role="tab" aria-controls="tab-C" disabled>Tab C</button>
 				</menu>
 				<article role="tabpanel" id="colorSettings" class="has-scrollbar" style="overflow: auto">
 					<fieldset>
@@ -34,22 +34,22 @@
 					<fieldset>
 						<legend>Select A Wallpaper</legend>
 						<div class="field-row">
-							<input id="radio19" type="radio" name="second-example">
-							<label for="radio19">Peanut butter should be smooth</label>
+							<input id="wallpaperoption1" type="radio" name="wallpaperselect">
+							<label for="wallpaperoption1">Wallpaper #1/label>
 						</div>
 						<div class="field-row">
-							<input checked disabled id="radio20" type="radio" name="second-example">
-							<label for="radio20">I understand why people like crunchy peanut butter</label>
+							<input id="wallpaperoption2" type="radio" name="wallpaperselect">
+							<label for="wallpaperoption2">"Wallpaper #2"</label>
 						</div>
 						<div class="field-row">
-							<input disabled id="radio21" type="radio" name="second-example">
-							<label for="radio21">Crunchy peanut butter is good</label>
+							<input id="wallpaperoption3" type="radio" name="wallpaperselect">
+							<label for="wallpaperoption3">"Wallpaper #3"</label>
 						</div>
 					</fieldset>
 				</article>
 				<article role="tabpanel" id="wallpaper"></article>
-				<article role="tabpanel" id="tab-C" hidden>Content for Tab C</article>
-				<article role="tabpanel" id="tab-D" hidden>Tab D is inactive</article>
+				<article role="tabpanel" id="tab-B" hidden>Content for Tab B</article>
+				<article role="tabpanel" id="tab-C" hidden>Tab C is inactive</article>
 			</section>
 		</div>
 	</div>
