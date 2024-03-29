@@ -82,9 +82,9 @@ $(document).ready(function() {
     console.log('Saved Color Settings:', savedColorSettings);
     if(savedColorSettings) {
         var colors = JSON.parse(savedColorSettings);
-        $('#red-slider').val(colors.red).trigger('input');
-        $('#green-slider').val(colors.green).trigger('input');
-        $('#blue-slider').val(colors.blue).trigger('input');
+    document.getElementById('red-slider').value = colors.red;
+    document.getElementById('green-slider').value = colors.green;
+    document.getElementById('blue-slider').value = colors.blue;
         applyColor(); // Apply the loaded color settings
     }
 
