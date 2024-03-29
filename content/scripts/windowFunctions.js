@@ -71,11 +71,11 @@ window.showTabPanel = function(tab) {
         console.log('Saved Color Settings:', savedColorSettings);
         if(savedColorSettings) {
             var colors = JSON.parse(savedColorSettings);
-            $('#red-slider').val(colors.red);
+            $('#red-slider').val(colors.red).trigger('input');
             console.log(`red: ${colors.red} `);
-            $('#green-slider').val(colors.green);
+            $('#green-slider').val(colors.green).trigger('input');
             console.log(`green: ${colors.green} `);
-            $('#blue-slider').val(colors.blue);
+            $('#blue-slider').val(colors.blue).trigger('input');
             console.log(`blue: ${colors.blue} `);
             applyColor(); // Apply the loaded color settings
         }
