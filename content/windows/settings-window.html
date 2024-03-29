@@ -54,21 +54,3 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <!-- Your custom JavaScript file -->
 <script src="content/scripts/windowFunctions.js"></script>
-<script>
-$(document).ready(function() {
-    // Listen for changes to the wallpaper selection
-    $('input[name="wallpaperselect"]').change(function() {
-        var newWallpaper = $(this).val();
-        $('body').css('background-image', 'url(' + newWallpaper + ')');
-        // Save the selected wallpaper to localStorage
-        localStorage.setItem('selectedWallpaper', newWallpaper);
-    });
-
-    // Load the saved wallpaper, if any, when the page loads
-    var savedWallpaper = localStorage.getItem('selectedWallpaper');
-    if(savedWallpaper) {
-        $('body').css('background-image', 'url(' + savedWallpaper + ')');
-        $('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
-    }
-});
-</script>
