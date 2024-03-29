@@ -40,9 +40,9 @@ window.showTabPanel = function(tab) {
 function applyColor() {
     // Wrap updateColorTheme with debounce
     const debouncedUpdateColorTheme = debounce(function() {
-        const red = document.getElementById('red-slider').value,
-            green = document.getElementById('green-slider').value,
-            blue = document.getElementById('blue-slider').value;
+        const red = document.getElementById('window-red-slider').value,
+            green = document.getElementById('window-green-slider').value,
+            blue = document.getElementById('window-blue-slider').value;
 
         // Update the CSS variable
         document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
@@ -53,9 +53,9 @@ function applyColor() {
     }, 100);
 
     // Setup event listeners for the color sliders
-    document.getElementById('red-slider').addEventListener('input', debouncedUpdateColorTheme);
-    document.getElementById('green-slider').addEventListener('input', debouncedUpdateColorTheme);
-    document.getElementById('blue-slider').addEventListener('input', debouncedUpdateColorTheme);
+    document.getElementById('window-red-slider').addEventListener('input', debouncedUpdateColorTheme);
+    document.getElementById('window-green-slider').addEventListener('input', debouncedUpdateColorTheme);
+    document.getElementById('window-blue-slider').addEventListener('input', debouncedUpdateColorTheme);
 }
 
 // Debounce function to limit how often a function can fire
@@ -72,9 +72,9 @@ function loadColorData() {
     const savedColorSettings = localStorage.getItem('colorSettings');
     if (savedColorSettings) {
         const colors = JSON.parse(savedColorSettings);
-        document.getElementById('red-slider').value = colors.red;
-        document.getElementById('green-slider').value = colors.green;
-        document.getElementById('blue-slider').value = colors.blue;
+        document.getElementById('window-red-slider').value = colors.red;
+        document.getElementById('window-green-slider').value = colors.green;
+        document.getElementById('window-blue-slider').value = colors.blue;
         console.log('Loaded Saved Colors:', colors);
         // Apply the loaded color settings immediately without debounce
         document.documentElement.style.setProperty('--title-color', `rgb(${colors.red}, ${colors.green}, ${colors.blue})`);
