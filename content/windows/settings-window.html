@@ -1,7 +1,16 @@
 <div class="background">
+	<style>
+		.field-row label img,
+		.field-row label i {
+			vertical-align: middle;
+			/* Align icons with input elements */
+			margin-right: 8px;
+			/* Space between icon and slider */
+		}
+	</style>
 	<div class="window color glass active" id="settingsWindow" style="width: 320px; height: 320px;">
 		<div class="title-bar">
-			<div class="title-bar-text">Website Customization</div>
+			<div class="title-bar-text">Website customization</div>
 			<div class="title-bar-controls">
 				<button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
 				<button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
