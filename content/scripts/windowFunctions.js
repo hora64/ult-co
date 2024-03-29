@@ -52,6 +52,7 @@ function applyColor() {
 			green,
 			blue
 		}));
+		console.log('Saved Colors:', localStorage.getItem('colorSettings'));
 		console.log('Applied Color Settings:', {
 			red,
 			green,
@@ -66,7 +67,7 @@ function applyColor() {
 		document.getElementById('red-slider').value = colors.red;
 		document.getElementById('green-slider').value = colors.green;
 		document.getElementById('blue-slider').value = colors.blue;
-		console.log('Saved Colors:', colors);
+		console.log('Loaded Saved Colors:', colors);
 		// Apply the loaded color settings immediately
 		updateColorTheme();
 	}
