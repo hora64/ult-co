@@ -37,10 +37,11 @@
     <div id="app-webamp">
         <!-- WebAmp will be loaded here -->
     </div>
-    <div class="background" oncontextmenu="showSettingsMenu(event)" onmouseleave="hideSettingsMenu()">
+    <div class="background">
         <!-- Your background HTML content here -->
+        <div class="css-wallpaper" onclick="showSettingsMenu(event)"></div>
     </div>
-    <div id="settingsMenu" class="settings-menu" style="display: none;">
+    <div id="app-settingsMenu" class="settings-menu" style="display: none;">
         <iframe src="" frameborder="0" width="320" height="320"></iframe>
     </div>
     <div class="ui-sfx">
@@ -63,17 +64,15 @@
             });
         });
 
-        var settingsMenu = document.getElementById('settingsMenu');
+        var settingsMenu = document.getElementById('app-settingsMenu');
 
         function showSettingsMenu(event) {
-            event.preventDefault(); // Prevent default right-click behavior
-
             // Position settings menu at the cursor
             settingsMenu.style.top = event.clientY + 'px';
             settingsMenu.style.left = event.clientX + 'px';
 
             // Load settings menu content
-            $("#settingsMenu iframe").attr("src", "content/windows/settingsMenu.html");
+            $("#app-settingsMenu iframe").attr("src", "content/windows/settingsMenu.html");
 
             settingsMenu.style.display = 'block';
         }
