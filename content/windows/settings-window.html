@@ -1,58 +1,47 @@
 <div class="background">
-	<div class="window color glass active has-scrollbar" id="settingsWindow" style="width: 320px; height: 320px; overflow: auto">
-		<div class="title-bar">
-			<div class="title-bar-text">Website Customization</div>
-			<div class="title-bar-controls">
-				<button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
-				<button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
-				<button aria-label="Close" onclick="closeWindow(this)"></button>
-			</div>
-		</div>
-		<div class="window-body has-space">
-			<section class="tabs">
-				<menu role="tablist" aria-label="Website Settings">
-					<button role="tab" aria-controls="colorSettings" aria-selected="true" onclick="showTabPanel(this)">Window Color</button>
-					<button role="tab" aria-controls="tab-B" aria-selected="false" onclick="showTabPanel(this)">Tab B</button>
-					<button role="tab" aria-controls="tab-C" disabled>Tab C</button>
-				</menu>
-				<article role="tabpanel" id="colorSettings">
-					<fieldset>
-						<legend>Adjust the sliders to change the color of the window.</legend>
-						<div class="field-row">
-							<label for="red-slider">Red</label>
-							<input id="red-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-						</div>
-						<div class="field-row">
-							<label for="green-slider">Green</label>
-							<input id="green-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-						</div>
-						<div class="field-row">
-							<label for="blue-slider">Blue</label>
-							<input id="blue-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-						</div>
-					</fieldset>
-					<fieldset>
-						<legend>Select a wallpaper</legend>
-						<div class="field-row">
-							<input id="wallpaperoption1" type="radio" name="wallpaperselect">
-							<label for="wallpaperoption1">Wallpaper #1</label>
-						</div>
-						<div class="field-row">
-							<input id="wallpaperoption2" type="radio" name="wallpaperselect">
-							<label for="wallpaperoption2">Wallpaper #2</label>
-						</div>
-						<div class="field-row">
-							<input id="wallpaperoption3" type="radio" name="wallpaperselect">
-							<label for="wallpaperoption3">Wallpaper #3</label>
-						</div>
-					</fieldset>
-				</article>
-				<article role="tabpanel" id="wallpaper"></article>
-				<article role="tabpanel" id="tab-B" hidden>Content for Tab B</article>
-				<article role="tabpanel" id="tab-C" hidden>Tab C is inactive</article>
-			</section>
-		</div>
-	</div>
+    <div class="window color glass active has-scrollbar" id="settingsWindow" style="width: 320px; height: 320px; overflow: auto">
+        <div class="title-bar">
+            <div class="title-bar-text">Website Customization</div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
+                <button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
+                <button aria-label="Close" onclick="closeWindow(this)"></button>
+            </div>
+        </div>
+        <div class="window-body has-space">
+            <!-- Combined content section -->
+            <fieldset>
+                <legend>Adjust the sliders to change the color of the window.</legend>
+                <div class="field-row">
+                    <label for="red-slider">Red</label>
+                    <input id="red-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+                </div>
+                <div class="field-row">
+                    <label for="green-slider">Green</label>
+                    <input id="green-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+                </div>
+                <div class="field-row">
+                    <label for="blue-slider">Blue</label>
+                    <input id="blue-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Select a wallpaper</legend>
+                <div class="field-row">
+                    <input id="wallpaperoption1" type="radio" name="wallpaperselect">
+                    <label for="wallpaperoption1">Wallpaper #1</label>
+                </div>
+                <div class="field-row">
+                    <input id="wallpaperoption2" type="radio" name="wallpaperselect">
+                    <label for="wallpaperoption2">Wallpaper #2</label>
+                </div>
+                <div class="field-row">
+                    <input id="wallpaperoption3" type="radio" name="wallpaperselect">
+                    <label for="wallpaperoption3">Wallpaper #3</label>
+                </div>
+            </fieldset>
+        </div>
+    </div>
 </div>
 <!-- jQuery and jQuery UI for other dynamic behaviors -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
