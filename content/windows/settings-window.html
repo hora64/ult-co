@@ -34,7 +34,7 @@
 			<fieldset>
 				<legend>Select a wallpaper</legend>
 				<div class="field-row">
-					<input id="wallpaperoption1" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero.jpg">
+					<input id="wallpaperoption1" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero.jpg" checked>
 					<label for="wallpaperoption1">Wallpaper #1</label>
 				</div>
 				<div class="field-row">
@@ -55,11 +55,16 @@
 <!-- Your custom JavaScript file -->
 <script src="content/scripts/windowFunctions.js"></script>
 <script>
-	$(document).ready(function() {
-		// Listen for any changes to the wallpaper selection
-		$('input[name="wallpaperselect"]').change(function() {
-			var newWallpaper = $(this).val(); // Get the value of the selected option
-			$('body').css('background-image', 'url(' + newWallpaper + ')'); // Update the background image
-		});
-	});
+    $(document).ready(function() {
+        $('input[name="wallpaperselect"]').change(function() {
+            var newWallpaper = $(this).val();
+            $('body').css('background-image', 'url(' + newWallpaper + ')');
+        });
+
+        // Initialize with the selected wallpaper on page load
+        var initialWallpaper = $('input[name="wallpaperselect"]:checked').val();
+        $('body').css('background-image', 'url(' + initialWallpaper + ')');
+    });
+
+    // Function to dynamically apply color based on slider values
 </script>
