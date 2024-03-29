@@ -35,19 +35,15 @@ window.showTabPanel = function(tab) {
     });
     tab.setAttribute('aria-selected', 'true');
 };
-// Standalone function to apply the color from sliders and save to localStorage
-// Standalone function to apply the color from sliders and save to localStorage
+
+// Function to apply the color from sliders and save to localStorage
 function applyColor() {
     // Debounce function to limit how often a given function can fire
     function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
             clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
+            timeout = setTimeout(() => func(...args), wait);
         };
     }
 
@@ -56,21 +52,18 @@ function applyColor() {
         var red = document.getElementById('red-slider').value,
             green = document.getElementById('green-slider').value,
             blue = document.getElementById('blue-slider').value;
-        // Update the CSS variable
         document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
-        // Save the color settings to localStorage
         localStorage.setItem('colorSettings', JSON.stringify({red, green, blue}));
         console.log(localStorage.getItem('colorSettings'));
-    }, 250); // 250 milliseconds debounce time
+    }, 250);
 
-    // Setup event listeners for the color sliders
     document.getElementById('red-slider').addEventListener('input', updateColorThemeDebounced);
     document.getElementById('green-slider').addEventListener('input', updateColorThemeDebounced);
     document.getElementById('blue-slider').addEventListener('input', updateColorThemeDebounced);
 }
 
-$(document).ready(function() {
-    // Load and apply saved wallpaper and color settings
+// Function to apply the wallpaper
+function applyWallpaper() {
     var savedWallpaper = localStorage.getItem('selectedWallpaper');
     console.log('Saved Wallpaper:', savedWallpaper);
     if(savedWallpaper) {
@@ -78,32 +71,26 @@ $(document).ready(function() {
         $('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
     }
 
-    var savedColorSettings = localStorage.getItem('colorSettings');
-    console.log('Saved Color Settings:', savedColorSettings);
-    if(savedColorSettings) {
-        var colors = JSON.parse(savedColorSettings);
-    document.getElementById('red-slider').value = colors.red;
-    document.getElementById('green-slider').value = colors.green;
-    document.getElementById('blue-slider').value = colors.blue;
-        applyColor(); // Apply the loaded color settings
-    }
-
-    // Save the selected wallpaper to localStorage on change
     $('input[name="wallpaperselect"]').change(function() {
         var newWallpaper = $(this).val();
         $('body').css('background-image', 'url(' + newWallpaper + ')');
         localStorage.setItem('selectedWallpaper', newWallpaper);
-        console.log(localStorage.getItem('selectedWallpaper'));
+        console.log('New Wallpaper Set:', newWallpaper);
     });
+}
+
+$(document).ready(function() {
+    applyWallpaper(); // Apply the saved or default wallpaper
+    applyColor(); // Apply the saved or default color theme
 
     // Activate the first tab
     $('[role="tab"]:first').click();
 });
+
 $(function() {
     // Make the window draggable
     $(".window.glass.active").draggable({
         handle: ".title-bar",
-        containment: 'window' // Restrict dragging to within the viewport
+        containment: 'window'
     });
 });
-
