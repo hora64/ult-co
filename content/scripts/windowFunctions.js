@@ -98,6 +98,30 @@ function applyWallpaper() {
     });
 }
 
+// Function to toggle mouse click effect settings
+function toggleClickEffectSettings() {
+    var clickEffectOptions = document.getElementById('click-effect-options');
+    var enableClickEffectCheckbox = document.getElementById('enable-click-effect');
+
+    if (enableClickEffectCheckbox.checked) {
+        clickEffectOptions.style.display = 'block';
+    } else {
+        clickEffectOptions.style.display = 'none';
+    }
+}
+
+// Function to toggle mouse trail effect settings
+function toggleMouseTrailSettings() {
+    var mouseTrailOptions = document.getElementById('mouse-trail-options');
+    var enableMouseTrailCheckbox = document.getElementById('enable-mouse-trail');
+
+    if (enableMouseTrailCheckbox.checked) {
+        mouseTrailOptions.style.display = 'block';
+    } else {
+        mouseTrailOptions.style.display = 'none';
+    }
+}
+
 $(document).ready(function() {
     loadColorData(); // Load and apply saved color settings on startup
     applyColor(); // Initialize color slider functionality
