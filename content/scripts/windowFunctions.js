@@ -60,12 +60,14 @@ window.showTabPanel = function(tab) {
     // Load and apply saved wallpaper and color settings on document ready
     $(document).ready(function() {
         var savedWallpaper = localStorage.getItem('selectedWallpaper');
+        console.log('Saved Wallpaper:', savedWallpaper);
         if(savedWallpaper) {
             $('body').css('background-image', 'url(' + savedWallpaper + ')');
             $('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
         }
 
         var savedColorSettings = localStorage.getItem('colorSettings');
+        console.log('Saved Color Settings:', savedColorSettings);
         if(savedColorSettings) {
             var colors = JSON.parse(savedColorSettings);
             $('#red-slider').val(colors.red);
