@@ -71,8 +71,11 @@ window.showTabPanel = function(tab) {
         if(savedColorSettings) {
             var colors = JSON.parse(savedColorSettings);
             $('#red-slider').val(colors.red);
+            console.log(`red: ${colors.red} `);
             $('#green-slider').val(colors.green);
+            console.log(`green: ${colors.green} `);
             $('#blue-slider').val(colors.blue);
+            console.log(`blue: ${colors.blue} `);
             applyColor(); // Apply the loaded color settings
         }
 
