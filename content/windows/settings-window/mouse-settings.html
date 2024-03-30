@@ -4,7 +4,7 @@
     <legend>Mouse click settings</legend>
     <!-- Icon size, rotation, etc. -->
     <div class="field-row">
-      <input id="enable-click-effect" type="checkbox" onclick="toggleSettings('enable-click-effect', 'click-effect-options')" checked>
+      <input id="enable-click-effect" type="checkbox" onclick="toggleContainer('enable-click-effect', 'click-effect-options')" checked>
       <label for="enable-click-effect">Enable mouse click</label>
     </div>
     <div class="field-row" id="click-effect-options" style="display: block;">
@@ -94,7 +94,7 @@
   <fieldset>
     <legend>Mouse trail settings</legend>
     <div class="field-row">
-      <input id="enable-mouse-trail" type="checkbox" onclick="toggleSettings('enable-mouse-trail', 'mouse-trail-options')" checked>
+      <input id="enable-mouse-trail" type="checkbox" onclick="toggleContainer('enable-mouse-trail', 'mouse-trail-options')" checked>
       <label for="enable-mouse-trail">Enable mouse trail</label>
     </div>
     <div class="field-row" id="mouse-trail-options" style="display: block;">
@@ -105,29 +105,12 @@
           <label for="randomColor">Random color</label>
         </div>
         <div class="field-row">
-          <input id="rgbColor" type="radio" name="mouseTrailColorSelect" value="RGB" onclick="toggleRgbSliders()">
+          <input id="rgbColor" type="radio" name="mouseTrailColorSelect" value="RGB" onclick="toggleContainer('rgbColor', 'color-picker-container')">
           <label for="rgbColor">RGB</label>
         </div>
-        <!-- Individual sliders for RGB -->
-        <div class="rgb-sliders" style="display: none;">
-          <div class="field-row">
-            <label for="mousetrail-red-slider">
-              <img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Red">
-            </label>
-            <input id="mousetrail-red-slider" type="range" min="0" max="255" value="125">
-          </div>
-          <div class="field-row">
-            <label for="mousetrail-green-slider">
-              <img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Green">
-            </label>
-            <input id="mousetrail-green-slider" type="range" min="0" max="255" value="125">
-          </div>
-          <div class="field-row">
-            <label for="mousetrail-blue-slider">
-              <img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Blue">
-            </label>
-            <input id="mousetrail-blue-slider" type="range" min="0" max="255" value="125">
-          </div>
+        <!-- Color Picker -->
+        <div id="color-picker-container" class="rgb-sliders" style="display: none;">
+          <input type="color" id="window-color-picker" oninput="handleColorChange(this.value)">
         </div>
       </fieldset>
       <fieldset>
