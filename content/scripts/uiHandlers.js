@@ -1,87 +1,61 @@
+// Assuming jQuery is available
 $(document).ready(function() {
-    const fileName = getCurrentFileName();
-
-    const colors = loadColorSettings(fileName);
+    const colors = loadColorSettings();
     if (colors) {
-        applyColor(fileName, colors);
-        applyWallpaper(fileName);
-        applyFavicon(fileName);
+        // Apply loaded color settings
+        document.documentElement.style.setProperty('--title-color', `rgb(${colors.red}, ${colors.green}, ${colors.blue})`);
+        // Update slider positions
+        $('#window-red-slider').val(colors.red);
+        $('#window-green-slider').val(colors.green);
+        $('#window-blue-slider').val(colors.blue);
     }
 
-    // Custom event listeners for color change
-    $(document).on('colorChange', function(event, data) {
-        const { red, green, blue } = data;
-        document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
-        saveColorSettings(red, green, blue);
-    });
-
-    // Custom event listeners for wallpaper change
-    $(document).on('wallpaperChange', function(event, data) {
-        $('body').css('background-image', `url(${data})`);
-        saveSelectedWallpaper(data);
-    });
-
-    // Custom event listeners for favicon change
-    $(document).on('faviconChange', function(event, data) {
-        $('#dynamicFavicon').attr('href', data);
-        saveSelectedFavicon(data);
-    });
+    applyColor(); // Set up color change handling
+    applyWallpaper(); // Set up wallpaper application
+    applyFavicon(); // Set up favicon application
 });
 
-function applyColor(fileName, colors) {
-    const redSlider = $(fileName).find('#window-red-slider');
-    const greenSlider = $(fileName).find('#window-green-slider');
-    const blueSlider = $(fileName).find('#window-blue-slider');
+function applyColor() {
+    // Setup event listeners for color change
+    $('#window-red-slider, #window-green-slider, #window-blue-slider').on('input', function() {
+        // Debounced update color theme
+        clearTimeout(window.colorDebounce);
+        window.colorDebounce = setTimeout(function() {
+            const red = $('#window-red-slider').val(),
+                green = $('#window-green-slider').val(),
+                blue = $('#window-blue-slider').val();
+            document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
+            saveColorSettings(red, green, blue);
+        }, 100);
+    });
+}
 
-    if (colors) {
-        redSlider.val(colors.red);
-        greenSlider.val(colors.green);
-        blueSlider.val(colors.blue);
+function applyWallpaper() {
+    const savedWallpaper = getSavedWallpaper();
+    if (savedWallpaper) {
+        $('body').css('background-image', `url(${savedWallpaper})`);
+        $('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
     }
 
-    redSlider.on('input', function() {
-        updateColor(fileName);
-    });
-
-    greenSlider.on('input', function() {
-        updateColor(fileName);
-    });
-
-    blueSlider.on('input', function() {
-        updateColor(fileName);
-    });
-
-    // Initial color setting
-    updateColor(fileName);
-}
-
-function updateColor(fileName) {
-    const red = $(fileName).find('#window-red-slider').val();
-    const green = $(fileName).find('#window-green-slider').val();
-    const blue = $(fileName).find('#window-blue-slider').val();
-    $(document).trigger('colorChange', { red, green, blue });
-}
-
-function applyWallpaper(fileName) {
-    $(fileName).find('input[name="wallpaperselect"]').change(function() {
+    $('input[name="wallpaperselect"]').change(function() {
         const newWallpaper = $(this).val();
-        $(document).trigger('wallpaperChange', newWallpaper);
+        $('body').css('background-image', `url(${newWallpaper})`);
+        saveSelectedWallpaper(newWallpaper);
     });
 }
 
-function applyFavicon(fileName) {
-    $(fileName).find('input[name="faviconSelect"]').change(function() {
+function applyFavicon() {
+    const savedFavicon = getSavedFavicon();
+    if (savedFavicon) {
+        $('#dynamicFavicon').attr('href', savedFavicon);
+        $('input[name="faviconSelect"][value="' + savedFavicon + '"]').prop('checked', true);
+    }
+
+    $('input[name="faviconSelect"]').change(function() {
         if ($(this).is(':checked')) {
             const newFavicon = $(this).val();
-            $(document).trigger('faviconChange', newFavicon);
+            $('#dynamicFavicon').attr('href', newFavicon);
+            saveSelectedFavicon(newFavicon);
         }
     });
-}
-
-function getCurrentFileName() {
-    // Get the current URL
-    const url = window.location.href;
-    // Extract the filename from the URL
-    const fileName = url.substring(url.lastIndexOf('/') + 1);
-    return fileName;
 }
