@@ -31,21 +31,26 @@
 <script src="content/scripts/settingsManager.js"></script>
 <script>
 $(document).ready(function() {
-    // Load the default tab content from the specified directory
-    $("#window-color-settings-content").load("content/windows/settings-window/window-color-settings.html");
-
-    // Event listeners for tab buttons, with updated paths
+    // Event listeners for tab buttons
     $("#tab-btn-window-color").click(function() {
-        $("#window-color-settings-content").load("content/windows/settings-window/window-color-settings.html");
+        unloadTabContent(".tab-content"); // Unload content of all tabs
+        loadTabContent("#window-color-settings-content", "content/windows/settings-window/window-color-settings.html");
     });
+
     $("#tab-btn-image-icon").click(function() {
-        $("#image-icon-settings-content").load("content/windows/settings-window/image-icon-settings.html");
+        unloadTabContent(".tab-content"); // Unload content of all tabs
+        loadTabContent("#image-icon-settings-content", "content/windows/settings-window/image-icon-settings.html");
     });
+
     $("#tab-btn-mouse").click(function() {
-        $("#mouse-settings-content").load("content/windows/settings-window/mouse-settings.html");
+        unloadTabContent(".tab-content"); // Unload content of all tabs
+        loadTabContent("#mouse-settings-content", "content/windows/settings-window/mouse-settings.html");
     });
+
     $("#tab-btn-sound").click(function() {
-        $("#sound-settings-content").load("content/windows/settings-window/sound-settings.html");
+        unloadTabContent(".tab-content"); // Unload content of all tabs
+        loadTabContent("#sound-settings-content", "content/windows/settings-window/sound-settings.html");
     });
 });
+
 </script>
