@@ -3,7 +3,7 @@ $(document).ready(function() {
     const hexColor = loadColorSettings() || '#7d7d7d'; // Default color if no saved settings
     document.documentElement.style.setProperty('--title-color', hexColor);
     $('#window-color-picker').val(hexColor);
-
+    document.getElementById('window-color-picker').value(hexColor);
     applyColor(); // Set up color change handling
     applyWallpaper(); // Apply saved wallpaper or default
     applyFavicon(); // Apply saved favicon or default
