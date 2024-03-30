@@ -23,8 +23,8 @@ $(document).ready(function() {
 	setTimeout(playStartupSound, 3000); // 3000 milliseconds = 3 seconds
 });
 
-const colorCooldown = cooldown(1000); // Set cooldown duration to 1000ms (1 second)
-const volumeCooldown = cooldown(1000);
+const colorCooldown = cooldown(200); // Set cooldown duration to 1000ms (1 second)
+const volumeCooldown = cooldown(200);
 
 function applyColor(hexColor, useCooldown = true) {
     if (!colorCooldown(useCooldown)) return;
