@@ -54,3 +54,27 @@
         </div>
     </fieldset>
 </article>
+<script>
+    // Function to set initial values based on local storage
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve saved wallpaper selection from local storage
+        const savedWallpaper = loadFromLocalStorage('selectedWallpaper');
+        if (savedWallpaper) {
+            // Set the checked attribute for the corresponding radio button
+            const radioInput = document.querySelector(`input[value="${savedWallpaper}"][name="wallpaperselect"]`);
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        }
+
+        // Retrieve saved favicon selection from local storage
+        const savedFavicon = loadFromLocalStorage('selectedFavicon');
+        if (savedFavicon) {
+            // Set the checked attribute for the corresponding radio button
+            const radioInput = document.querySelector(`input[value="${savedFavicon}"][name="faviconSelect"]`);
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        }
+    });
+</script>
