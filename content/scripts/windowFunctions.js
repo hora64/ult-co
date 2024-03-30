@@ -75,7 +75,7 @@ function switchTab(tabId, tabPath) {
 // jQuery for draggable and resizable behaviors on "#app-settings"
 $(function() {
 	// Draggable and resizable initialization for "#app-settings"
-	$("#app-settings").draggable({
+	$(".window.glass.active").draggable({
 		cancel: '.inhalt', // Selector for elements that should not initiate drag
 		containment: 'body', // Constrain dragging within the body
 		scroll: false // Disable window scroll during drag
