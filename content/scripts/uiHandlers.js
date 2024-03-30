@@ -29,15 +29,37 @@ $(document).ready(function() {
 });
 
 function applyColor(fileName, colors) {
-    $(fileName).find('#window-red-slider, #window-green-slider, #window-blue-slider').on('input', function() {
-        clearTimeout(window.colorDebounce);
-        window.colorDebounce = setTimeout(function() {
-            const red = $(fileName).find('#window-red-slider').val(),
-                green = $(fileName).find('#window-green-slider').val(),
-                blue = $(fileName).find('#window-blue-slider').val();
-            $(document).trigger('colorChange', { red, green, blue });
-        }, 100);
+    const redSlider = $(fileName).find('#window-red-slider');
+    const greenSlider = $(fileName).find('#window-green-slider');
+    const blueSlider = $(fileName).find('#window-blue-slider');
+
+    if (colors) {
+        redSlider.val(colors.red);
+        greenSlider.val(colors.green);
+        blueSlider.val(colors.blue);
+    }
+
+    redSlider.on('input', function() {
+        updateColor(fileName);
     });
+
+    greenSlider.on('input', function() {
+        updateColor(fileName);
+    });
+
+    blueSlider.on('input', function() {
+        updateColor(fileName);
+    });
+
+    // Initial color setting
+    updateColor(fileName);
+}
+
+function updateColor(fileName) {
+    const red = $(fileName).find('#window-red-slider').val();
+    const green = $(fileName).find('#window-green-slider').val();
+    const blue = $(fileName).find('#window-blue-slider').val();
+    $(document).trigger('colorChange', { red, green, blue });
 }
 
 function applyWallpaper(fileName) {
