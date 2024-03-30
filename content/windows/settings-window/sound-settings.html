@@ -1,1 +1,21 @@
+<article role="tabpanel" id="sound-settings">
+    <fieldset>
+        <legend>Select a startup sound</legend>
+        <div class="field-row">
+            <input id="startupOption1" type="radio" name="startupSoundSelect" value="content/assets/audio/7startup.mp3" onclick="applyStartupSound(this.value)" checked>
+            <label for="startupOption1">Windows 7</label>
+        </div>
+        <div class="field-row">
+            <input id="startupOption2" type="radio" name="startupSoundSelect" value="content/assets/audio/longhornStartup.mp3" onclick="applyStartupSound(this.value)">
+            <label for="startupOption2">Longhorn</label>
+        </div>
+        <!-- Add more options as needed -->
+    </fieldset>
 
+    <!-- Volume Control Slider -->
+    <fieldset>
+        <legend>Volume Control</legend>
+        <input type="range" id="volumeControl" name="volume" min="0" max="1" step="0.01" value="0.2" oninput="applyStartupVolume(this.value)">
+        <label for="volumeControl">Adjust Volume</label>
+    </fieldset>
+</article>
