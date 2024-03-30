@@ -1,6 +1,6 @@
 <article role="tabpanel" id="window-color-settings">
-    <fieldset>
-        <legend>Adjust the sliders to change the color of the window.</legend>
-        <input type="color" id="window-color-picker" oninput="applyColor(this.value)">
-    </fieldset>
+  <fieldset>
+    <legend>Adjust the sliders to change the color of the window.</legend> 
+    <input type="color" id="window-color-picker" oninput="applyColor(this.value)" onmouseup="applyColor(this.value,false)">
+  </fieldset>
 </article>
