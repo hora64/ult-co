@@ -4,3 +4,17 @@
     <input type="color" id="window-color-picker" oninput="applyColor(this.value)" onmouseup="applyColor(this.value,false)">
   </fieldset>
 </article>
+<script>
+    // Function to set initial values based on local storage
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve saved window color from local storage
+        const savedColor = loadFromLocalStorage('colorSettings');
+        if (savedColor) {
+            // Set the value of the window color picker
+            const windowColorPicker = document.getElementById('window-color-picker');
+            if (windowColorPicker) {
+                windowColorPicker.value = savedColor;
+            }
+        }
+    });
+</script>
