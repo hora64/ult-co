@@ -32,7 +32,7 @@ function cooldown(cooldownDuration) {
     return function(useCooldown) {
         const timeElapsed = Date.now() - lastCalled;
         if (useCooldown && timeElapsed < cooldownDuration) {
-            console.log(`Color function is cooling down. Please wait ${timeElapsed}ms`);
+            console.log(`Function is on cooldown. Please wait ${timeElapsed}ms`);
             return false;
         }
         return !(lastCalled = Date.now(), false);
