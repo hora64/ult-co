@@ -5,16 +5,10 @@
   </fieldset>
 </article>
 <script>
-    // Function to set initial values based on local storage
     document.addEventListener('DOMContentLoaded', function() {
-        // Retrieve saved window color from local storage
-        const savedColor = loadFromLocalStorage('colorSettings');
-        if (savedColor) {
-            // Set the value of the window color picker
-            const windowColorPicker = document.getElementById('window-color-picker');
-            if (windowColorPicker) {
-                windowColorPicker.value = savedColor;
-            }
-        }
+        const savedColor = loadFromLocalStorage('colorSettings') || '#7d7d7d'; // Use the saved color if available, otherwise use default
+        document.getElementById('window-color-picker').value = savedColor;
+        if (!loadFromLocalStorage('colorSettings')) saveToLocalStorage('colorSettings', savedColor); // Save the default color if not saved already
     });
 </script>
+
