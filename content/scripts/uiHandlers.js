@@ -11,14 +11,10 @@ $(document).ready(function() {
 
 
 function applyColor() {
-    const debouncedApplyColor = debounce(function(hexColor) {
-        document.documentElement.style.setProperty('--title-color', hexColor);
-        saveColorSettings(hexColor); // Save the hex value after delay
-        console.log('Color applied:', hexColor); // Optional: log for demonstration
-    }, 250); // Delay in milliseconds
-
     $('#window-color-picker').on('input', function() {
-        debouncedApplyColor($(this).val());
+        const hexColor = $(this).val();
+        document.documentElement.style.setProperty('--title-color', hexColor);
+        saveColorSettings(hexColor); // Directly save the hex value
     });
 }
 
