@@ -13,9 +13,6 @@ $(document).ready(function() {
 });
 
 function applyColor(hexColor) {
-    document.documentElement.style.setProperty('--title-color', hexColor);
-    $('#window-color-picker').val(hexColor);
-
     // Adjusted debounce function to handle color changes
     $('#window-color-picker').on('input', debounce(function() {
         const newColor = $(this).val();
@@ -38,11 +35,13 @@ function applyFavicon(selectedFavicon) {
 // Assuming the debounce function is defined elsewhere in your script as provided
 
 
-function debounce(func, wait) {
+function debounce(func, delay) {
     let timeout;
     return function(...args) {
         const context = this;
         clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), wait);
+        timeout = setTimeout(() => {
+            func.apply(context, args);
+        }, delay);
     };
 }
