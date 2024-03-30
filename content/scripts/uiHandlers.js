@@ -1,6 +1,4 @@
-
 $(document).ready(function() {
-    // Initial settings load without cooldown
     const hexColor = loadFromLocalStorage('colorSettings') || '#7d7d7d';
     applyColor(hexColor, false);
     
@@ -11,21 +9,24 @@ $(document).ready(function() {
     applyFavicon(savedFavicon);
 });
 
-let lastCalled = 0;
 function applyColor(hexColor, useCooldown = true) {
-    const now = Date.now();
-    // Check if we should apply cooldown and if it's within the cooldown period
-    if (useCooldown && (now - lastCalled < 200)) {
-        console.log(`Color function is cooling down. Please wait ${now - lastCalled}ms`);
-        return;
-    }
-    lastCalled = now; // Update the last called timestamp if cooldown is used
+    if (checkCooldown(useCooldown)) return;
 
-    // Apply the color change
     document.documentElement.style.setProperty('--title-color', hexColor);
     saveToLocalStorage('colorSettings', hexColor);
     console.log('Color applied:', hexColor);
 }
+
+function checkCooldown(useCooldown) {
+    const now = Date.now();
+    if (useCooldown && (now - lastCalled < 200)) {
+        console.log(`Color function is cooling down. Please wait ${now - lastCalled}ms`);
+        return true;
+    }
+    lastCalled = now;
+    return false;
+}
+
 function applyWallpaper(selectedWallpaper) {
     $('body').css('background-image', `url(${selectedWallpaper})`);
     saveToLocalStorage('selectedWallpaper', selectedWallpaper);
@@ -36,7 +37,6 @@ function applyFavicon(selectedFavicon) {
     saveToLocalStorage('selectedFavicon', selectedFavicon);
 }
 
-// Debounce function remains unchanged
 function debounce(func, delay) {
     let timeout;
     return function(...args) {
