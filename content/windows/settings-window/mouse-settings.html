@@ -97,7 +97,8 @@
 							<input id="enable-mouse-trail" type="checkbox" onclick="toggleMouseTrailSettings()" checked>
 							<label for="enable-mouse-trail">Enable mouse trail</label>
 						</div>
-						<fieldset>
+						<div class="field-row" id="mouse-trail-options" style="display: block;">
+						    <fieldset>
 							<legend>Color</legend>
 							<div class="field-row">
 								<input id="randomColor" type="radio" name="mouseTrailColorSelect" value="random" checked>
@@ -129,13 +130,14 @@
 								</div>
 							</div>
 						</fieldset>
-						<fieldset>
+						    <fieldset>
 							<legend>Sparkles</legend>
 							<div class="field-row">
 								<label for="trail-sparkles">Sparkles:</label>
 								<input id="trail-sparkles" type="number" value="50" min="0" max="360" onchange=>
 							</div>
 						</fieldset>
+					    </div>
 					</fieldset>
 					<!-- Mouse Cursor settings -->
 					<fieldset>
