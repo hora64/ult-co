@@ -9,12 +9,24 @@ $(document).ready(function() {
 });
 
 function applyColor() {
-    $('#window-color-picker').on('input', function() {
-        const hexColor = $(this).val();
+    // Load initial color setting or use default, and apply it
+    const hexColor = loadColorSettings() || '#7d7d7d';
+    document.documentElement.style.setProperty('--title-color', hexColor);
+    $('#window-color-picker').val(hexColor);
+
+    // Debounced function to handle color changes
+    const handleColorChange = debounce(function(hexColor) {
         document.documentElement.style.setProperty('--title-color', hexColor);
-        saveColorSettings(hexColor); // Directly save the hex value
+        saveColorSettings(hexColor);
+        console.log('Color applied:', hexColor);
+    }, 250);
+
+    // Set up the event listener for color changes
+    $('#window-color-picker').on('input', function() {
+        handleColorChange($(this).val());
     });
 }
+
 
 
 
