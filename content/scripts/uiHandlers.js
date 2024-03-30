@@ -10,6 +10,8 @@ $(document).ready(function() {
     }
 
     applyColor(); // Set up color change handling
+    applyWallpaper(); // Assuming function setup remains the same
+    applyFavicon(); // Assuming function setup remains the same
     // Assuming functions applyWallpaper() and applyFavicon() remain unchanged
 });
 
