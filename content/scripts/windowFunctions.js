@@ -1,74 +1,81 @@
 // Vanilla JS window control functions for basic window manipulation
 function minimizeWindow(button) {
-    const window = button.closest('.window');
-    const windowBody = window.querySelector('.window-body');
-    windowBody.style.display = windowBody.style.display === 'none' ? 'block' : 'none';
+	const window = button.closest('.window');
+	const windowBody = window.querySelector('.window-body');
+	windowBody.style.display = windowBody.style.display === 'none' ? 'block' : 'none';
+	// Ensure maximizing state is toggled off for visual consistency
+	window.classList.remove('maximized');
 }
 
 function maximizeWindow(button) {
-    const window = button.closest('.window');
-    window.classList.toggle('maximized');
+	const window = button.closest('.window');
+	if (window.classList.contains('maximized')) {
+		window.classList.remove('maximized');
+		window.style.removeProperty('max-width');
+		window.style.removeProperty('height');
+	} else {
+		window.classList.add('maximized');
+		window.style.maxWidth = '100%';
+		window.style.height = '100%';
+	}
+	// Ensure minimizing state is toggled off if window is maximized
+	window.classList.remove('minimized');
 }
 
 function closeWindow(button) {
-    const window = button.closest('.window');
-    window.remove();
+	const window = button.closest('.window');
+	window.remove(); // Simply remove the window element
 }
 
-// Toggle display based on checkbox or button click
 function toggleContainer(controlElementId, containerElementId) {
-    const controlElement = document.getElementById(controlElementId);
-    const containerElement = document.getElementById(containerElementId);
-    if (containerElement && controlElement) {
-        containerElement.style.display = controlElement.checked ? 'block' : 'none';
-    } else {
-        console.error('Element not found:', controlElementId, containerElementId);
-    }
+	const controlElement = document.getElementById(controlElementId);
+	const containerElement = document.getElementById(containerElementId);
+	if (containerElement && controlElement) {
+		containerElement.style.display = controlElement.checked ? 'block' : 'none';
+	} else {
+		console.error('Element not found:', controlElementId, containerElementId);
+	}
 }
 
-// Disable a container by its ID
 function disableContainer(containerElementId) {
-    const containerElement = document.getElementById(containerElementId);
-    if (containerElement) {
-        containerElement.style.display = 'none';
-    } else {
-        console.error('Element not found:', containerElementId);
-    }
+	const containerElement = document.getElementById(containerElementId);
+	if (containerElement) {
+		containerElement.style.display = 'none';
+	} else {
+		console.error('Element not found:', containerElementId);
+	}
 }
 
 // Function to switch tabs and display corresponding content, defined globally for accessibility
 function switchTab(tabId) {
-    const $tabPanels = $('article[role="tabpanel"]');
-    const $tabs = $('menu[role="tablist"] button');
+	const $tabPanels = $('article[role="tabpanel"]');
+	const $tabs = $('menu[role="tablist"] button');
 
-    $tabPanels.hide().attr('hidden', true);
-    $('#' + tabId).show().removeAttr('hidden');
-    $tabs.attr('aria-selected', 'false');
-    $(`[aria-controls="${tabId}"]`).attr('aria-selected', 'true');
+	$tabPanels.hide().attr('hidden', true);
+	$('#' + tabId).show().removeAttr('hidden');
+	$tabs.attr('aria-selected', 'false');
+	$(`[aria-controls="${tabId}"]`).attr('aria-selected', 'true');
 }
 
-$(document).ready(function() {
-    // Initial tab setup
-    const firstTabId = $('[role="tab"]:first').attr('aria-controls');
-    switchTab(firstTabId);
+// jQuery for draggable and resizable behaviors on "#app-settings"
+$(function() {
+	// Draggable and resizable initialization for "#app-settings"
+	$("#app-settings").draggable({
+		cancel: '.inhalt', // Selector for elements that should not initiate drag
+		containment: 'body', // Constrain dragging within the body
+		scroll: false // Disable window scroll during drag
+	}).resizable({
+		handles: 'n, e, s, w, ne, se, sw, nw', // Enable resizing from all sides and corners
+		containment: 'body', // Constrain resizing within the body
+		minHeight: 80, // Minimum height
+		minWidth: 138, // Minimum width
+		maxHeight: $(window).height(), // Maximum height
+		maxWidth: $(window).width() // Maximum width
+	});
 
-    // Event delegation for tab switching to accommodate dynamic content
-    $('menu[role="tablist"]').on('click', 'button', function() {
-        switchTab($(this).attr('aria-controls'));
-    });
-
-    // Enhance the app settings window with draggable and resizable features
-    $("#app-settings").draggable({
-        handle: ".title-bar",
-        containment: 'window'
-    }).resizable({
-        handles: "n, e, s, w, ne, se, sw, nw",
-        minHeight: 200,
-        minWidth: 200
-    });
-
-    // Optimize radio buttons event handling for changing mouse trail color
-    $('input[name="mouseTrailColorSelect"]').on('change', function() {
-        // Implement the RGB sliders toggle functionality here
-    });
+	// Dynamically update maximum size on window resize
+	$(window).resize(function() {
+		$("#app-settings").resizable("option", "maxHeight", $(window).height());
+		$("#app-settings").resizable("option", "maxWidth", $(window).width());
+	});
 });
