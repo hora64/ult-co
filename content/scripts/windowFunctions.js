@@ -92,65 +92,69 @@ function applyWallpaper() {
 		console.log('New Wallpaper Set:', newWallpaper);
 	});
 }
-function applyFavicon() {
-    // Load and apply the saved favicon from local storage
-    var savedFavicon = localStorage.getItem('selectedFavicon');
-    if (savedFavicon) {
-        $('#dynamicFavicon').attr('href', savedFavicon);
-        $('input[name="faviconSelect"][value="' + savedFavicon + '"]').prop('checked', true);
-    }
 
-    // Set up change event listener using jQuery
-    $('input[name="faviconSelect"]').change(function() {
-        if ($(this).is(':checked')) {
-            var newFavicon = $(this).val();
-            $('#dynamicFavicon').attr('href', newFavicon);
-            localStorage.setItem('selectedFavicon', newFavicon);
-        }
-    });
+function applyFavicon() {
+	// Load and apply the saved favicon from local storage
+	var savedFavicon = localStorage.getItem('selectedFavicon');
+	if (savedFavicon) {
+		$('#dynamicFavicon').attr('href', savedFavicon);
+		$('input[name="faviconSelect"][value="' + savedFavicon + '"]').prop('checked', true);
+		console.log('Saved Favicon:', savedFavicon);
+	}
+
+	// Set up change event listener using jQuery
+	$('input[name="faviconSelect"]').change(function() {
+		if ($(this).is(':checked')) {
+			var newFavicon = $(this).val();
+			$('#dynamicFavicon').attr('href', newFavicon);
+			localStorage.setItem('selectedFavicon', newFavicon);
+			console.log('New Favicon Set:', newFavicon);
+		}
+	});
 }
+
 function toggleMouseTrailSettings() {
-    var checkbox = document.getElementById('enable-mouse-trail');
-    var mouseTrailOptions = document.getElementById('mouse-trail-options');
-    mouseTrailOptions.style.display = checkbox.checked ? 'block' : 'none';
-    
-    // Additionally, handle enabling/disabling the mouse trail effect functionality
+	var checkbox = document.getElementById('enable-mouse-trail');
+	var mouseTrailOptions = document.getElementById('mouse-trail-options');
+	mouseTrailOptions.style.display = checkbox.checked ? 'block' : 'none';
+
+	// Additionally, handle enabling/disabling the mouse trail effect functionality
 }
 
 function toggleClickSettings() {
-    var checkbox = document.getElementById('enable-click-effect');
-    var clickEffectOptions = document.getElementById('click-effect-options');
-    clickEffectOptions.style.display = checkbox.checked ? 'block' : 'none';
-    
-    // If needed, you can also enable/disable actual click effect functionality here
+	var checkbox = document.getElementById('enable-click-effect');
+	var clickEffectOptions = document.getElementById('click-effect-options');
+	clickEffectOptions.style.display = checkbox.checked ? 'block' : 'none';
+
+	// If needed, you can also enable/disable actual click effect functionality here
 }
 
 function toggleRgbSliders() {
-    // Get the radio button for RGB selection
-    const rgbRadio = document.getElementById('rgbColor');
-    // Get the container for the RGB sliders
-    const rgbSliders = document.querySelector('.rgb-sliders');
+	// Get the radio button for RGB selection
+	const rgbRadio = document.getElementById('rgbColor');
+	// Get the container for the RGB sliders
+	const rgbSliders = document.querySelector('.rgb-sliders');
 
-    // Check if the RGB radio button is selected
-    if (rgbRadio && rgbRadio.checked) {
-        // If RGB is selected, display the sliders
-        rgbSliders.style.display = 'block';
-    } else {
-        // Otherwise, hide them
-        rgbSliders.style.display = 'none';
-    }
+	// Check if the RGB radio button is selected
+	if (rgbRadio && rgbRadio.checked) {
+		// If RGB is selected, display the sliders
+		rgbSliders.style.display = 'block';
+	} else {
+		// Otherwise, hide them
+		rgbSliders.style.display = 'none';
+	}
 }
 
 // Add an event listener to the radio buttons for changing the mouse trail color
 document.querySelectorAll('input[name="mouseTrailColorSelect"]').forEach(radio => {
-    radio.addEventListener('change', toggleRgbSliders);
+	radio.addEventListener('change', toggleRgbSliders);
 });
 
 $(document).ready(function() {
 	loadColorData(); // Load and apply saved color settings on startup
 	applyColor(); // Initialize color slider functionality
 	applyWallpaper(); // Apply the saved or default wallpaper
-    applyFavicon();
+	applyFavicon();
 	// Activate the first tab
 	$('[role="tab"]:first').click();
 });
