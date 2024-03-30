@@ -23,30 +23,31 @@ function closeWindow(button) {
     window.style.display = 'none';
 }
 
-// Function to show tab panel
 $(document).ready(function() {
-  // Function to switch tabs
+  // Function to switch tabs and display corresponding content
   function switchTab(tabId) {
-    // Hide all articles
-    $('article[role="tabpanel"]').hide();
-    // Show the selected tab content
-    $(`#${tabId}`).show();
+    // Hide all tab content sections
+    $('article[role="tabpanel"]').hide().attr('hidden', true);
+    // Show the selected tab content and remove the hidden attribute
+    $('#' + tabId).show().removeAttr('hidden');
 
-    // Set aria-selected="false" for all tabs
+    // Update aria-selected for all tabs
     $('menu[role="tablist"] button').attr('aria-selected', 'false');
-    // Set aria-selected="true" for the active tab
-    $(`menu[role="tablist"] button[aria-controls="${tabId}"]`).attr('aria-selected', 'true');
+    // Mark the current tab as selected
+    $('menu[role="tablist"] button[aria-controls="' + tabId + '"]').attr('aria-selected', 'true');
   }
 
-  // Initial setup: show the first tab, hide others
-  switchTab($('menu[role="tablist"] button:first').attr('aria-controls'));
+  // Initial display setup
+  let firstTabId = $('menu[role="tablist"] button:first').attr('aria-controls');
+  switchTab(firstTabId);
 
-  // Click event binding for tabs
+  // Bind click event to tabs
   $('menu[role="tablist"] button').click(function() {
     var tabId = $(this).attr('aria-controls');
     switchTab(tabId);
   });
 });
+
 
 
 // Function to apply the color from sliders and save to localStorage
