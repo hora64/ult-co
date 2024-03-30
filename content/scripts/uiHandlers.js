@@ -8,6 +8,10 @@ $(document).ready(function() {
         $('#window-red-slider').val(colors.red);
         $('#window-green-slider').val(colors.green);
         $('#window-blue-slider').val(colors.blue);
+    } else {
+        $('#window-red-slider').val(125);
+        $('#window-green-slider').val(125);
+        $('#window-blue-slider').val(125);
     }
 
     applyColor(); // Set up color change handling
