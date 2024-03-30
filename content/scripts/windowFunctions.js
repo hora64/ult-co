@@ -47,15 +47,30 @@ function disableContainer(containerElementId) {
 }
 
 // Function to switch tabs and display corresponding content, defined globally for accessibility
-function switchTab(tabId) {
-	const $tabPanels = $('article[role="tabpanel"]');
-	const $tabs = $('menu[role="tablist"] button');
+function switchTab(tabId, tabPath) {
+    const $tabPanels = $('article[role="tabpanel"]');
+    const $tabs = $('menu[role="tablist"] button');
 
-	$tabPanels.hide().attr('hidden', true);
-	$('#' + tabId).show().removeAttr('hidden');
-	$tabs.attr('aria-selected', 'false');
-	$(`[aria-controls="${tabId}"]`).attr('aria-selected', 'true');
+    // Hide all tab panels and mark them as hidden
+    $tabPanels.hide().attr('hidden', true);
+
+    // Load the content for the selected tab using the provided path
+    $('#' + tabId).load(tabPath, function(response, status, xhr) {
+        if (status == "error") {
+            console.error("Failed to load tab content:", xhr.status, xhr.statusText);
+            // Optionally, display an error message within the tab content area
+            $(this).html("Sorry, there was an error loading the content.");
+        } else {
+            // Show the loaded content
+            $(this).show().removeAttr('hidden');
+        }
+    });
+
+    // Update aria-selected for all tabs
+    $tabs.attr('aria-selected', 'false');
+    $(`button[aria-controls="${tabId}"]`).attr('aria-selected', 'true');
 }
+
 
 // jQuery for draggable and resizable behaviors on "#app-settings"
 $(function() {
@@ -75,7 +90,7 @@ $(function() {
 
 	// Dynamically update maximum size on window resize
 	$(window).resize(function() {
-		$("#app-settings").resizable("option", "maxHeight", $(window).height());
-		$("#app-settings").resizable("option", "maxWidth", $(window).width());
+		$(".window.glass.active").resizable("option", "maxHeight", $(window).height());
+		$(".window.glass.active").resizable("option", "maxWidth", $(window).width());
 	});
 });
