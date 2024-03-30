@@ -23,12 +23,37 @@ $(document).ready(function() {
 	setTimeout(playStartupSound, 3000); // 3000 milliseconds = 3 seconds
 });
 
-function applyColor(hexColor, useCooldown = true) {
-	if (checkCooldown(useCooldown)) return;
+const colorCooldown = cooldown(1000); // Set cooldown duration to 1000ms (1 second)
 
-	document.documentElement.style.setProperty('--title-color', hexColor);
-	saveToLocalStorage('colorSettings', hexColor);
-	console.log('Color applied:', hexColor);
+function applyColor(hexColor, useCooldown = true) {
+    if (!colorCooldown(useCooldown)) return;
+    document.documentElement.style.setProperty('--title-color', hexColor);
+    saveToLocalStorage('colorSettings', hexColor);
+    console.log('Color applied:', hexColor);
+}
+
+function applyWallpaper(selectedWallpaper) {
+    $('body').css('background-image', `url(${selectedWallpaper})`);
+    saveToLocalStorage('selectedWallpaper', selectedWallpaper);
+}
+
+function applyFavicon(selectedFavicon) {
+    $('#dynamicFavicon').attr('href', selectedFavicon);
+    saveToLocalStorage('selectedFavicon', selectedFavicon);
+}
+
+function applyStartupSound(selectedSound) {
+    $('#startup').prop('src', selectedSound);
+    saveToLocalStorage('startupSound', selectedSound);
+}
+
+function applyStartupVolume(volume) {
+    $('#startup').prop('volume', volume);
+    saveToLocalStorage('startupSoundVolume', volume);
+}
+
+function playStartupSound() {
+    document.getElementById('startup')?.play().then(() => console.log('Startup sound played successfully')).catch(error => console.error('Failed to play startup sound:', error));
 }
 
 function applyWallpaper(selectedWallpaper) {
