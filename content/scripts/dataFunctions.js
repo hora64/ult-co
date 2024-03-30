@@ -16,8 +16,11 @@ function saveSelectedWallpaper(wallpaperPath) {
 }
 
 function getSavedWallpaper() {
-    return localStorage.getItem('selectedWallpaper');
+    const wallpaper = localStorage.getItem('selectedWallpaper');
+    console.log(wallpaper ? `Wallpaper Loaded: ${wallpaper}` : 'No Wallpaper Found.');
+    return wallpaper ? wallpaper : null; // Returns the wallpaper or null
 }
+
 
 function saveSelectedFavicon(faviconPath) {
     localStorage.setItem('selectedFavicon', faviconPath);
@@ -25,5 +28,8 @@ function saveSelectedFavicon(faviconPath) {
 }
 
 function getSavedFavicon() {
-    return localStorage.getItem('selectedFavicon');
+    const favicon = localStorage.getItem('selectedFavicon');
+    console.log(favicon ? `Favicon Loaded: ${favicon}` : 'No Favicon Found.');
+    return favicon ? favicon : null; // Returns the favicon or null
 }
+
