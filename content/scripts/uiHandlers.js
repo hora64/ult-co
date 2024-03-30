@@ -19,7 +19,7 @@ function applyColor() {
         document.documentElement.style.setProperty('--title-color', hexColor);
         saveColorSettings(hexColor);
         console.log('Color applied:', hexColor);
-    }, 250);
+    }, 500);
 
     // Set up the event listener for color changes
     $('#window-color-picker').on('input', function() {
