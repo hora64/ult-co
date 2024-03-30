@@ -1,0 +1,50 @@
+<article role="tabpanel" id="mouse-settings">
+    <!-- Mouse click effect settings -->
+    <fieldset>
+        <legend>Mouse click settings</legend>
+        <div class="field-row">
+            <input id="enable-click-effect" type="checkbox" checked>
+            <label for="enable-click-effect">Enable mouse click effects</label>
+        </div>
+    </fieldset>
+    <!-- Mouse icon settings -->
+    <fieldset>
+        <legend>Mouse icon customization</legend>
+        <div class="field-row">
+            <input id="icon-red-enable" type="checkbox" checked>
+            <label for="icon-red-enable">Red Icon</label>
+        </div>
+        <div class="field-row">
+            <input id="icon-green-enable" type="checkbox" checked>
+            <label for="icon-green-enable">Green Icon</label>
+        </div>
+        <div class="field-row">
+            <input id="icon-blue-enable" type="checkbox" checked>
+            <label for="icon-blue-enable">Blue Icon</label>
+        </div>
+    </fieldset>
+    <!-- Icon size settings -->
+    <fieldset>
+        <legend>Icon size</legend>
+        <label for="size-min">Min Size:</label>
+        <input id="size-min" type="number" value="16" min="1">
+        <label for="size-max">Max Size:</label>
+        <input id="size-max" type="number" value="32" min="1">
+    </fieldset>
+    <!-- Mouse trail settings -->
+    <fieldset>
+        <legend>Mouse trail settings</legend>
+        <div class="field-row">
+            <input id="enable-mouse-trail" type="checkbox" checked>
+            <label for="enable-mouse-trail">Enable mouse trail</label>
+        </div>
+        <div class="field-row">
+            <label for="trail-color">Trail Color:</label>
+            <input id="trail-color" type="color" value="#FF0000">
+        </div>
+        <div class="field-row">
+            <label for="trail-length">Trail Length:</label>
+            <input id="trail-length" type="number" value="10" min="1" max="100">
+        </div>
+    </fieldset>
+</article>
