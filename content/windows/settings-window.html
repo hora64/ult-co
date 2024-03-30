@@ -96,17 +96,17 @@
 						</div>
 					</fieldset>
 				</article>
-				<article role="tabpanel" id="tab-C" hidden>
-				    <!-- Mouse click effect settings -->
+				<article role="tabpanel" id="tab-C">
+					<!-- Mouse click effect settings -->
 					<fieldset>
 						<legend>Mouse click settings</legend>
 						<!-- Icon size, rotation, etc. -->
 						<div class="field-row">
-							<input id="enable-click-effect" type="checkbox" onchange="toggleClickEffectSettings()" checked>
+							<input id="enable-click-effect" type="checkbox" onclick="toggleMouseClickSettings()" checked>
 							<label for="enable-click-effect">Enable mouse click</label>
 						</div>
 						<div class="field-row" id="click-effect-options">
-						    <!-- Select Icons -->
+							<!-- Select Icons -->
 							<fieldset>
 								<legend>Enabled icons</legend>
 								<div class="field-row">
@@ -192,32 +192,52 @@
 					<fieldset>
 						<legend>Mouse trail settings</legend>
 						<div class="field-row">
-							<input id="enable-mouse-trail" type="checkbox" onchange="toggleMouseTrailSettings()" checked>
+							<input id="enable-mouse-trail" type="checkbox" onclick="toggleMouseTrailSettings()" checked>
 							<label for="enable-mouse-trail">Enable mouse trail</label>
 						</div>
-						<!-- Individual sliders for RGB -->
-						<div class="field-row">
-							<label for="mousetrail-red-slider">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Red">
-							</label>
-							<input id="mousetrail-red-slider" type="range" min="0" max="255" value="125">
-						</div>
-						<div class="field-row">
-							<label for="mousetrail-green-slider">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Green">
-							</label>
-							<input id="mousetrail-green-slider" type="range" min="0" max="255" value="125">
-						</div>
-						<div class="field-row">
-							<label for="mousetrail-blue-slider">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Blue">
-							</label>
-							<input id="mousetrail-blue-slider" type="range" min="0" max="255" value="125">
-						</div>
+						<fieldset>
+							<legend>Color</legend>
+							<div class="field-row">
+								<input id="randomColor" type="radio" name="mouseTrailColorSelect" value="random" checked>
+								<label for="randomColor">Random color</label>
+							</div>
+							<div class="field-row">
+								<input id="rgbColor" type="radio" name="mouseTrailColorSelect" value="RGB" onclick="toggleRgbSliders()">
+								<label for="rgbColor">RGB</label>
+							</div>
+							<!-- Individual sliders for RGB -->
+							<div class="rgb-sliders" style="display: none;">
+								<div class="field-row">
+									<label for="mousetrail-red-slider">
+										<img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Red">
+									</label>
+									<input id="mousetrail-red-slider" type="range" min="0" max="255" value="125">
+								</div>
+								<div class="field-row">
+									<label for="mousetrail-green-slider">
+										<img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Green">
+									</label>
+									<input id="mousetrail-green-slider" type="range" min="0" max="255" value="125">
+								</div>
+								<div class="field-row">
+									<label for="mousetrail-blue-slider">
+										<img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Blue">
+									</label>
+									<input id="mousetrail-blue-slider" type="range" min="0" max="255" value="125">
+								</div>
+							</div>
+						</fieldset>
+						<fieldset>
+							<legend>Sparkles</legend>
+							<div class="field-row">
+								<label for="trail-sparkles">Sparkles:</label>
+								<input id="trail-sparkles" type="number" value="50" min="0" max="360" onchange=>
+							</div>
+						</fieldset>
 					</fieldset>
 					<!-- Mouse Cursor settings -->
 					<fieldset>
-					    <legend>Mouse cursor settings</legend>
+						<legend>Mouse cursor settings</legend>
 					</fieldset>
 				</article>
 				<article role="tabpanel" id="tab-D" hidden></article>
