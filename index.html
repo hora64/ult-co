@@ -11,47 +11,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/7.css">
     <link rel="stylesheet" href="content/css/styles.css">
-    <style type="text/css">
-        * {
-            cursor: url('content/assets/images/cur/chrome/chrome.cur'),
-                auto !important;
-        }
-
-        html,
-        body {
-            width: 100vw;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100%;
-        }
-
-        /* Uncopyable text */
-        body {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+/Edge */
-            user-select: none;
-        }
-    </style>
 </head>
-
 <body>
-    <div id="app-settings">
-        <!-- Settings window will be loaded here -->
-    </div>
-    <div id="app-webamp">
-        <!-- WebAmp will be loaded here -->
-    </div>
-    <div class="background" oncontextmenu="showSettingsMenu(event)">
-        <!-- Your background HTML content here -->
-    </div>
+    <div id="app-settings"></div>
+    <div id="app-webamp"></div>
+    <div class="background" oncontextmenu="showSettingsMenu(event)"></div>
     <div id="app-settingsMenu" class="settings-menu" style="display: none;">
         <iframe src="" frameborder="0" width="320" height="320"></iframe>
     </div>
     <div class="ui-sfx">
-        <audio id="startup" src="content/assets/audio/7startup.mp3" preload="auto"></audio>
+        <audio id="startup" preload="auto"></audio>
     </div>
     <script src="https://unpkg.com/webamp@1.5.0/built/webamp.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
