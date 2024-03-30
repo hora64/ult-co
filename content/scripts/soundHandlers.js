@@ -12,6 +12,7 @@ function applyStartupSound(selectedSoundUrl) {
         audioElement.src = selectedSoundUrl;
     }
     saveToLocalStorage('startupSoundUrl', selectedSoundUrl); // Save the new selection
+    playStartupSound();
 }
 
 function applyVolume(volume) {
@@ -19,6 +20,7 @@ function applyVolume(volume) {
     if (music) {
         music.volume = volume;
         saveToLocalStorage('startupSoundVolume', volume); // Save the new volume
+        playStartupSound();
     }
 }
 
