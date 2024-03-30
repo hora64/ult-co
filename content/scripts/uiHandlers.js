@@ -15,7 +15,7 @@ let lastCalled = 0;
 function applyColor(hexColor, useCooldown = true) {
     const now = Date.now();
     // Check if we should apply cooldown and if it's within the cooldown period
-    if (useCooldown && (now - lastCalled < 500)) {
+    if (useCooldown && (now - lastCalled < 200)) {
         console.log("Action is cooling down. Please wait.");
         return;
     }
