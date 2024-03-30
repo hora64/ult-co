@@ -14,7 +14,7 @@ $(document).ready(function() {
 	applyStartupSound(savedStartupSound);
 	
 	const savedVolume = loadFromLocalStorage('startupSoundVolume') || 0.2; // Default volume
-	applyStartupVolume(savedVolume);
+	applyStartupVolume(savedVolume, false);
 
 	// Play the startup sound immediately
 	playStartupSound();
@@ -24,6 +24,7 @@ $(document).ready(function() {
 });
 
 const colorCooldown = cooldown(1000); // Set cooldown duration to 1000ms (1 second)
+const volumeCooldown = cooldown(1000);
 
 function applyColor(hexColor, useCooldown = true) {
     if (!colorCooldown(useCooldown)) return;
@@ -71,9 +72,11 @@ function applyStartupSound(selectedSound) {
 	saveToLocalStorage('startupSound', selectedSound);
 }
 
-function applyStartupVolume(volume) {
-	$('#startup').prop('volume', volume);
-	saveToLocalStorage('startupSoundVolume', volume);
+function applyStartupVolume(volume, useCooldown = true) {
+    if (!volumeCooldown(useCooldown)) return;
+    $('#startup').prop('volume', volume);
+    saveToLocalStorage('startupSoundVolume', volume);
+    console.log('volume applied:', volume);
 }
 
 function playStartupSound() {
