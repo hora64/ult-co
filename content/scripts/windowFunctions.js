@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     // Make the window draggable
-    document.getElementById('settingsWindow').querySelector('.title-bar').addEventListener('mousedown', function(event) {
+    document.getElementById('app-settings').querySelector('.title-bar').addEventListener('mousedown', function(event) {
         const window = event.target.closest('.window');
         if (window) {
             const initialX = event.clientX - window.getBoundingClientRect().left;
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Make the window resizable
-    document.getElementById('settingsWindow').querySelector('.window-body').addEventListener('mousedown', function(event) {
+    document.getElementById('app-settings').querySelector('.window-body').addEventListener('mousedown', function(event) {
         const window = event.target.closest('.window');
         if (window) {
             const initialWidth = window.offsetWidth;
