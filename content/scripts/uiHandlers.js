@@ -1,62 +1,65 @@
-// Assuming jQuery is available
 $(document).ready(function() {
-    const colors = loadColorSettings();
+    const fileName = getCurrentFileName();
+
+    const colors = loadColorSettings(fileName);
     if (colors) {
-        // Apply loaded color settings
-        document.documentElement.style.setProperty('--title-color', `rgb(${colors.red}, ${colors.green}, ${colors.blue})`);
-        // Update slider positions
-        $('#window-red-slider').val(colors.red);
-        $('#window-green-slider').val(colors.green);
-        $('#window-blue-slider').val(colors.blue);
+        applyColor(fileName, colors);
+        applyWallpaper(fileName);
+        applyFavicon(fileName);
     }
 
-    applyColor(); // Set up color change handling
-    applyWallpaper(); // Set up wallpaper application
-    applyFavicon(); // Set up favicon application
+    // Custom event listeners for color change
+    $(document).on('colorChange', function(event, data) {
+        const { red, green, blue } = data;
+        document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
+        saveColorSettings(red, green, blue);
+    });
+
+    // Custom event listeners for wallpaper change
+    $(document).on('wallpaperChange', function(event, data) {
+        $('body').css('background-image', `url(${data})`);
+        saveSelectedWallpaper(data);
+    });
+
+    // Custom event listeners for favicon change
+    $(document).on('faviconChange', function(event, data) {
+        $('#dynamicFavicon').attr('href', data);
+        saveSelectedFavicon(data);
+    });
 });
 
-function applyColor() {
-    // Setup event listeners for color change
-    $('#window-red-slider, #window-green-slider, #window-blue-slider').on('input', function() {
-        // Debounced update color theme
+function applyColor(fileName, colors) {
+    $(fileName).find('#window-red-slider, #window-green-slider, #window-blue-slider').on('input', function() {
         clearTimeout(window.colorDebounce);
         window.colorDebounce = setTimeout(function() {
-            const red = $('#window-red-slider').val(),
-                green = $('#window-green-slider').val(),
-                blue = $('#window-blue-slider').val();
-            document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
-            saveColorSettings(red, green, blue);
+            const red = $(fileName).find('#window-red-slider').val(),
+                green = $(fileName).find('#window-green-slider').val(),
+                blue = $(fileName).find('#window-blue-slider').val();
+            $(document).trigger('colorChange', { red, green, blue });
         }, 100);
     });
 }
 
-function applyWallpaper() {
-    const savedWallpaper = getSavedWallpaper();
-    if (savedWallpaper) {
-        $('body').css('background-image', `url(${savedWallpaper})`);
-        $('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
-    }
-
-    $('input[name="wallpaperselect"]').change(function() {
+function applyWallpaper(fileName) {
+    $(fileName).find('input[name="wallpaperselect"]').change(function() {
         const newWallpaper = $(this).val();
-        $('body').css('background-image', `url(${newWallpaper})`);
-        saveSelectedWallpaper(newWallpaper);
+        $(document).trigger('wallpaperChange', newWallpaper);
     });
 }
 
-function applyFavicon() {
-    const savedFavicon = getSavedFavicon();
-    if (savedFavicon) {
-        $('#dynamicFavicon').attr('href', savedFavicon);
-        $('input[name="faviconSelect"][value="' + savedFavicon + '"]').prop('checked', true);
-    }
-
-    $('input[name="faviconSelect"]').change(function() {
+function applyFavicon(fileName) {
+    $(fileName).find('input[name="faviconSelect"]').change(function() {
         if ($(this).is(':checked')) {
             const newFavicon = $(this).val();
-            $('#dynamicFavicon').attr('href', newFavicon);
-            saveSelectedFavicon(newFavicon);
+            $(document).trigger('faviconChange', newFavicon);
         }
     });
 }
 
+function getCurrentFileName() {
+    // Get the current URL
+    const url = window.location.href;
+    // Extract the filename from the URL
+    const fileName = url.substring(url.lastIndexOf('/') + 1);
+    return fileName;
+}
