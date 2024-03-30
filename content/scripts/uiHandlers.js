@@ -11,12 +11,17 @@ $(document).ready(function() {
 
 
 function applyColor() {
-    $('#window-color-picker').on('input', function() {
-        const hexColor = $(this).val();
+    const debouncedApplyColor = debounce(function(hexColor) {
         document.documentElement.style.setProperty('--title-color', hexColor);
-        saveColorSettings(hexColor); // Directly save the hex value
+        saveColorSettings(hexColor); // Save the hex value after delay
+        console.log('Color applied:', hexColor); // Optional: log for demonstration
+    }, 250); // Delay in milliseconds
+
+    $('#window-color-picker').on('input', function() {
+        debouncedApplyColor($(this).val());
     });
 }
+
 
 
 
@@ -45,5 +50,17 @@ function applyFavicon() {
             saveSelectedFavicon(newFavicon);
         }
     });
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
