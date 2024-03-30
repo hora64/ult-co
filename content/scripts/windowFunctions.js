@@ -24,17 +24,30 @@ function closeWindow(button) {
 }
 
 // Function to show tab panel
-window.showTabPanel = function(tab) {
-    var selectedPanelId = tab.getAttribute('aria-controls');
-    document.querySelectorAll('[role="tabpanel"]').forEach(function(panel) {
-        panel.hidden = true;
-    });
-    document.getElementById(selectedPanelId).hidden = false;
-    document.querySelectorAll('[role="tab"]').forEach(function(tab) {
-        tab.setAttribute('aria-selected', 'false');
-    });
-    tab.setAttribute('aria-selected', 'true');
-};
+$(document).ready(function() {
+  // Function to switch tabs
+  function switchTab(tabId) {
+    // Hide all articles
+    $('article[role="tabpanel"]').hide();
+    // Show the selected tab content
+    $(`#${tabId}`).show();
+
+    // Set aria-selected="false" for all tabs
+    $('menu[role="tablist"] button').attr('aria-selected', 'false');
+    // Set aria-selected="true" for the active tab
+    $(`menu[role="tablist"] button[aria-controls="${tabId}"]`).attr('aria-selected', 'true');
+  }
+
+  // Initial setup: show the first tab, hide others
+  switchTab($('menu[role="tablist"] button:first').attr('aria-controls'));
+
+  // Click event binding for tabs
+  $('menu[role="tablist"] button').click(function() {
+    var tabId = $(this).attr('aria-controls');
+    switchTab(tabId);
+  });
+});
+
 
 // Function to apply the color from sliders and save to localStorage
 function applyColor() {
