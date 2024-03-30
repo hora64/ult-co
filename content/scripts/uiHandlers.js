@@ -1,16 +1,23 @@
 $(document).ready(function() {
     // Load and apply color settings or apply default color
     const hexColor = loadColorSettings() || '#7d7d7d'; // Default color if no saved settings
-    document.documentElement.style.setProperty('--title-color', hexColor);
-    $('#window-color-picker').val(hexColor); // Just use jQuery for consistency
-    applyColor(); // Set up color change handling
-    applyWallpaper(); // Apply saved wallpaper or default
-    applyFavicon(); // Apply saved favicon or default
+    applyColor(hexColor); // Set up color change handling with the loaded color
+    
+    // Load saved wallpaper and apply
+    const savedWallpaper = getSavedWallpaper() || 'content/assets/images/wallpapers/frutigeraero.jpg'; // Default wallpaper path
+    applyWallpaper(savedWallpaper);
+
+    // Load saved favicon and apply
+    const savedFavicon = getSavedFavicon() || 'content/assets/images/icons/ultcoFrutigerAeroBlue_px64.ico'; // Default favicon path
+    applyFavicon(savedFavicon);
 });
 
-function applyColor() {
-    // Load initial color setting or use default, and apply it
-    const hexColor = loadColorSettings() || '#7d7d7d';
+
+// Rest of your functions remain unchanged
+
+
+function applyColor(hexColor) {
+    // If no hexColor is provided, load the initial color setting or use default
     document.documentElement.style.setProperty('--title-color', hexColor);
     $('#window-color-picker').val(hexColor);
 
@@ -20,42 +27,30 @@ function applyColor() {
         saveColorSettings(hexColor);
         console.log('Color applied:', hexColor);
     }, 500);
-
-    // Set up the event listener for color changes
-    $('#window-color-picker').on('input', function() {
-        handleColorChange($(this).val());
-    });
 }
 
 
-
-
-
-function applyWallpaper() {
-    const savedWallpaper = getSavedWallpaper() || 'content/assets/images/wallpapers/frutigeraero.jpg'; // Default wallpaper path
-    $('body').css('background-image', `url(${savedWallpaper})`);
-    $(`input[name="wallpaperselect"][value="${savedWallpaper}"]`).prop('checked', true);
-
-    $('input[name="wallpaperselect"]').change(function() {
-        const newWallpaper = $(this).val();
-        $('body').css('background-image', `url(${newWallpaper})`);
-        saveSelectedWallpaper(newWallpaper);
-    });
+// Apply wallpaper function with parameter
+function applyWallpaper(selectedWallpaper) {
+    $('body').css('background-image', `url(${selectedWallpaper})`);
+    saveSelectedWallpaper(selectedWallpaper); // Save the new selection
 }
 
-function applyFavicon() {
-    const savedFavicon = getSavedFavicon() || 'content/assets/images/icons/ultcoFrutigerAeroBlue_px64.ico'; // Default favicon path
-    $('#dynamicFavicon').attr('href', savedFavicon);
-    $(`input[name="faviconSelect"][value="${savedFavicon}"]`).prop('checked', true);
-
-    $('input[name="faviconSelect"]').change(function() {
-        if ($(this).is(':checked')) {
-            const newFavicon = $(this).val();
-            $('#dynamicFavicon').attr('href', newFavicon);
-            saveSelectedFavicon(newFavicon);
-        }
-    });
+// Apply favicon function with parameter
+function applyFavicon(selectedFavicon) {
+    $('#dynamicFavicon').attr('href', selectedFavicon);
+    saveSelectedFavicon(selectedFavicon); // Save the new selection
 }
+
+// Radio button event handlers for wallpaper selection
+$('input[name="wallpaperselect"]').change(function() {
+    applyWallpaper($(this).val());
+});
+
+// Radio button event handlers for favicon selection
+$('input[name="faviconSelect"]').change(function() {
+    applyFavicon($(this).val());
+});
 
 function debounce(func, wait) {
     let timeout;
@@ -65,4 +60,3 @@ function debounce(func, wait) {
         timeout = setTimeout(() => func.apply(context, args), wait);
     };
 }
-
