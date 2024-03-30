@@ -19,3 +19,28 @@
         <label for="volumeControl">Adjust Volume</label>
     </fieldset>
 </article>
+
+<script>
+    // Function to set initial values based on local storage
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve saved startup sound selection from local storage
+        const savedStartupSound = loadFromLocalStorage('startupSound');
+        if (savedStartupSound) {
+            // Set the checked attribute for the corresponding radio button
+            const radioInput = document.querySelector(`input[value="${savedStartupSound}"]`);
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        }
+
+        // Retrieve saved volume level from local storage
+        const savedVolume = loadFromLocalStorage('startupSoundVolume');
+        if (savedVolume) {
+            // Set the value of the volume control slider
+            const volumeControl = document.getElementById('volumeControl');
+            if (volumeControl) {
+                volumeControl.value = savedVolume;
+            }
+        }
+    });
+</script>
