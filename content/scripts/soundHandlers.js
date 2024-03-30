@@ -1,43 +1,27 @@
 $(document).ready(function() {
     // Load and apply startup sound
-    const savedStartupSound = loadFromLocalStorage('startupSoundUrl') || 'content/assets/audio/7startup.mp3'; // Default startup sound path
-    const savedVolume = loadFromLocalStorage('startupSoundVolume') || 0.2; // Default volume
+    const savedStartupSound = loadFromLocalStorage('startupSound') || 'content/assets/audio/7startup.mp3'; // Default startup sound path
     applyStartupSound(savedStartupSound);
-    applyVolume(savedVolume);
+
+    const savedVolume = loadFromLocalStorage('startupSoundVolume') || 0.2; // Default volume
+    applyStartupVolume(savedVolume);
 });
 
-function applyStartupSound(selectedSoundUrl) {
-    var audioElement = document.getElementById('startup');
-    if (audioElement) {
-        audioElement.src = selectedSoundUrl;
-    }
-    saveToLocalStorage('startupSoundUrl', selectedSoundUrl); // Save the new selection
-    playStartupSound();
+function applyStartupSound(selectedSound) {
+    $('#startup').prop('src', selectedSound);
+    saveToLocalStorage('startupSound', selectedSound);
 }
 
-function applyVolume(volume) {
-    var music = document.getElementById('startup');
-    if (music) {
-        music.volume = volume;
-        saveToLocalStorage('startupSoundVolume', volume); // Save the new volume
-        playStartupSound();
-    }
+function applyStartupVolume(volume) {
+    $('#startup').prop('volume', volume);
+    saveToLocalStorage('startupSoundVolume', volume);
 }
 
 function playStartupSound() {
-    var music = document.getElementById('startup');
-    if (music) {
-        music.play()
-            .then(() => {
-                // Audio playback successful
-                console.log('Startup sound played successfully');
-            })
-            .catch(error => {
-                // Audio playback failed
-                console.error('Failed to play startup sound:', error);
-            });
-    }
+    document.getElementById('startup')?.play().then(() => console.log('Startup sound played successfully')).catch(error => console.error('Failed to play startup sound:', error));
 }
+
+
 // Wait for the full page content to load
 window.addEventListener('DOMContentLoaded', (event) => {
     // Play the startup sound immediately
