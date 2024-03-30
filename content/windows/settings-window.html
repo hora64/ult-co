@@ -10,7 +10,7 @@
 		</div>
 		<div class="window-body has-space has-scrollbar" style="width: 295px; height: 250px; overflow: auto">
 			<!-- Combined content section -->
-			<section class="tabs">
+			<section class="tabs" style="max-width: 279px">
 				<menu role="tablist" aria-label="settingsTabs">
 					<button role="tab" aria-controls="tab-A" aria-selected="true">Window Color</button>
 					<button role="tab" aria-controls="tab-B">Image & Icon Settings</button>
@@ -97,6 +97,7 @@
 					</fieldset>
 				</article>
 				<article role="tabpanel" id="tab-C" hidden>
+				    <!-- Mouse click effect settings -->
 					<fieldset>
 						<legend>Mouse click settings</legend>
 						<!-- Icon size, rotation, etc. -->
@@ -105,7 +106,7 @@
 							<label for="enable-click-effect">Enable mouse click</label>
 						</div>
 						<div class="field-row" id="click-effect-options">
-							<!-- Select Icons -->
+						    <!-- Select Icons -->
 							<fieldset>
 								<legend>Enabled icons</legend>
 								<div class="field-row">
@@ -187,6 +188,7 @@
 							</fieldset>
 						</div>
 					</fieldset>
+					<!-- Mouse trail effect settings -->
 					<fieldset>
 						<legend>Mouse trail settings</legend>
 						<div class="field-row">
@@ -212,6 +214,10 @@
 							</label>
 							<input id="mousetrail-blue-slider" type="range" min="0" max="255" value="125">
 						</div>
+					</fieldset>
+					<!-- Mouse Cursor settings -->
+					<fieldset>
+					    <legend>Mouse cursor settings</legend>
 					</fieldset>
 				</article>
 				<article role="tabpanel" id="tab-D" hidden></article>
