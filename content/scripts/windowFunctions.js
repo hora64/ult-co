@@ -24,37 +24,18 @@ function closeWindow(button) {
 }
 
 
-function toggleMouseTrailSettings() {
-	var checkbox = document.getElementById('enable-mouse-trail');
-	var mouseTrailOptions = document.getElementById('mouse-trail-options');
-	mouseTrailOptions.style.display = checkbox.checked ? 'block' : 'none';
-
-	// Additionally, handle enabling/disabling the mouse trail effect functionality
+function toggleContainer(controlElementId, containerElementId) {
+    var controlElement = document.getElementById(controlElementId);
+    var containerElement = document.getElementById(containerElementId);
+    
+    if (containerElement && controlElement) {
+        containerElement.style.display = controlElement.checked ? 'block' : 'none';
+    } else {
+        console.error('One or more elements not found:', controlElementId, containerElementId);
+    }
 }
 
-function toggleMouseClickSettings() {
-	var checkbox = document.getElementById('enable-click-effect');
-	var clickEffectOptions = document.getElementById('click-effect-options');
-	clickEffectOptions.style.display = checkbox.checked ? 'block' : 'none';
 
-	// If needed, you can also enable/disable actual click effect functionality here
-}
-
-function toggleRgbSliders() {
-	// Get the radio button for RGB selection
-	const rgbRadio = document.getElementById('rgbColor');
-	// Get the container for the RGB sliders
-	const rgbSliders = document.querySelector('.rgb-sliders');
-
-	// Check if the RGB radio button is selected
-	if (rgbRadio && rgbRadio.checked) {
-		// If RGB is selected, display the sliders
-		rgbSliders.style.display = 'block';
-	} else {
-		// Otherwise, hide them
-		rgbSliders.style.display = 'none';
-	}
-}
 
 // Add an event listener to the radio buttons for changing the mouse trail color
 document.querySelectorAll('input[name="mouseTrailColorSelect"]').forEach(radio => {
