@@ -1,255 +1,51 @@
-<div class="background">
-	<div class="window color glass active" id="settingsWindow" style="width: 320px; height: 300px;">
-		<div class="title-bar">
-			<div class="title-bar-text">Website Customization</div>
-			<div class="title-bar-controls">
-				<button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
-				<button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
-				<button aria-label="Close" onclick="closeWindow(this)"></button>
-			</div>
-		</div>
-		<div class="window-body has-space has-scrollbar" style="width: 295px; height: 250px; overflow: auto">
-			<!-- Combined content section -->
-			<section class="tabs" style="max-width: 279px">
-				<menu role="tablist" aria-label="settingsTabs">
-					<button role="tab" aria-controls="tab-A" aria-selected="true">Window Color</button>
-					<button role="tab" aria-controls="tab-B">Image & Icon Settings</button>
-					<button role="tab" aria-controls="tab-C">Mouse</button>
-					<button role="tab" aria-controls="tab-D">Sound</button>
-				</menu>
-				<article role="tabpanel" id="tab-A">
-					<fieldset>
-						<legend>Adjust the sliders to change the color of the window.</legend>
-						<div class="field-row">
-							<label for="window-red-slider">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Red">
-							</label>
-							<input id="window-red-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-						</div>
-						<div class="field-row">
-							<label for="window-green-slider">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Green">
-							</label>
-							<input id="window-green-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-						</div>
-						<div class="field-row">
-							<label for="window-blue-slider">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Blue">
-							</label>
-							<input id="window-blue-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
-						</div>
-					</fieldset>
-				</article>
-				<article role="tabpanel" id="tab-B" hidden>
-					<fieldset>
-						<legend>Select a wallpaper</legend>
-						<div class="field-row">
-							<input id="wallpaperoption1" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero.jpg" checked>
-							<label for="wallpaperoption1">Wallpaper #1</label>
-						</div>
-						<div class="field-row">
-							<input id="wallpaperoption2" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/Windows7Wallpaper.jpg">
-							<label for="wallpaperoption2">Wallpaper #2</label>
-						</div>
-						<div class="field-row">
-							<input id="wallpaperoption3" type="radio" name="wallpaperselect" value="content/assets/images/wallpapers/frutigeraero2.jpg">
-							<label for="wallpaperoption3">Wallpaper #3</label>
-						</div>
-					</fieldset>
-					<fieldset>
-						<legend>Select a favicon</legend>
-						<div class="field-row">
-							<input id="faviconOption1" type="radio" name="faviconSelect" value="content/assets/images/icons/ultcoFrutigerAeroRed_px64.ico" checked>
-							<label for="faviconOption1">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Favicon #1">
-							</label>
-						</div>
-						<div class="field-row">
-							<input id="faviconOption2" type="radio" name="faviconSelect" value="content/assets/images/icons/ultcoFrutigerAeroLime_px64.ico">
-							<label for="faviconOption2">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Favicon #2">
-							</label>
-						</div>
-						<div class="field-row">
-							<input id="faviconOption3" type="radio" name="faviconSelect" value="content/assets/images/icons/ultcoFrutigerAeroBlue_px64.ico">
-							<label for="faviconOption3">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Favicon #3">
-							</label>
-						</div>
-						<div class="field-row">
-							<input id="faviconOption4" type="radio" name="faviconSelect" value="content/assets/images/icons/ultcoFrutigerAeroPink_px64.ico">
-							<label for="faviconOption4">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroPink_px16.png" alt="Favicon #4">
-							</label>
-						</div>
-						<div class="field-row">
-							<input id="faviconOption5" type="radio" name="faviconSelect" value="content/assets/images/icons/ultcoFrutigerAeroPurple_px64.ico">
-							<label for="faviconOption5">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroPurple_px16.png" alt="Favicon #5">
-							</label>
-						</div>
-						<div class="field-row">
-							<input id="faviconOption6" type="radio" name="faviconSelect" value="content/assets/images/icons/ultcoFrutigerAeroGrey_px64.ico">
-							<label for="faviconOption6">
-								<img src="content/assets/images/png/px16/ultcoFrutigerAeroGrey_px16.png" alt="Favicon #6">
-							</label>
-						</div>
-					</fieldset>
-				</article>
-				<article role="tabpanel" id="tab-C">
-					<!-- Mouse click effect settings -->
-					<fieldset>
-						<legend>Mouse click settings</legend>
-						<!-- Icon size, rotation, etc. -->
-						<div class="field-row">
-							<input id="enable-click-effect" type="checkbox" onclick="toggleMouseClickSettings()" checked>
-							<label for="enable-click-effect">Enable mouse click</label>
-						</div>
-						<div class="field-row" id="click-effect-options">
-							<!-- Select Icons -->
-							<fieldset>
-								<legend>Enabled icons</legend>
-								<div class="field-row">
-									<input id="icon-red-enable" type="checkbox" checked>
-									<label for="icon-red-enable">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Enable Red Icon">
-									</label>
-								</div>
-								<div class="field-row">
-									<input id="icon-green-enable" type="checkbox" checked>
-									<label for="icon-green-enable">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Enable Green Icon">
-									</label>
-								</div>
-								<div class="field-row">
-									<input id="icon-blue-enable" type="checkbox" checked>
-									<label for="icon-blue-enable">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Enable Blue Icon">
-									</label>
-								</div>
-								<div class="field-row">
-									<input id="icon-pink-enable" type="checkbox" checked>
-									<label for="icon-pink-enable">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroPink_px16.png" alt="Enable Pink Icon">
-									</label>
-								</div>
-								<div class="field-row">
-									<input id="icon-purple-enable" type="checkbox" checked>
-									<label for="icon-purple-enable">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroPurple_px16.png" alt="Enable Purple Icon">
-									</label>
-								</div>
-								<div class="field-row">
-									<input id="icon-grey-enable" type="checkbox" checked>
-									<label for="icon-grey-enable">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroGrey_px16.png" alt="Enable Grey Icon">
-									</label>
-								</div>
-							</fieldset>
-							<!-- Icon size -->
-							<fieldset>
-								<legend>Icon size</legend>
-								<div class="field-row">
-									<label for="size-min">Min:</label>
-									<input id="size-min" type="number" value="9" min="1" max="100" onchange="updateConfig('size', 'min', this.value)">
-								</div>
-								<div class="field-row">
-									<label for="size-max">Max:</label>
-									<input id="size-max" type="number" value="24" min="1" max="100" onchange="updateConfig('size', 'max', this.value)">
-								</div>
-							</fieldset>
-							<!-- Rotation settings-->
-							<fieldset>
-								<legend>Rotation</legend>
-								<!-- Initial rotation -->
-								<fieldset>
-									<legend>Initial</legend>
-									<div class="field-row">
-										<label for="rotation-initial-min">Min:</label>
-										<input id="rotation-initial-min" type="number" value="-90" min="-360" max="360" onchange="updateConfig('rotation.initial', 'min', this.value)">
-									</div>
-									<div class="field-row">
-										<label for="rotation-initial-max">Max:</label>
-										<input id="rotation-initial-max" type="number" value="90" min="-360" max="360" onchange="updateConfig('rotation.initial', 'max', this.value)">
-									</div>
-								</fieldset>
-								<!-- Final rotation -->
-								<fieldset>
-									<legend>Final</legend>
-									<div class="field-row">
-										<label for="rotation-final-min">Min:</label>
-										<input id="rotation-final-min" type="number" value="-90" min="-360" max="360" onchange="updateConfig('rotation.final', 'min', this.value)">
-									</div>
-									<div class="field-row">
-										<label for="rotation-final-max">Max:</label>
-										<input id="rotation-final-max" type="number" value="90" min="-360" max="360" onchange="updateConfig('rotation.final', 'max', this.value)">
-									</div>
-								</fieldset>
-							</fieldset>
-						</div>
-					</fieldset>
-					<!-- Mouse trail effect settings -->
-					<fieldset>
-						<legend>Mouse trail settings</legend>
-						<div class="field-row">
-							<input id="enable-mouse-trail" type="checkbox" onclick="toggleMouseTrailSettings()" checked>
-							<label for="enable-mouse-trail">Enable mouse trail</label>
-						</div>
-						<fieldset>
-							<legend>Color</legend>
-							<div class="field-row">
-								<input id="randomColor" type="radio" name="mouseTrailColorSelect" value="random" checked>
-								<label for="randomColor">Random color</label>
-							</div>
-							<div class="field-row">
-								<input id="rgbColor" type="radio" name="mouseTrailColorSelect" value="RGB" onclick="toggleRgbSliders()">
-								<label for="rgbColor">RGB</label>
-							</div>
-							<!-- Individual sliders for RGB -->
-							<div class="rgb-sliders" style="display: none;">
-								<div class="field-row">
-									<label for="mousetrail-red-slider">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroRed_px16.png" alt="Red">
-									</label>
-									<input id="mousetrail-red-slider" type="range" min="0" max="255" value="125">
-								</div>
-								<div class="field-row">
-									<label for="mousetrail-green-slider">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroLime_px16.png" alt="Green">
-									</label>
-									<input id="mousetrail-green-slider" type="range" min="0" max="255" value="125">
-								</div>
-								<div class="field-row">
-									<label for="mousetrail-blue-slider">
-										<img src="content/assets/images/png/px16/ultcoFrutigerAeroBlue_px16.png" alt="Blue">
-									</label>
-									<input id="mousetrail-blue-slider" type="range" min="0" max="255" value="125">
-								</div>
-							</div>
-						</fieldset>
-						<fieldset>
-							<legend>Sparkles</legend>
-							<div class="field-row">
-								<label for="trail-sparkles">Sparkles:</label>
-								<input id="trail-sparkles" type="number" value="50" min="0" max="360" onchange=>
-							</div>
-						</fieldset>
-					</fieldset>
-					<!-- Mouse Cursor settings -->
-					<fieldset>
-						<legend>Mouse cursor settings</legend>
-					</fieldset>
-				</article>
-				<article role="tabpanel" id="tab-D" hidden></article>
-				<!-- Remaining fieldsets and content -->
-			</section>
-		</div>
-	</div>
-</div>
-<!-- jQuery and jQuery UI for other dynamic behaviors -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-<!-- Your custom JavaScript file -->
-<script src="content/scripts/windowFunctions.js"></script>
-<script src="content/scripts/dataFunctions.js"></script>
-<script src="content/scripts/uiHandlers.js"></script>
+ <div class="background">
+        <div class="window color glass active" id="settingsWindow" style="width: 320px; height: 300px;">
+            <div class="title-bar">
+                <div class="title-bar-text">Website Customization</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
+                    <button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
+                    <button aria-label="Close" onclick="closeWindow(this)"></button>
+                </div>
+            </div>
+            <div class="window-body has-space has-scrollbar" style="width: 295px; height: 250px; overflow: auto">
+                <section class="tabs" style="max-width: 279px">
+                    <menu role="tablist" aria-label="settingsTabs">
+                        <button role="tab" aria-controls="window-color-settings" aria-selected="true" id="tab-btn-window-color">Window Color</button>
+                        <button role="tab" aria-controls="image-icon-settings" id="tab-btn-image-icon">Image & Icon Settings</button>
+                        <button role="tab" aria-controls="mouse-settings" id="tab-btn-mouse">Mouse</button>
+                        <button role="tab" aria-controls="sound-settings" id="tab-btn-sound">Sound</button>
+                    </menu>
+                    <div id="window-color-settings-content" class="tab-content"></div>
+                    <div id="image-icon-settings-content" class="tab-content"></div>
+                    <div id="mouse-settings-content" class="tab-content"></div>
+                    <div id="sound-settings-content" class="tab-content"></div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="content/scripts/windowFunctions.js"></script>
+    <script src="content/scripts/dataFunctions.js"></script>
+    <script src="content/scripts/uiHandlers.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Initially load the first tab content
+        $("#window-color-settings-content").load("window-color-settings.html");
+
+        // Event listeners for tab buttons
+        $("#tab-btn-window-color").click(function() {
+            $("#window-color-settings-content").load("window-color-settings.html");
+        });
+        $("#tab-btn-image-icon").click(function() {
+            $("#image-icon-settings-content").load("image-icon-settings.html");
+        });
+        $("#tab-btn-mouse").click(function() {
+            $("#mouse-settings-content").load("mouse-settings.html");
+        });
+        $("#tab-btn-sound").click(function() {
+            $("#sound-settings-content").load("sound-settings.html");
+        });
+    });
+    </script>
