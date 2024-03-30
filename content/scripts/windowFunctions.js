@@ -23,33 +23,6 @@ function closeWindow(button) {
 	window.style.display = 'none';
 }
 
-$(document).ready(function() {
-	// Function to switch tabs and display corresponding content
-	function switchTab(tabId) {
-		// Hide all tab content sections
-		$('article[role="tabpanel"]').hide().attr('hidden', true);
-		// Show the selected tab content and remove the hidden attribute
-		$('#' + tabId).show().removeAttr('hidden');
-
-		// Update aria-selected for all tabs
-		$('menu[role="tablist"] button').attr('aria-selected', 'false');
-		// Mark the current tab as selected
-		$('menu[role="tablist"] button[aria-controls="' + tabId + '"]').attr('aria-selected', 'true');
-	}
-
-	// Initial display setup
-	let firstTabId = $('menu[role="tablist"] button:first').attr('aria-controls');
-	switchTab(firstTabId);
-
-	// Bind click event to tabs
-	$('menu[role="tablist"] button').click(function() {
-		var tabId = $(this).attr('aria-controls');
-		switchTab(tabId);
-	});
-});
-
-
-
 // Function to apply the color from sliders and save to localStorage
 function applyColor() {
 	// Wrap updateColorTheme with debounce
@@ -120,39 +93,42 @@ function applyWallpaper() {
 	});
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-	// Event listener for the mouse click effect toggle
-	document.getElementById('enable-click-effect').addEventListener('change', function() {
-		toggleCheckboxEffect(this);
-	});
-
-	// Event listener for the mouse trail toggle
-	document.getElementById('enable-mouse-trail').addEventListener('change', function() {
-		toggleCheckboxEffect(this);
-	});
-
-	// Initialize the visibility based on the checkbox state
-	toggleCheckboxEffect(document.getElementById('enable-click-effect'));
-	toggleCheckboxEffect(document.getElementById('enable-mouse-trail'));
-});
-
-function toggleCheckboxEffect(checkbox) {
-	// Find the next sibling element with the class 'hiddenCheckbox'
-	let nextHiddenCheckbox = checkbox.parentElement.nextElementSibling;
-	while (nextHiddenCheckbox && !nextHiddenCheckbox.classList.contains('hiddenCheckbox')) {
-		nextHiddenCheckbox = nextHiddenCheckbox.nextElementSibling;
-	}
-
-	// If a corresponding 'hiddenCheckbox' element is found, toggle its display
-	if (nextHiddenCheckbox) {
-		if (checkbox.checked) {
-			nextHiddenCheckbox.style.display = 'block'; // Show the settings
-		} else {
-			nextHiddenCheckbox.style.display = 'none'; // Hide the settings
-		}
-	}
+function toggleMouseTrailSettings() {
+    var checkbox = document.getElementById('enable-mouse-trail');
+    var mouseTrailOptions = document.getElementById('mouse-trail-options');
+    mouseTrailOptions.style.display = checkbox.checked ? 'block' : 'none';
+    
+    // Additionally, handle enabling/disabling the mouse trail effect functionality
 }
 
+function toggleClickEffectSettings() {
+    var checkbox = document.getElementById('enable-click-effect');
+    var clickEffectOptions = document.getElementById('click-effect-options');
+    clickEffectOptions.style.display = checkbox.checked ? 'block' : 'none';
+    
+    // If needed, you can also enable/disable actual click effect functionality here
+}
+
+function toggleRgbSliders() {
+    // Get the radio button for RGB selection
+    const rgbRadio = document.getElementById('rgbColor');
+    // Get the container for the RGB sliders
+    const rgbSliders = document.querySelector('.rgb-sliders');
+
+    // Check if the RGB radio button is selected
+    if (rgbRadio && rgbRadio.checked) {
+        // If RGB is selected, display the sliders
+        rgbSliders.style.display = 'block';
+    } else {
+        // Otherwise, hide them
+        rgbSliders.style.display = 'none';
+    }
+}
+
+// Add an event listener to the radio buttons for changing the mouse trail color
+document.querySelectorAll('input[name="mouseTrailColorSelect"]').forEach(radio => {
+    radio.addEventListener('change', toggleRgbSliders);
+});
 
 $(document).ready(function() {
 	loadColorData(); // Load and apply saved color settings on startup
@@ -161,6 +137,31 @@ $(document).ready(function() {
 
 	// Activate the first tab
 	$('[role="tab"]:first').click();
+});
+
+$(document).ready(function() {
+	// Function to switch tabs and display corresponding content
+	function switchTab(tabId) {
+		// Hide all tab content sections
+		$('article[role="tabpanel"]').hide().attr('hidden', true);
+		// Show the selected tab content and remove the hidden attribute
+		$('#' + tabId).show().removeAttr('hidden');
+
+		// Update aria-selected for all tabs
+		$('menu[role="tablist"] button').attr('aria-selected', 'false');
+		// Mark the current tab as selected
+		$('menu[role="tablist"] button[aria-controls="' + tabId + '"]').attr('aria-selected', 'true');
+	}
+
+	// Initial display setup
+	let firstTabId = $('menu[role="tablist"] button:first').attr('aria-controls');
+	switchTab(firstTabId);
+
+	// Bind click event to tabs
+	$('menu[role="tablist"] button').click(function() {
+		var tabId = $(this).attr('aria-controls');
+		switchTab(tabId);
+	});
 });
 
 $(function() {
