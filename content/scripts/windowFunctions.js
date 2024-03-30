@@ -23,95 +23,6 @@ function closeWindow(button) {
 	window.style.display = 'none';
 }
 
-// Function to apply the color from sliders and save to localStorage
-function applyColor() {
-	// Wrap updateColorTheme with debounce
-	const debouncedUpdateColorTheme = debounce(function() {
-		const red = document.getElementById('window-red-slider').value,
-			green = document.getElementById('window-green-slider').value,
-			blue = document.getElementById('window-blue-slider').value;
-
-		// Update the CSS variable
-		document.documentElement.style.setProperty('--title-color', `rgb(${red}, ${green}, ${blue})`);
-
-		// Save the color settings to localStorage
-		localStorage.setItem('colorSettings', JSON.stringify({
-			red,
-			green,
-			blue
-		}));
-		console.log('Saved Colors:', {
-			red,
-			green,
-			blue
-		});
-	}, 100);
-
-	// Setup event listeners for the color sliders
-	document.getElementById('window-red-slider').addEventListener('input', debouncedUpdateColorTheme);
-	document.getElementById('window-green-slider').addEventListener('input', debouncedUpdateColorTheme);
-	document.getElementById('window-blue-slider').addEventListener('input', debouncedUpdateColorTheme);
-}
-
-// Debounce function to limit how often a function can fire
-function debounce(func, wait) {
-	let timeout;
-	return function executedFunction(...args) {
-		clearTimeout(timeout);
-		timeout = setTimeout(() => func(...args), wait);
-	};
-}
-
-// Separate function to load and apply saved color settings
-function loadColorData() {
-	const savedColorSettings = localStorage.getItem('colorSettings');
-	if (savedColorSettings) {
-		const colors = JSON.parse(savedColorSettings);
-		document.getElementById('window-red-slider').value = colors.red;
-		document.getElementById('window-green-slider').value = colors.green;
-		document.getElementById('window-blue-slider').value = colors.blue;
-		console.log('Loaded Saved Colors:', colors);
-		// Apply the loaded color settings immediately without debounce
-		document.documentElement.style.setProperty('--title-color', `rgb(${colors.red}, ${colors.green}, ${colors.blue})`);
-	}
-}
-
-// Function to apply the wallpaper
-function applyWallpaper() {
-	var savedWallpaper = localStorage.getItem('selectedWallpaper');
-	if (savedWallpaper) {
-		$('body').css('background-image', 'url(' + savedWallpaper + ')');
-		$('input[name="wallpaperselect"][value="' + savedWallpaper + '"]').prop('checked', true);
-		console.log('Saved Wallpaper:', savedWallpaper);
-	}
-
-	$('input[name="wallpaperselect"]').change(function() {
-		var newWallpaper = $(this).val();
-		$('body').css('background-image', 'url(' + newWallpaper + ')');
-		localStorage.setItem('selectedWallpaper', newWallpaper);
-		console.log('New Wallpaper Set:', newWallpaper);
-	});
-}
-
-function applyFavicon() {
-	// Load and apply the saved favicon from local storage
-	var savedFavicon = localStorage.getItem('selectedFavicon');
-	if (savedFavicon) {
-		$('#dynamicFavicon').attr('href', savedFavicon);
-		$('input[name="faviconSelect"][value="' + savedFavicon + '"]').prop('checked', true);
-		console.log('Saved Favicon:', savedFavicon);
-	}
-
-	// Set up change event listener using jQuery
-	$('input[name="faviconSelect"]').change(function() {
-		if ($(this).is(':checked')) {
-			var newFavicon = $(this).val();
-			$('#dynamicFavicon').attr('href', newFavicon);
-			localStorage.setItem('selectedFavicon', newFavicon);
-			console.log('New Favicon Set:', newFavicon);
-		}
-	});
-}
 
 function toggleMouseTrailSettings() {
 	var checkbox = document.getElementById('enable-mouse-trail');
@@ -151,10 +62,6 @@ document.querySelectorAll('input[name="mouseTrailColorSelect"]').forEach(radio =
 });
 
 $(document).ready(function() {
-	loadColorData(); // Load and apply saved color settings on startup
-	applyColor(); // Initialize color slider functionality
-	applyWallpaper(); // Apply the saved or default wallpaper
-	applyFavicon();
 	// Activate the first tab
 	$('[role="tab"]:first').click();
 });
