@@ -117,7 +117,7 @@ function toggleMouseTrailSettings() {
     // Additionally, handle enabling/disabling the mouse trail effect functionality
 }
 
-function toggleClickEffectSettings() {
+function toggleClickSettings() {
     var checkbox = document.getElementById('enable-click-effect');
     var clickEffectOptions = document.getElementById('click-effect-options');
     clickEffectOptions.style.display = checkbox.checked ? 'block' : 'none';
