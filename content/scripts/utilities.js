@@ -26,3 +26,17 @@ function loadFromLocalStorage(key) {
         return data; // Return as is if it's not JSON
     }
 }
+
+function createCooldownChecker(cooldownDuration) {
+    let lastCalled = 0;
+    return function(useCooldown) {
+        const now = Date.now();
+        // Check if we should apply cooldown and if it's within the cooldown period
+        if (useCooldown && (now - lastCalled < cooldownDuration)) {
+            console.log(`Color function is cooling down. Please wait ${now - lastCalled}ms`);
+            return false;
+        }
+        lastCalled = now; // Update the last called timestamp if cooldown is used
+        return true;
+    };
+}
