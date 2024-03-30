@@ -1,21 +1,6 @@
 <article role="tabpanel" id="window-color-settings">
     <fieldset>
         <legend>Adjust the sliders to change the color of the window.</legend>
-        <input type="color" id="window-color-picker" value="#7d7d7d" oninput="applyColor()">
+        <input type="color" id="window-color-picker" value="#7d7d7d" oninput="applyColor(this.value)">
     </fieldset>
 </article>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Directly use loadColorSettings to fetch the stored color value
-        var storedColor = loadColorSettings() || '#7d7d7d'; // Use a default color if none is saved
-
-        // Set the color picker's value to the stored or default color
-        document.getElementById('window-color-picker').value = storedColor;
-
-        // Optionally, if you want to trigger the applyColor function upon loading
-        // applyColor(); 
-        // Note: You would need to adjust applyColor to work without event parameter 
-        // or simulate an input event here if applyColor depends on it.
-    });
-</script>
