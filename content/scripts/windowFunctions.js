@@ -34,6 +34,15 @@ function toggleContainer(controlElementId, containerElementId) {
         console.error('One or more elements not found:', controlElementId, containerElementId);
     }
 }
+function disableContainer(containerElementId) {
+    var containerElement = document.getElementById(containerElementId);
+    
+    if (containerElement) {
+        containerElement.style.display = 'none';
+    } else {
+        console.error('Element not found:', containerElementId);
+    }
+}
 
 
 
