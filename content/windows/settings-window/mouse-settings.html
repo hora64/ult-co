@@ -127,3 +127,31 @@
     <legend>Mouse cursor settings</legend>
   </fieldset>
 </article>
+<script>
+    // Function to set initial values based on local storage
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve saved mouse click effect settings from local storage
+        const enableClickEffect = loadFromLocalStorage('enableClickEffect');
+        const clickEffectOptions = document.getElementById('click-effect-options');
+        const enableClickCheckbox = document.getElementById('enable-click-effect');
+        if (enableClickEffect) {
+            clickEffectOptions.style.display = 'block';
+            enableClickCheckbox.checked = true;
+        } else {
+            clickEffectOptions.style.display = 'none';
+            enableClickCheckbox.checked = false;
+        }
+
+        // Retrieve saved mouse trail effect settings from local storage
+        const enableMouseTrail = loadFromLocalStorage('enableMouseTrail');
+        const mouseTrailOptions = document.getElementById('mouse-trail-options');
+        const enableTrailCheckbox = document.getElementById('enable-mouse-trail');
+        if (enableMouseTrail) {
+            mouseTrailOptions.style.display = 'block';
+            enableTrailCheckbox.checked = true;
+        } else {
+            mouseTrailOptions.style.display = 'none';
+            enableTrailCheckbox.checked = false;
+        }
+    });
+</script>
