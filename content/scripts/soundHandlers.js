@@ -14,6 +14,14 @@ function applyStartupSound(selectedSoundUrl) {
     saveToLocalStorage('startupSoundUrl', selectedSoundUrl); // Save the new selection
 }
 
+function applyVolume(volume) {
+    var music = document.getElementById('startup');
+    if (music) {
+        music.volume = volume;
+        saveToLocalStorage('startupSoundVolume', volume); // Save the new volume
+    }
+}
+
 function playStartupSound() {
     var music = document.getElementById('startup');
     if (music) {
@@ -28,15 +36,6 @@ function playStartupSound() {
             });
     }
 }
-
-function applyVolume(volume) {
-    var music = document.getElementById('startup');
-    if (music) {
-        music.volume = volume;
-        saveToLocalStorage('startupSoundVolume', volume); // Save the new volume
-    }
-}
-
 // Wait for the full page content to load
 window.addEventListener('DOMContentLoaded', (event) => {
     // Play the startup sound immediately
