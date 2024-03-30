@@ -27,7 +27,7 @@ function loadFromLocalStorage(key) {
     }
 }
 
-function createCooldownChecker(cooldownDuration) {
+function cooldown(cooldownDuration) {
     let lastCalled = 0;
     return function(useCooldown) {
         const now = Date.now();
