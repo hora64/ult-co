@@ -7,10 +7,12 @@ function saveToLocalStorage(key, data) {
         const isObject = typeof data === 'object' && data !== null;
         localStorage.setItem(key, isObject ? JSON.stringify(data) : data);
         console.log(`${key} saved successfully.`);
+        console.log('Saved data:', data); // Log the saved data
     } catch (e) {
         console.error('Error saving data to local storage:', e);
     }
 }
+
 function loadFromLocalStorage(key) {
     const data = localStorage.getItem(key);
     if (data === null) {
