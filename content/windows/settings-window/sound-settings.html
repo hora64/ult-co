@@ -1,5 +1,7 @@
 <article role="tabpanel" id="sound-settings">
     <fieldset>
+        <legend>Startup Settings</legend>
+    <fieldset>
         <legend>Select a startup sound</legend>
         <div class="field-row">
             <input id="startupOption1" type="radio" name="startupSoundSelect" value="content/assets/audio/7startup.mp3" onclick="applyStartupSound(this.value)" checked>
@@ -16,9 +18,13 @@
     <fieldset>
         <legend>Volume Control</legend>
         <input type="range" id="volumeControl" name="volume" min="0" max="1" step="0.01" value="0.2" oninput="applyStartupVolume(this.value)">
-        <label for="volumeControl">Adjust Volume</label>
+    </fieldset>
+
+    <!-- Button to play the selected sound -->
+    <button onclick="playSelectedSound()">Play Selected Sound</button>
     </fieldset>
 </article>
+
 
 <script>
     // Function to set initial values based on local storage
