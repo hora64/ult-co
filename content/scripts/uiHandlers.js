@@ -17,16 +17,6 @@ function applyColor(hexColor, useCooldown = true) {
     console.log('Color applied:', hexColor);
 }
 
-function checkCooldown(useCooldown) {
-    const now = Date.now();
-    if (useCooldown && (now - lastCalled < 200)) {
-        console.log(`Color function is cooling down. Please wait ${now - lastCalled}ms`);
-        return true;
-    }
-    lastCalled = now;
-    return false;
-}
-
 function applyWallpaper(selectedWallpaper) {
     $('body').css('background-image', `url(${selectedWallpaper})`);
     saveToLocalStorage('selectedWallpaper', selectedWallpaper);
@@ -37,11 +27,4 @@ function applyFavicon(selectedFavicon) {
     saveToLocalStorage('selectedFavicon', selectedFavicon);
 }
 
-function debounce(func, delay) {
-    let timeout;
-    return function(...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), delay);
-    };
-}
+
