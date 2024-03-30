@@ -105,45 +105,7 @@
 							<label for="enable-click-effect">Enable mouse click</label>
 						</div>
 						<div class="field-row" id="click-effect-options">
-							<!-- Icon size -->
-							<fieldset>
-								<legend>Icon size</legend>
-								<div class="field-row">
-									<label for="size-min">Min:</label>
-									<input id="size-min" type="number" value="9" min="1" max="100" onchange="updateConfig('size', 'min', this.value)">
-								</div>
-								<div class="field-row">
-									<label for="size-max">Max:</label>
-									<input id="size-max" type="number" value="24" min="1" max="100" onchange="updateConfig('size', 'max', this.value)">
-								</div>
-							</fieldset>
-							<!-- Initial rotation -->
-							<fieldset>
-								<legend>Rotation</legend>
-								<fieldset>
-									<legend>Initial</legend>
-									<div class="field-row">
-										<label for="rotation-initial-min">Min:</label>
-										<input id="rotation-initial-min" type="number" value="-90" min="-360" max="360" onchange="updateConfig('rotation.initial', 'min', this.value)">
-									</div>
-									<div class="field-row">
-										<label for="rotation-initial-max">Max:</label>
-										<input id="rotation-initial-max" type="number" value="90" min="-360" max="360" onchange="updateConfig('rotation.initial', 'max', this.value)">
-									</div>
-								</fieldset>
-								<!-- Final rotation -->
-								<fieldset>
-									<legend>Final</legend>
-									<div class="field-row">
-										<label for="rotation-final-min">Min:</label>
-										<input id="rotation-final-min" type="number" value="-90" min="-360" max="360" onchange="updateConfig('rotation.final', 'min', this.value)">
-									</div>
-									<div class="field-row">
-										<label for="rotation-final-max">Max:</label>
-										<input id="rotation-final-max" type="number" value="90" min="-360" max="360" onchange="updateConfig('rotation.final', 'max', this.value)">
-									</div>
-								</fieldset>
-							</fieldset>
+							<!-- Select Icons -->
 							<fieldset>
 								<legend>Enabled icons</legend>
 								<div class="field-row">
@@ -182,6 +144,46 @@
 										<img src="content/assets/images/png/px16/ultcoFrutigerAeroGrey_px16.png" alt="Enable Grey Icon">
 									</label>
 								</div>
+							</fieldset>
+							<!-- Icon size -->
+							<fieldset>
+								<legend>Icon size</legend>
+								<div class="field-row">
+									<label for="size-min">Min:</label>
+									<input id="size-min" type="number" value="9" min="1" max="100" onchange="updateConfig('size', 'min', this.value)">
+								</div>
+								<div class="field-row">
+									<label for="size-max">Max:</label>
+									<input id="size-max" type="number" value="24" min="1" max="100" onchange="updateConfig('size', 'max', this.value)">
+								</div>
+							</fieldset>
+							<!-- Rotation settings-->
+							<fieldset>
+								<legend>Rotation</legend>
+								<!-- Initial rotation -->
+								<fieldset>
+									<legend>Initial</legend>
+									<div class="field-row">
+										<label for="rotation-initial-min">Min:</label>
+										<input id="rotation-initial-min" type="number" value="-90" min="-360" max="360" onchange="updateConfig('rotation.initial', 'min', this.value)">
+									</div>
+									<div class="field-row">
+										<label for="rotation-initial-max">Max:</label>
+										<input id="rotation-initial-max" type="number" value="90" min="-360" max="360" onchange="updateConfig('rotation.initial', 'max', this.value)">
+									</div>
+								</fieldset>
+								<!-- Final rotation -->
+								<fieldset>
+									<legend>Final</legend>
+									<div class="field-row">
+										<label for="rotation-final-min">Min:</label>
+										<input id="rotation-final-min" type="number" value="-90" min="-360" max="360" onchange="updateConfig('rotation.final', 'min', this.value)">
+									</div>
+									<div class="field-row">
+										<label for="rotation-final-max">Max:</label>
+										<input id="rotation-final-max" type="number" value="90" min="-360" max="360" onchange="updateConfig('rotation.final', 'max', this.value)">
+									</div>
+								</fieldset>
 							</fieldset>
 						</div>
 					</fieldset>
