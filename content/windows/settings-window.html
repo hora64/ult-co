@@ -1,50 +1,79 @@
- <div class="background">
- 	<div class="window color glass active" id="settingsWindow" style="width: 320px; height: 300px;">
- 		<div class="title-bar">
- 			<div class="title-bar-text">Website Customization</div>
- 			<div class="title-bar-controls">
- 				<button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
- 				<button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
- 				<button aria-label="Close" onclick="closeWindow(this)"></button>
- 			</div>
- 		</div>
- 		<div class="window-body has-space has-scrollbar" style="width: 295px; height: 250px; overflow: auto">
- 			<section class="tabs" style="max-width: 279px">
- 				<menu role="tablist" aria-label="settingsTabs">
- 					<button role="tab" aria-controls="window-color-settings" aria-selected="true" id="tab-btn-window-color">Window Color</button>
- 					<button role="tab" aria-controls="image-icon-settings" id="tab-btn-image-icon">Image & Icon Settings</button>
- 					<button role="tab" aria-controls="mouse-settings" id="tab-btn-mouse">Mouse</button>
- 					<button role="tab" aria-controls="sound-settings" id="tab-btn-sound">Sound</button>
- 				</menu>
- 				<div id="window-color-settings-content" class="tab-content"></div>
- 				<div id="image-icon-settings-content" class="tab-content"></div>
- 				<div id="mouse-settings-content" class="tab-content"></div>
- 				<div id="sound-settings-content" class="tab-content"></div>
- 			</section>
- 		</div>
- 	</div>
- </div>
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
- <script src="content/scripts/windowFunctions.js"></script>
- <script src="content/scripts/dataFunctions.js"></script>
- <script src="content/scripts/uiHandlers.js"></script>
- <script>
- 	$(document).ready(function() {
- 		// Load the default tab content from the specified directory
- 		$("#window-color-settings-content").load("content/windows/settings-window/window-color-settings.html");
- 		// Event listeners for tab buttons, with updated paths
- 		$("#tab-btn-window-color").click(function() {
- 			$("#window-color-settings-content").load("content/windows/settings-window/window-color-settings.html");
- 		});
- 		$("#tab-btn-image-icon").click(function() {
- 			$("#image-icon-settings-content").load("content/windows/settings-window/image-icon-settings.html");
- 		});
- 		$("#tab-btn-mouse").click(function() {
- 			$("#mouse-settings-content").load("content/windows/settings-window/mouse-settings.html");
- 		});
- 		$("#tab-btn-sound").click(function() {
- 			$("#sound-settings-content").load("content/windows/settings-window/sound-settings.html");
- 		});
- 	});
- </script>
+<!-- Direct content without HTML, HEAD, or BODY tags, ready for dynamic loading -->
+<div class="window color glass active" id="settingsWindow" style="width: 320px; height: 300px;">
+    <div class="title-bar">
+        <div class="title-bar-text">Website Customization</div>
+        <div class="title-bar-controls">
+            <button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
+            <button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
+            <button aria-label="Close" onclick="closeWindow(this)"></button>
+        </div>
+    </div>
+    <div class="window-body has-space has-scrollbar" style="width: 295px; height: 250px; overflow: auto">
+        <!-- Content sections for dynamic tab loading -->
+        <section class="tabs" style="max-width: 279px">
+            <menu role="tablist" aria-label="settingsTabs">
+                <button role="tab" aria-controls="window-color-settings-content" aria-selected="true" id="tab-btn-window-color">Window Color</button>
+                <button role="tab" aria-controls="image-icon-settings-content" id="tab-btn-image-icon">Image &amp; Icon Settings</button>
+                <button role="tab" aria-controls="mouse-settings-content" id="tab-btn-mouse">Mouse</button>
+                <button role="tab" aria-controls="sound-settings-content" id="tab-btn-sound">Sound</button>
+            </menu>
+            <div id="window-color-settings-content" class="tab-content"></div>
+            <div id="image-icon-settings-content" class="tab-content"></div>
+            <div id="mouse-settings-content" class="tab-content"></div>
+            <div id="sound-settings-content" class="tab-content"></div>
+        </section>
+    </div>
+</div>
+<!-- Scripts related to this fragment (if any) -->
+<script src="content/scripts/windowFunctions.js"></script>
+<script src="content/scripts/dataFunctions.js"></script>
+<script src="content/scripts/uiHandlers.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Assuming jQuery is loaded in the main document
+    
+    // Function to load content dynamically
+    function loadContent(tabId, contentId, contentUrl) {
+        // Check if content is already loaded
+        if ($(contentId).is(':empty')) {
+            // Load content dynamically
+            $(contentId).load(contentUrl);
+        }
+    }
+    
+    // Event handler for tab clicks
+    $('[role="tab"]').click(function() {
+        // Get tab and content IDs
+        var tabId = $(this).attr('id');
+        var contentId = '#' + $(this).attr('aria-controls') + '-content';
+        
+        // Load content dynamically
+        if (tabId === 'tab-btn-window-color') {
+            loadContent(tabId, contentId, 'content/window-color-settings.html');
+        } else if (tabId === 'tab-btn-image-icon') {
+            loadContent(tabId, contentId, 'content/image-icon-settings.html');
+        } else if (tabId === 'tab-btn-mouse') {
+            loadContent(tabId, contentId, 'content/mouse-settings.html');
+        } else if (tabId === 'tab-btn-sound') {
+            loadContent(tabId, contentId, 'content/sound-settings.html');
+        }
+    });
+    
+    // Load content for the initially selected tab
+    var initialTabId = $('[aria-selected="true"]').attr('id');
+    var initialContentId = '#' + $('[aria-selected="true"]').attr('aria-controls') + '-content';
+    
+    if (initialTabId) {
+        if (initialTabId === 'tab-btn-window-color') {
+            loadContent(initialTabId, initialContentId, 'content/window-color-settings.html');
+        } else if (initialTabId === 'tab-btn-image-icon') {
+            loadContent(initialTabId, initialContentId, 'content/image-icon-settings.html');
+        } else if (initialTabId === 'tab-btn-mouse') {
+            loadContent(initialTabId, initialContentId, 'content/mouse-settings.html');
+        } else if (initialTabId === 'tab-btn-sound') {
+            loadContent(initialTabId, initialContentId, 'content/sound-settings.html');
+        }
+    }
+});
+</script>
