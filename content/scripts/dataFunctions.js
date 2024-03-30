@@ -1,15 +1,12 @@
 function saveColorSettings(hexColor) {
-    localStorage.setItem('colorSettings', JSON.stringify({ hexColor }));
+    // Directly store the hex color string
+    localStorage.setItem('colorSettings', hexColor);
 }
 
 function loadColorSettings() {
+    // Directly retrieve the hex color string
     const savedColorSettings = localStorage.getItem('colorSettings');
-    if (savedColorSettings) {
-        const { hexColor } = JSON.parse(savedColorSettings);
-        // Return the hexColor to be applied by the caller
-        return hexColor;
-    }
-    return null; // No saved settings
+    return savedColorSettings ? savedColorSettings : null; // Return null if not found
 }
 
 
