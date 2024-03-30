@@ -92,7 +92,23 @@ function applyWallpaper() {
 		console.log('New Wallpaper Set:', newWallpaper);
 	});
 }
+function applyFavicon() {
+    // Load and apply the saved favicon from local storage
+    var savedFavicon = localStorage.getItem('selectedFavicon');
+    if (savedFavicon) {
+        $('#dynamicFavicon').attr('href', savedFavicon);
+        $('input[name="faviconSelect"][value="' + savedFavicon + '"]').prop('checked', true);
+    }
 
+    // Set up change event listener using jQuery
+    $('input[name="faviconSelect"]').change(function() {
+        if ($(this).is(':checked')) {
+            var newFavicon = $(this).val();
+            $('#dynamicFavicon').attr('href', newFavicon);
+            localStorage.setItem('selectedFavicon', newFavicon);
+        }
+    });
+}
 function toggleMouseTrailSettings() {
     var checkbox = document.getElementById('enable-mouse-trail');
     var mouseTrailOptions = document.getElementById('mouse-trail-options');
@@ -134,7 +150,7 @@ $(document).ready(function() {
 	loadColorData(); // Load and apply saved color settings on startup
 	applyColor(); // Initialize color slider functionality
 	applyWallpaper(); // Apply the saved or default wallpaper
-
+    applyFavicon();
 	// Activate the first tab
 	$('[role="tab"]:first').click();
 });
