@@ -1,47 +1,47 @@
+
 $(document).ready(function() {
-    // Load and apply color settings or apply default color
-    const hexColor = loadFromLocalStorage('colorSettings') || '#7d7d7d'; // Default color if no saved settings
-    applyColor(hexColor);
+    // Initial settings load without cooldown
+    const hexColor = loadFromLocalStorage('colorSettings') || '#7d7d7d';
+    applyColor(hexColor, false);
     
-    // Load saved wallpaper and apply
-    const savedWallpaper = loadFromLocalStorage('selectedWallpaper') || 'content/assets/images/wallpapers/frutigeraero.jpg'; // Default wallpaper path
+    const savedWallpaper = loadFromLocalStorage('selectedWallpaper') || 'content/assets/images/wallpapers/frutigeraero.jpg';
     applyWallpaper(savedWallpaper);
 
-    // Load saved favicon and apply
-    const savedFavicon = loadFromLocalStorage('selectedFavicon') || 'content/assets/images/icons/ultcoFrutigerAeroBlue_px64.ico'; // Default favicon path
+    const savedFavicon = loadFromLocalStorage('selectedFavicon') || 'content/assets/images/icons/ultcoFrutigerAeroBlue_px64.ico';
     applyFavicon(savedFavicon);
 });
 
-function applyColor(hexColor) {
-    // Adjusted debounce function to handle color changes
-    $('#window-color-picker').on('input', debounce(function() {
-        const newColor = $(this).val();
-        document.documentElement.style.setProperty('--title-color', newColor);
-        saveToLocalStorage('colorSettings', newColor);
-        console.log('Color applied:', newColor);
-    }, 500));
-}
+let lastCalled = 0;
+function applyColor(hexColor, useCooldown = true) {
+    const now = Date.now();
+    // Check if we should apply cooldown and if it's within the cooldown period
+    if (useCooldown && (now - lastCalled < 500)) {
+        console.log("Action is cooling down. Please wait.");
+        return;
+    }
+    lastCalled = now; // Update the last called timestamp if cooldown is used
 
+    // Apply the color change
+    document.documentElement.style.setProperty('--title-color', hexColor);
+    saveToLocalStorage('colorSettings', hexColor);
+    console.log('Color applied:', hexColor);
+}
 function applyWallpaper(selectedWallpaper) {
     $('body').css('background-image', `url(${selectedWallpaper})`);
-    saveToLocalStorage('selectedWallpaper', selectedWallpaper); // Save the new selection
+    saveToLocalStorage('selectedWallpaper', selectedWallpaper);
 }
 
 function applyFavicon(selectedFavicon) {
     $('#dynamicFavicon').attr('href', selectedFavicon);
-    saveToLocalStorage('selectedFavicon', selectedFavicon); // Save the new selection
+    saveToLocalStorage('selectedFavicon', selectedFavicon);
 }
 
-// Assuming the debounce function is defined elsewhere in your script as provided
-
-
+// Debounce function remains unchanged
 function debounce(func, delay) {
     let timeout;
     return function(...args) {
         const context = this;
         clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            func.apply(context, args);
-        }, delay);
+        timeout = setTimeout(() => func.apply(context, args), delay);
     };
 }
