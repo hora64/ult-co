@@ -97,7 +97,28 @@ $(function() {
     });
 
     $(window).resize(function() {
-        $(".window.glass.active").resizable("option", "maxHeight", $(window).height());
-        $(".window.glass.active").resizable("option", "maxWidth", $(window).width());
+        var maxHeight = $(window).height();
+        var maxWidth = $(window).width();
+
+        // Update the resizable options
+        $(".window.glass.active").resizable("option", "maxHeight", maxHeight);
+        $(".window.glass.active").resizable("option", "maxWidth", maxWidth);
+
+        // Adjust window-body within the window to ensure it has space and can show a scrollbar if needed
+        $(".window.glass.active .window-body").each(function() {
+            var $this = $(this);
+
+            // Adjustments here depend on your layout. Example:
+            var padding = 10; // Assuming there's some padding inside the window that should be accounted for
+            var titleBarHeight = $this.siblings(".title-bar").outerHeight(true) || 0; // Include margin if true
+            
+            // Set maximum height considering the title bar and padding
+            var bodyMaxHeight = maxHeight - titleBarHeight - (padding * 2);
+            $this.css({
+                'max-height': bodyMaxHeight + 'px',
+                'overflow-y': 'auto' // Add scrollbar if content overflows
+            });
+        });
     });
 });
+
