@@ -82,23 +82,22 @@ function unloadTabContent(tabSelector) {
 
 // jQuery for draggable and resizable behaviors on "#app-settings"
 $(function() {
-	// Draggable and resizable initialization for "#app-settings"
-	$(".window.glass.active").draggable({
-		cancel: '.inhalt', // Selector for elements that should not initiate drag
-		containment: 'body', // Constrain dragging within the body
-		scroll: false // Disable window scroll during drag
-	}).resizable({
-		handles: 'n, e, s, w, ne, se, sw, nw', // Enable resizing from all sides and corners
-		containment: 'body', // Constrain resizing within the body
-		minHeight: 80, // Minimum height
-		minWidth: 138, // Minimum width
-		maxHeight: $(window).height(), // Maximum height
-		maxWidth: $(window).width() // Maximum width
-	});
+    $(".window.glass.active").draggable({
+        handle: ".window-edge", // Specify the handle for dragging
+        cancel: '.inhalt',
+        containment: 'body',
+        scroll: false
+    }).resizable({
+        handles: 'n, e, s, w, ne, se, sw, nw',
+        containment: 'body',
+        minHeight: 80,
+        minWidth: 138,
+        maxHeight: $(window).height(),
+        maxWidth: $(window).width()
+    });
 
-	// Dynamically update maximum size on window resize
-	$(window).resize(function() {
-		$(".window.glass.active").resizable("option", "maxHeight", $(window).height());
-		$(".window.glass.active").resizable("option", "maxWidth", $(window).width());
-	});
+    $(window).resize(function() {
+        $(".window.glass.active").resizable("option", "maxHeight", $(window).height());
+        $(".window.glass.active").resizable("option", "maxWidth", $(window).width());
+    });
 });
