@@ -31,6 +31,7 @@
 <script src="content/scripts/settingsManager.js"></script>
 <script>
 $(document).ready(function() {
+    loadTabContent("#window-color-settings-content", "content/windows/settings-window/window-color-settings.html");
     // Event listeners for tab buttons
     $("#tab-btn-window-color").click(function() {
         unloadTabContent(".tab-content"); // Unload content of all tabs
