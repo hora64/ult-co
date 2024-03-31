@@ -82,18 +82,48 @@ function unloadTabContent(tabSelector) {
 
 // jQuery for draggable and resizable behaviors on "#app-settings"
 $(function() {
+    // Flags to track the state of dragging and resizing
+    let isDragging = false;
+    let isResizing = false;
+
     $(".window.glass.active").draggable({
-        handle: ".title-bar", // Specify the handle for dragging
+        handle: ".title-bar",
         cancel: '.inhalt',
         containment: 'body',
-        scroll: false
+        scroll: false,
+        start: function(event, ui) {
+            // Prevent dragging if resizing is active
+            if (isResizing) {
+                $(this).draggable('disable');
+            } else {
+                isDragging = true;
+            }
+        },
+        stop: function(event, ui) {
+            isDragging = false;
+            // Re-enable dragging once the drag action has stopped
+            $(this).draggable('enable');
+        }
     }).resizable({
         handles: 'e, s, w',
         containment: 'body',
         minHeight: 80,
         minWidth: 138,
         maxHeight: $(window).height(),
-        maxWidth: $(window).width()
+        maxWidth: $(window).width(),
+        start: function(event, ui) {
+            // Prevent resizing if dragging is active
+            if (isDragging) {
+                $(this).resizable('disable');
+            } else {
+                isResizing = true;
+            }
+        },
+        stop: function(event, ui) {
+            isResizing = false;
+            // Re-enable resizing once the resize action has stopped
+            $(this).resizable('enable');
+        }
     });
 
     $(window).resize(function() {
@@ -104,21 +134,16 @@ $(function() {
         $(".window.glass.active").resizable("option", "maxHeight", maxHeight);
         $(".window.glass.active").resizable("option", "maxWidth", maxWidth);
 
-        // Adjust window-body within the window to ensure it has space and can show a scrollbar if needed
+        // Adjustments for window-body as previously
         $(".window.glass.active .window-body").each(function() {
             var $this = $(this);
-
-            // Adjustments here depend on your layout. Example:
-            var padding = 10; // Assuming there's some padding inside the window that should be accounted for
-            var titleBarHeight = $this.siblings(".title-bar").outerHeight(true) || 0; // Include margin if true
-            
-            // Set maximum height considering the title bar and padding
+            var padding = 10; // Example padding
+            var titleBarHeight = $this.siblings(".title-bar").outerHeight(true) || 0;
             var bodyMaxHeight = maxHeight - titleBarHeight - (padding * 2);
             $this.css({
                 'max-height': bodyMaxHeight + 'px',
-                'overflow-y': 'auto' // Add scrollbar if content overflows
+                'overflow-y': 'auto'
             });
         });
     });
 });
-
