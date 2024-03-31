@@ -82,67 +82,75 @@ function unloadTabContent(tabSelector) {
 
 // jQuery for draggable and resizable behaviors on "#app-settings"
 $(function() {
-    // Flags to track the state of dragging and resizing
-    let isDragging = false;
-    let isResizing = false;
+    var activeWindowSelector = ".window.glass.active";
+    
+    $(activeWindowSelector).each(function() {
+        // Capture initial dimensions
+        var $element = $(this);
+        var initialWidth = $element.outerWidth();
+        var initialHeight = $element.outerHeight();
 
-    $(".window.glass.active").draggable({
-        handle: ".title-bar",
-        cancel: '.inhalt',
-        containment: 'body',
-        scroll: false,
-        start: function(event, ui) {
-            // Prevent dragging if resizing is active
-            if (isResizing) {
-                $(this).draggable('disable');
-            } else {
-                isDragging = true;
+        // Initialize draggable
+        $element.draggable({
+            handle: ".title-bar",
+            cancel: '.inhalt',
+            containment: 'body',
+            scroll: false,
+            start: function(event, ui) {
+                if ($element.resizable("option", "disabled")) {
+                    $(this).data('allowDrag', true);
+                } else {
+                    $(this).data('allowDrag', false);
+                    return false; // Prevent dragging if resizable is enabled but not allowed
+                }
+            },
+            drag: function(event, ui) {
+                if (!$(this).data('allowDrag')) {
+                    return false; // Cancel dragging dynamically if not allowed
+                }
+            },
+            stop: function(event, ui) {
+                $(this).data('allowDrag', false); // Reset flag after drag stops
             }
-        },
-        stop: function(event, ui) {
-            isDragging = false;
-            // Re-enable dragging once the drag action has stopped
-            $(this).draggable('enable');
-        }
-    }).resizable({
-        handles: 'e, s, w',
-        containment: 'body',
-        minHeight: 80,
-        minWidth: 138,
-        maxHeight: $(window).height(),
-        maxWidth: $(window).width(),
-        start: function(event, ui) {
-            // Prevent resizing if dragging is active
-            if (isDragging) {
-                $(this).resizable('disable');
-            } else {
-                isResizing = true;
+        });
+
+        // Initialize resizable
+        $element.resizable({
+            handles: 'e, s, w',
+            containment: 'body',
+            minWidth: initialWidth,
+            minHeight: initialHeight,
+            start: function(event, ui) {
+                if ($element.draggable("option", "disabled")) {
+                    $(this).data('allowResize', true);
+                } else {
+                    $(this).data('allowResize', false);
+                    return false; // Prevent resizing if draggable is enabled but not allowed
+                }
+            },
+            resize: function(event, ui) {
+                if (!$(this).data('allowResize')) {
+                    return false; // Cancel resizing dynamically if not allowed
+                }
+            },
+            stop: function(event, ui) {
+                $(this).data('allowResize', false); // Reset flag after resize stops
             }
-        },
-        stop: function(event, ui) {
-            isResizing = false;
-            // Re-enable resizing once the resize action has stopped
-            $(this).resizable('enable');
-        }
+        });
     });
 
+    // Adjust maximum height and width on window resize
     $(window).resize(function() {
         var maxHeight = $(window).height();
         var maxWidth = $(window).width();
 
-        // Update the resizable options
-        $(".window.glass.active").resizable("option", "maxHeight", maxHeight);
-        $(".window.glass.active").resizable("option", "maxWidth", maxWidth);
-
-        // Adjustments for window-body as previously
-        $(".window.glass.active .window-body").each(function() {
-            var $this = $(this);
-            var padding = 10; // Example padding
-            var titleBarHeight = $this.siblings(".title-bar").outerHeight(true) || 0;
-            var bodyMaxHeight = maxHeight - titleBarHeight - (padding * 2);
-            $this.css({
-                'max-height': bodyMaxHeight + 'px',
-                'overflow-y': 'auto'
+        $(activeWindowSelector).each(function() {
+            $(this).resizable("option", "maxHeight", maxHeight).resizable("option", "maxWidth", maxWidth);
+            
+            // Adjust the .window-body inside each active window
+            $(this).find(".window-body").css({
+                'max-height': maxHeight - $(this).find(".title-bar").outerHeight(true) - 20, // Consider title bar height and padding
+                'overflow-y': 'auto' // Ensure scrollability
             });
         });
     });
