@@ -88,7 +88,7 @@ $(function() {
         containment: 'body',
         scroll: false
     }).resizable({
-        handles: 'n, e, s, w, ne, se, sw, nw',
+        handles: 'e, s, w',
         containment: 'body',
         minHeight: 80,
         minWidth: 138,
