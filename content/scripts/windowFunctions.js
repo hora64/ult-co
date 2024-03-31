@@ -83,7 +83,7 @@ function unloadTabContent(tabSelector) {
 // jQuery for draggable and resizable behaviors on "#app-settings"
 $(function() {
     $(".window.glass.active").draggable({
-        handle: ".window-edge", // Specify the handle for dragging
+        handle: ".title-bar", // Specify the handle for dragging
         cancel: '.inhalt',
         containment: 'body',
         scroll: false
