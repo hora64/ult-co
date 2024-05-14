@@ -31,27 +31,42 @@
 <script src="content/scripts/settingsManager.js"></script>
 <script>
 $(document).ready(function() {
+    // Load initial content
     loadTabContent("#window-color-settings-content", "content/windows/settings-window/window-color-settings.html");
+
+    // Function to handle tab selection state
+    function selectTab(tabButton) {
+        // Remove aria-selected from all tabs
+        $("menu[role='tablist'] button").attr("aria-selected", "false");
+        // Set aria-selected to true for the clicked tab
+        $(tabButton).attr("aria-selected", "true");
+    }
+
     // Event listeners for tab buttons
     $("#tab-btn-window-color").click(function() {
+        selectTab(this);
         unloadTabContent(".tab-content"); // Unload content of all tabs
         loadTabContent("#window-color-settings-content", "content/windows/settings-window/window-color-settings.html");
     });
 
     $("#tab-btn-image-icon").click(function() {
+        selectTab(this);
         unloadTabContent(".tab-content"); // Unload content of all tabs
         loadTabContent("#image-icon-settings-content", "content/windows/settings-window/image-icon-settings.html");
     });
 
     $("#tab-btn-mouse").click(function() {
+        selectTab(this);
         unloadTabContent(".tab-content"); // Unload content of all tabs
         loadTabContent("#mouse-settings-content", "content/windows/settings-window/mouse-settings.html");
     });
 
     $("#tab-btn-sound").click(function() {
+        selectTab(this);
         unloadTabContent(".tab-content"); // Unload content of all tabs
         loadTabContent("#sound-settings-content", "content/windows/settings-window/sound-settings.html");
     });
 });
+
 
 </script>
