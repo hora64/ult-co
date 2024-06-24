@@ -1,0 +1,47 @@
+<div class="background">
+	<div class="window color glass active" id="settingsWindow" style="width: 320px;">
+		<div class="title-bar">
+			<div class="title-bar-text">Website Customization</div>
+			<div class="title-bar-controls">
+				<button aria-label="Minimize" onclick="minimizeWindow(this)"></button>
+				<button aria-label="Maximize" onclick="maximizeWindow(this)"></button>
+				<button aria-label="Close" onclick="closeWindow(this)"></button>
+			</div>
+		</div>
+		<div class="window-body has-space">
+			<section class="tabs">
+				<menu role="tablist" aria-label="Website Settings">
+					<button role="tab" aria-controls="colorSettings" aria-selected="true" onclick="showTabPanel(this)">Window Color</button>
+					<button role="tab" aria-controls="tab-B" aria-selected="false" onclick="showTabPanel(this)">Wallpaper</button>
+					<button role="tab" aria-controls="tab-C" aria-selected="false" onclick="showTabPanel(this)">Tab C</button>
+					<button role="tab" aria-controls="tab-D" disabled>Tab D</button>
+				</menu>
+				<article role="tabpanel" id="colorSettings">
+					<fieldset>
+						<legend>Adjust the sliders to change the color of the window.</legend>
+						<div class="field-row">
+							<label for="red-slider">R</label>
+							<input id="red-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+						</div>
+						<div class="field-row">
+							<label for="green-slider">G</label>
+							<input id="green-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+						</div>
+						<div class="field-row">
+							<label for="blue-slider">B</label>
+							<input id="blue-slider" type="range" min="0" max="255" value="125" oninput="applyColor()">
+						</div>
+					</fieldset>
+				</article>
+				<article role="tabpanel" id="tab-B" hidden>Content for Tab B</article>
+				<article role="tabpanel" id="tab-C" hidden>Content for Tab C</article>
+				<article role="tabpanel" id="tab-D" hidden>Tab D is inactive</article>
+			</section>
+		</div>
+	</div>
+</div>
+<!-- jQuery and jQuery UI for other dynamic behaviors -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<!-- Your custom JavaScript file -->
+<script src="content/scripts/windowFunctions.js"></script>
