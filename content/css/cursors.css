@@ -1,40 +1,40 @@
 /* Default cursor (grey icon) */
 body {
-    cursor: url('../assets/images/ultco/ultcoGrey.png'), auto;
+    cursor: url('../assets/images/ultco/ultcoGrey.png') 16 16, auto;
 }
 
 /* Pointer cursor (lime icon) */
 a, button {
-    cursor: url('../assets/images/ultco/ultcoLime.png'), pointer;
+    cursor: url('../assets/images/ultco/ultcoLime.png') 16 16, pointer;
 }
 
 a:hover, button:hover {
-    cursor: url('../assets/images/ultco/ultcoLime.png') 32 32, pointer; /* Larger cursor */
+    cursor: url('../assets/images/ultco/ultcoLime.png') 16 16, pointer; /* Larger cursor */
 }
 
 /* Text cursor (pink icon) */
 input[type="text"], textarea {
-    cursor: url('../assets/images/ultco/ultcoPink.png'), text;
+    cursor: url('../assets/images/ultco/ultcoPink.png') 16 16, text;
 }
 
 input[type="text"]:hover, textarea:hover {
-    cursor: url('../assets/images/ultco/ultcoPink.png') 32 32, text; /* Larger cursor */
+    cursor: url('../assets/images/ultco/ultcoPink.png') 16 16, text; /* Larger cursor */
 }
 
 /* Wait cursor (red icon) */
 .waiting {
-    cursor: url('../assets/images/ultco/ultcoRed.png'), wait;
+    cursor: url('../assets/images/ultco/ultcoRed.png') 16 16, wait;
 }
 
 .waiting:hover {
-    cursor: url('../assets/images/ultco/ultcoRed.png') 32 32, wait; /* Larger cursor */
+    cursor: url('../assets/images/ultco/ultcoRed.png') 16 16, wait; /* Larger cursor */
 }
 
 /* Help cursor (blue icon) */
 .help {
-    cursor: url('../assets/images/ultco/ultcoBlue.png'), help;
+    cursor: url('../assets/images/ultco/ultcoBlue.png') 16 16, help;
 }
 
 .help:hover {
-    cursor: url('../assets/images/ultco/ultcoBlue.png') 32 32, help; /* Larger cursor */
+    cursor: url('../assets/images/ultco/ultcoBlue.png') 16 16, help; /* Larger cursor */
 }
