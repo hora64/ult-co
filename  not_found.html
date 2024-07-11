@@ -11,16 +11,20 @@
         }
     </style>
     <style>
-            .centered-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                text-align: center;
-            }
-            .centered-button {
-                margin-top: 20px;
-            }
+.centered-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Aligns items at the top */
+    height: 50vh; /* Adjusts the height to 50% of the viewport height */
+    text-align: center;
+    width: 50%; /* Adjusts the width to 50% of the viewport width */
+    margin: 0 auto; /* Centers the container horizontally */
+    box-sizing: border-box; /* Ensures padding and border are included in the width and height */
+}
+
+.centered-button {
+    margin-top: 20px;
+}
     </style>
     <link rel="stylesheet" href="content/css/cursors.css">
     <link rel="icon" type="image/png" href="content/assets/images/ultco/ultcoRed.png"/>
