@@ -10,6 +10,18 @@
             background-repeat: repeat;
         }
     </style>
+    <style>
+            .centered-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                text-align: center;
+            }
+            .centered-button {
+                margin-top: 20px;
+            }
+    </style>
     <link rel="stylesheet" href="content/css/cursors.css">
     <link rel="icon" type="image/png" href="content/assets/images/ultco/ultcoRed.png"/>
     <script src="https://unpkg.com/webamp@1.5.0/built/webamp.bundle.min.js"></script>
@@ -17,7 +29,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
 <body>
-    <div id="window">
+    <div id="window centered-container">
         <div id="content"></div>
     </div>
     <div id="app-webamp"></div>
@@ -36,15 +48,6 @@
                 link.rel = 'stylesheet';
                 link.href = 'https://unpkg.com/98.css';
                 shadowRoot.appendChild(link);
-
-                // Create the title bar in the shadow root
-                const titleBar = document.createElement('div');
-                titleBar.className = 'title-bar';
-                const titleBarText = document.createElement('div');
-                titleBarText.className = 'title-bar-text';
-                titleBarText.innerText = 'Main Content';
-                titleBar.appendChild(titleBarText);
-                shadowRoot.appendChild(titleBar);
 
                 // Create the window body in the shadow root
                 const windowBody = document.createElement('div');
