@@ -12,14 +12,11 @@
     </style>
     <style>
 .centered-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Aligns items at the top */
-    height: 50vh; /* Adjusts the height to 50% of the viewport height */
-    text-align: center;
-    width: 50%; /* Adjusts the width to 50% of the viewport width */
-    margin: 0 auto; /* Centers the container horizontally */
-    box-sizing: border-box; /* Ensures padding and border are included in the width and height */
+    padding: 8px;
+    position: relative;
+    margin: auto;
+    width: 50vw;
+    top: 5vh;
 }
 
 .centered-button {
@@ -33,8 +30,8 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
 <body>
-    <div id="window centered-container">
-        <div id="content"></div>
+    <div id="window">
+        <div id="content" class=centered-container></div>
     </div>
     <div id="app-webamp"></div>
     <script>
