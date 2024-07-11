@@ -18,12 +18,7 @@
 </head>
 <body>
     <div id="window">
-        <div id="windowTitleBar" class="title-bar">
-            <div class="title-bar-text">Main Content</div>
-        </div>
-    <div id="windowContent" class="window-body">
-        <p>This is a sample content styled with 98.css.</p>
-    </div>
+        <div id="content"></div>
     </div>
     <div id="app-webamp"></div>
     <script>
@@ -31,7 +26,7 @@
             $("#app-webamp").load("content/windows/webamp.html", function() {
                 // WebAmp loaded
             });
-            $("#windowContent").load("content/windows/main.html", function() {
+            $("#content").load("content/windows/main.html", function() {
                 // Main content loaded
                 const contentDiv = document.getElementById('content');
                 const shadowRoot = contentDiv.attachShadow({mode: 'open'});
@@ -51,10 +46,15 @@
                 titleBar.appendChild(titleBarText);
                 shadowRoot.appendChild(titleBar);
 
-                // Move the loaded content into the shadow root
+                // Create the window body in the shadow root
+                const windowBody = document.createElement('div');
+                windowBody.className = 'window-body';
+
+                // Move the loaded content into the window body
                 while (contentDiv.firstChild) {
-                    shadowRoot.appendChild(contentDiv.firstChild);
+                    windowBody.appendChild(contentDiv.firstChild);
                 }
+                shadowRoot.appendChild(windowBody);
             });
         });
     </script>
