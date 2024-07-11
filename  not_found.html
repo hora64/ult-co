@@ -6,7 +6,7 @@
     <title>ult & co 3ds</title>
     <style>
         body {
-            background-image: url('content/assets/images/background/stars1.gif');
+            background-image: url('content/assets/images/background/infinitefun.png');
             background-repeat: repeat;
         }
     </style>
@@ -26,7 +26,7 @@
             $("#app-webamp").load("content/windows/webamp.html", function() {
                 // WebAmp loaded
             });
-            $("#content").load("content/windows/main.html", function() {
+            $("#content").load("content/windows/invalid.html", function() {
                 // Main content loaded
                 const contentDiv = document.getElementById('content');
                 const shadowRoot = contentDiv.attachShadow({mode: 'open'});
@@ -41,6 +41,8 @@
                 const titleBar = document.createElement('div');
                 titleBar.className = 'title-bar';
                 const titleBarText = document.createElement('div');
+                titleBarText.className = 'title-bar-text';
+                titleBarText.innerText = 'Main Content';
                 titleBar.appendChild(titleBarText);
                 shadowRoot.appendChild(titleBar);
 
