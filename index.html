@@ -38,13 +38,6 @@
                 link.href = 'https://unpkg.com/98.css';
                 shadowRoot.appendChild(link);
 
-                // Create the title bar in the shadow root
-                const titleBar = document.createElement('div');
-                titleBar.className = 'title-bar';
-                const titleBarText = document.createElement('div');
-                titleBar.appendChild(titleBarText);
-                shadowRoot.appendChild(titleBar);
-
                 // Create the window body in the shadow root
                 const windowBody = document.createElement('div');
                 windowBody.className = 'window-body';
