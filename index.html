@@ -5,62 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ult & co 3ds</title>
     <style>
-        :root {
-            --scale: 1; /* Initial value, will be updated by JavaScript */
-        }
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #000000;
-            overflow: hidden; /* Add this line to remove overflow */
-        }
-        .box {
-            background-color: #4CAF50;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: calc(var(--scale) * 0.12px);
-            font-family: Arial, sans-serif;
-        }
-        #topScreen {
-            width: calc(var(--scale) * 5px);
-            height: calc(var(--scale) * 3px);
-        }
-        #bottomScreen {
-            width: calc(var(--scale) * 4px);
-            height: calc(var(--scale) * 3px);
+            background-image: url('content/assets/images/background/stars1.gif');
+            background-repeat: repeat;
+            background-size: cover;
         }
     </style>
     <link rel="stylesheet" href="content/css/cursors.css">
     <link rel="stylesheet" href="content/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <script src="https://unpkg.com/webamp@1.5.0/built/webamp.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
 </head>
 <body>
-    <div id="topScreen" class="box">
+    <div id="content">
 	
 	</div>
-    <div id="bottomScreen" class="box">
-	
-	</div>
+    <div id="app-webamp">
 
+    </div>
     <script>
-        function updateScale() {
-            let vh = window.innerHeight;
-            let scale = vh / 6;
-            document.documentElement.style.setProperty('--scale', scale);
-        }
-
-        // Update scale on initial load
-        updateScale();
-
-        // Update scale on window resize
-        window.addEventListener('resize', updateScale);
-
         $(document).ready(function() {
-            $("#topScreen").load("content/windows/top");
-            $("#bottomScreen").load("path/to/bottomScreenContent.html");
+            $("#app-webamp").load("content/windows/webamp.html", function() {
+                // WebAmp loaded
+            });
+            $("#content").load("content/windows/main.html", function() {
+                // Main content loaded
+            });
         });
     </script>
 </body>
