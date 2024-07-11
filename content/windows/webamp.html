@@ -33,8 +33,8 @@
 
             // Load initial tracks and skins from JSON files
             const [initialTracks, availableSkins] = await Promise.all([
-                loadJsonData('content/assets/jsonLists/webampSongs.json'),
-                loadJsonData('content/assets/jsonLists/webampSkins.json')
+                loadJsonData('content/jsonLists/webampSongs.json'),
+                loadJsonData('content/jsonLists/webampSkins.json')
             ]);
 
             if (initialTracks.length === 0) {
