@@ -17,14 +17,21 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
 <body>
-    <div id="content"></div>
+    <div id="window">
+        <div id="windowTitleBar" class="title-bar">
+            <div class="title-bar-text">Main Content</div>
+        </div>
+    <div id="windowContent" class="window-body">
+        <p>This is a sample content styled with 98.css.</p>
+    </div>
+    </div>
     <div id="app-webamp"></div>
     <script>
         $(document).ready(function() {
             $("#app-webamp").load("content/windows/webamp.html", function() {
                 // WebAmp loaded
             });
-            $("#content").load("content/windows/main.html", function() {
+            $("#windowContent").load("content/windows/main.html", function() {
                 // Main content loaded
                 const contentDiv = document.getElementById('content');
                 const shadowRoot = contentDiv.attachShadow({mode: 'open'});
@@ -34,6 +41,15 @@
                 link.rel = 'stylesheet';
                 link.href = 'https://unpkg.com/98.css';
                 shadowRoot.appendChild(link);
+
+                // Create the title bar in the shadow root
+                const titleBar = document.createElement('div');
+                titleBar.className = 'title-bar';
+                const titleBarText = document.createElement('div');
+                titleBarText.className = 'title-bar-text';
+                titleBarText.innerText = 'Main Content';
+                titleBar.appendChild(titleBarText);
+                shadowRoot.appendChild(titleBar);
 
                 // Move the loaded content into the shadow root
                 while (contentDiv.firstChild) {
