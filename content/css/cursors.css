@@ -1,14 +1,14 @@
 /* Default cursor (grey icon) */
-body {
+html {
     cursor: url('../assets/images/ultco/ultcoGrey.png') 16 16, auto;
 }
 
 /* Pointer cursor (lime icon) */
-a, button {
+a, button, .hover-lime {
     cursor: url('../assets/images/ultco/ultcoLime.png') 16 16, pointer;
 }
 
-a:hover, button:hover {
+a:hover, button:hover, .hover-lime:hover {
     cursor: url('../assets/images/ultco/ultcoLime.png') 16 16, pointer; /* Larger cursor */
 }
 
