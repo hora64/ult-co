@@ -46,23 +46,20 @@ export function toggleContainer(controlElementId, containerElementId) {
     }
 }
 function initializeShadowContent(containerId, windowId, stylesheetUrl, draggableFunction) {
-    const contentDiv = document.getElementById(containerId);
     const windowElement = document.getElementById(windowId);
-
-    if (!contentDiv) {
-        console.error(`Element with ID ${containerId} not found.`);
-        return;
-    }
 
     if (!windowElement) {
         console.error(`Element with ID ${windowId} not found.`);
         return;
     }
 
-    // Create a new div and append it to the window element
+    // Create a new div with the contentId and append it to the window element
     const newDiv = document.createElement('div');
+    newDiv.id = containerId;
     newDiv.className = 'centered-container';
     windowElement.appendChild(newDiv);
+
+    const contentDiv = document.getElementById(containerId);
 
     // Attach a shadow root to the new div
     const shadowRoot = newDiv.attachShadow({ mode: 'open' });
