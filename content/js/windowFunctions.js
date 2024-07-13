@@ -81,7 +81,6 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
         // Add title-bar class to the element that should be draggable
         const titleBar = shadowRoot.querySelector('.title-bar');
 
-        // Initialize draggable functionality after content is loaded
         if (typeof draggableFunction === 'function') {
             draggableFunction(newDiv, titleBar);
         } else {
