@@ -45,7 +45,7 @@ export function toggleContainer(controlElementId, containerElementId) {
         console.error('Element not found:', controlElementId, containerElementId);
     }
 }
-function initializeShadowContent(containerId, windowId, stylesheetUrl, htmlPageUrl, draggableFunction) {
+export function initializeShadowContent(containerId, windowId, stylesheetUrl, htmlPageUrl, draggableFunction) {
     const windowElement = document.getElementById(windowId);
 
     if (!windowElement) {
