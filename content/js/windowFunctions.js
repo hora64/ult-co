@@ -59,10 +59,12 @@ function initializeShadowContent(containerId, windowId, stylesheetUrl, draggable
         return;
     }
 
+    // Create a new div and append it to the window element
     const newDiv = document.createElement('div');
     newDiv.className = 'centered-container';
     windowElement.appendChild(newDiv);
 
+    // Attach a shadow root to the new div
     const shadowRoot = newDiv.attachShadow({ mode: 'open' });
 
     // Load the stylesheet exclusively within the shadow root
@@ -88,7 +90,4 @@ function initializeShadowContent(containerId, windowId, stylesheetUrl, draggable
         console.error('Provided draggableFunction is not a function.');
     }
 }
-
-// Example usage
-
 
