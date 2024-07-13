@@ -45,7 +45,7 @@ export function toggleContainer(controlElementId, containerElementId) {
         console.error('Element not found:', controlElementId, containerElementId);
     }
 }
-function initializeShadowContent(containerId, windowId, stylesheetUrl, draggableFunction) {
+function initializeShadowContent(containerId, windowId, stylesheetUrl, htmlPageUrl, draggableFunction) {
     const windowElement = document.getElementById(windowId);
 
     if (!windowElement) {
@@ -59,8 +59,6 @@ function initializeShadowContent(containerId, windowId, stylesheetUrl, draggable
     newDiv.className = 'centered-container';
     windowElement.appendChild(newDiv);
 
-    const contentDiv = document.getElementById(containerId);
-
     // Attach a shadow root to the new div
     const shadowRoot = newDiv.attachShadow({ mode: 'open' });
 
@@ -73,18 +71,19 @@ function initializeShadowContent(containerId, windowId, stylesheetUrl, draggable
     // Create the window body in the shadow root
     const windowBody = document.createElement('div');
     windowBody.className = 'window-body';
-
-    // Move the loaded content into the window body
-    while (contentDiv.firstChild) {
-        windowBody.appendChild(contentDiv.firstChild);
-    }
     shadowRoot.appendChild(windowBody);
 
-    // Initialize draggable functionality
-    if (typeof draggableFunction === 'function') {
-        draggableFunction(windowBody, shadowRoot.querySelector('.title-bar'));
-    } else {
-        console.error('Provided draggableFunction is not a function.');
-    }
+    // Load the content into the newly created div
+    $("#" + containerId).load(htmlPageUrl, function() {
+        // Initialize draggable functionality after content is loaded
+        if (typeof draggableFunction === 'function') {
+            draggableFunction(windowBody, shadowRoot.querySelector('.title-bar'));
+        } else {
+            console.error('Provided draggableFunction is not a function.');
+        }
+    });
 }
+
+// Example usage
+
 
