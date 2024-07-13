@@ -36,7 +36,7 @@
 </head>
 <body>
     <div id="window">
-        
+
     </div>
     <div id="app-webamp"></div>
     <script type="module">
@@ -46,9 +46,9 @@
             $("#app-webamp").load("content/windows/webamp.html", function() {
                 // WebAmp loaded
             });
-
+            initializeShadowContent('content-main', 'window', 'https://unpkg.com/98.css', initDraggable);
             $("#content").load("content/windows/main.html", function() {
-                initializeShadowContent('content-main', 'window', 'https://unpkg.com/98.css', initDraggable);
+                
             });
         });
     </script>
