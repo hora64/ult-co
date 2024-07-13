@@ -75,10 +75,11 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
     shadowRoot.appendChild(windowBody);
 
     // Load the content into the newly created div
-    $("#" + containerId).load(htmlPageUrl, function() {
+    $.get(htmlPageUrl, function(data) {
+        $(windowBody).html(data);
         // Initialize draggable functionality after content is loaded
         if (typeof draggableFunction === 'function') {
-            draggableFunction(windowBody, shadowRoot.querySelector('.title-bar'));
+            draggableFunction(newDiv, windowBody.querySelector('.title-bar'));
         } else {
             console.error('Provided draggableFunction is not a function.');
         }
