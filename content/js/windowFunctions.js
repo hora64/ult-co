@@ -45,6 +45,7 @@ export function toggleContainer(controlElementId, containerElementId) {
         console.error('Element not found:', controlElementId, containerElementId);
     }
 }
+
 export function initializeShadowContent(containerId, windowId, stylesheetUrl, htmlPageUrl, draggableFunction) {
     const windowElement = document.getElementById(windowId);
 
@@ -83,7 +84,3 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
         }
     });
 }
-
-// Example usage
-
-

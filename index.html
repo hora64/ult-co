@@ -16,6 +16,8 @@
             margin: auto;
             width: 50vw;
             top: 5vh;
+            background-color: white; /* Ensure the container is visible */
+            border: 1px solid #ccc; /* Add border for visibility */
         }
         .centered-button {
             margin-top: 20px;
@@ -40,15 +42,14 @@
     </div>
     <div id="app-webamp"></div>
     <script type="module">
-        import { initDraggable } from './content/js/windowFunctions.js';
-        import { initializeShadowContent } from './content/js/windowFunctions.js';
+        import { initDraggable, initializeShadowContent } from './content/js/windowFunctions.js';
+
         $(document).ready(function() {
             $("#app-webamp").load("content/windows/webamp.html", function() {
-                // WebAmp loaded
-            });
-            initializeShadowContent('content-main', 'window', 'https://unpkg.com/98.css', 'content/windows/main.html', initDraggable);
+        // WebAmp loaded
         });
-
+        initializeShadowContent('content-main', 'window', 'https://unpkg.com/98.css', 'content/windows/main.html', initDraggable);
+    );
     </script>
 </body>
 </html>
