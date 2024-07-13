@@ -31,7 +31,8 @@ export function maximizeWindow(button) {
 }
 
 export function closeWindow(button) {
-    const window = button.closest('.window');
+    const shadowRoot = button.closest('div[part="window"]').getRootNode();
+    const window = shadowRoot.host;
     window.remove();
 }
 
@@ -44,3 +45,50 @@ export function toggleContainer(controlElementId, containerElementId) {
         console.error('Element not found:', controlElementId, containerElementId);
     }
 }
+function initializeShadowContent(containerId, windowId, stylesheetUrl, draggableFunction) {
+    const contentDiv = document.getElementById(containerId);
+    const windowElement = document.getElementById(windowId);
+
+    if (!contentDiv) {
+        console.error(`Element with ID ${containerId} not found.`);
+        return;
+    }
+
+    if (!windowElement) {
+        console.error(`Element with ID ${windowId} not found.`);
+        return;
+    }
+
+    const newDiv = document.createElement('div');
+    newDiv.className = 'centered-container';
+    windowElement.appendChild(newDiv);
+
+    const shadowRoot = newDiv.attachShadow({ mode: 'open' });
+
+    // Load the stylesheet exclusively within the shadow root
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = stylesheetUrl;
+    shadowRoot.appendChild(link);
+
+    // Create the window body in the shadow root
+    const windowBody = document.createElement('div');
+    windowBody.className = 'window-body';
+
+    // Move the loaded content into the window body
+    while (contentDiv.firstChild) {
+        windowBody.appendChild(contentDiv.firstChild);
+    }
+    shadowRoot.appendChild(windowBody);
+
+    // Initialize draggable functionality
+    if (typeof draggableFunction === 'function') {
+        draggableFunction(windowBody, shadowRoot.querySelector('.title-bar'));
+    } else {
+        console.error('Provided draggableFunction is not a function.');
+    }
+}
+
+// Example usage
+
+

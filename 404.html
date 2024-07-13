@@ -35,7 +35,7 @@
 </head>
 <body>
     <div id="window">
-        <div id="content" class="centered-container"></div>
+        
     </div>
     <div id="app-webamp"></div>
     <script type="module">
@@ -47,28 +47,7 @@
             });
 
             $("#content").load("content/windows/invalid.html", function() {
-                // Main content loaded
-                const contentDiv = document.getElementById('content');
-                const shadowRoot = contentDiv.attachShadow({ mode: 'open' });
-
-                // Load the stylesheet exclusively within the shadow root
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = 'https://unpkg.com/98.css';
-                shadowRoot.appendChild(link);
-
-                // Create the window body in the shadow root
-                const windowBody = document.createElement('div');
-                windowBody.className = 'window-body';
-
-                // Move the loaded content into the window body
-                while (contentDiv.firstChild) {
-                    windowBody.appendChild(contentDiv.firstChild);
-                }
-                shadowRoot.appendChild(windowBody);
-
-                // Initialize draggable functionality
-                initDraggable(windowBody, shadowRoot.querySelector('.title-bar'));
+                initializeShadowContent('content-invalid', 'window', 'https://unpkg.com/98.css', initDraggable);
             });
         });
     </script>
