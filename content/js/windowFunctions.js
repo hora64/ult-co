@@ -77,9 +77,13 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
     // Load the content into the newly created div
     $.get(htmlPageUrl, function(data) {
         $(windowBody).html(data);
+        
+        // Add title-bar class to the element that should be draggable
+        const titleBar = shadowRoot.querySelector('.title-bar');
+
         // Initialize draggable functionality after content is loaded
         if (typeof draggableFunction === 'function') {
-            draggableFunction(newDiv, windowBody.querySelector('.title-bar'));
+            draggableFunction(newDiv, titleBar);
         } else {
             console.error('Provided draggableFunction is not a function.');
         }
