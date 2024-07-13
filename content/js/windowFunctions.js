@@ -69,11 +69,6 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
     link.href = stylesheetUrl;
     shadowRoot.appendChild(link);
 
-    // Append the custom script within the shadow DOM
-    const script = document.createElement('script');
-    script.src = 'content/js/windowFunctions.js';
-    shadowRoot.appendChild(script);
-    
     // Create the window body in the shadow root
     const windowBody = document.createElement('div');
     windowBody.className = 'window-body';
