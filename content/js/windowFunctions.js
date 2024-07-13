@@ -77,14 +77,7 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
     // Load the content into the window body
     $.get(htmlPageUrl, function(data) {
         $(windowBody).html(data);
-
-        // Create a script to initialize the draggable functionality
-        const script = document.createElement('script');
-        script.textContent = `
-            (${draggableFunction.toString()})(windowBody, shadowRoot.querySelector('.title-bar'));
-        `;
-        shadowRoot.appendChild(script);
-
+        
         // Add title-bar class to the element that should be draggable
         const titleBar = shadowRoot.querySelector('.title-bar');
 
