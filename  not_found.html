@@ -9,20 +9,17 @@
             background-image: url('content/assets/images/background/infinitefun.png');
             background-repeat: repeat;
         }
-    </style>
-    <style>
-.centered-container {
-    padding: 8px;
-    position: relative;
-    margin: auto;
-    width: 50vw;
-    top: 5vh;
-}
-
-.centered-button {
-    margin-top: 20px;
-}
-html, body {
+        .centered-container {
+            padding: 8px;
+            position: relative;
+            margin: auto;
+            width: 50vw;
+            top: 5vh;
+        }
+        .centered-button {
+            margin-top: 20px;
+        }
+        html, body {
             height: 100%;
             margin: 0;
             padding: 0;
@@ -34,22 +31,25 @@ html, body {
     <script src="https://unpkg.com/webamp@1.5.0/built/webamp.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    <script src="content/js/windowFunctions.js"></script>
+    <script src="content/js/windowFunctions.js" type="module"></script>
 </head>
 <body>
     <div id="window">
-        <div id="content" class=centered-container></div>
+        <div id="content" class="centered-container"></div>
     </div>
     <div id="app-webamp"></div>
-    <script>
+    <script type="module">
+        import { initDraggable } from './content/js/windowFunctions.js';
+
         $(document).ready(function() {
             $("#app-webamp").load("content/windows/webamp.html", function() {
                 // WebAmp loaded
             });
+
             $("#content").load("content/windows/invalid.html", function() {
                 // Main content loaded
                 const contentDiv = document.getElementById('content');
-                const shadowRoot = contentDiv.attachShadow({mode: 'open'});
+                const shadowRoot = contentDiv.attachShadow({ mode: 'open' });
 
                 // Load the stylesheet exclusively within the shadow root
                 const link = document.createElement('link');
@@ -66,6 +66,9 @@ html, body {
                     windowBody.appendChild(contentDiv.firstChild);
                 }
                 shadowRoot.appendChild(windowBody);
+
+                // Initialize draggable functionality
+                initDraggable(windowBody, shadowRoot.querySelector('.title-bar'));
             });
         });
     </script>
