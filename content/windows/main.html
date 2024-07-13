@@ -1,4 +1,4 @@
-<div class="window">
+<div class="window" id="main-window">
     <div class="title-bar">
         <div class="title-bar-text">
             <img src="content/assets/images/ultco/ultcoBlue.png" style="height: 1em; vertical-align: middle; margin: -3px -1px;">
@@ -43,6 +43,13 @@
         </fieldset>
     </div>
     <div class="status-bar">
-        <p class="status-bar-field" style="text-align: right">website programed by <b>hora64_</b></p>
+        <p class="status-bar-field" style="text-align: right">website programmed by <b>hora64_</b></p>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        // Initialize draggable functionality
+        initDraggable('#main-window', '.title-bar');
+    });
+</script>

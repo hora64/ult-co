@@ -46,7 +46,7 @@ export function toggleContainer(controlElementId, containerElementId) {
     }
 }
 
-export function initializeShadowContent(containerId, windowId, stylesheetUrl, htmlPageUrl, draggableFunction) {
+export function initializeShadowContent(containerId, windowId, stylesheetUrl, htmlPageUrl) {
     const windowElement = document.getElementById(windowId);
 
     if (!windowElement) {
@@ -69,6 +69,11 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
     link.href = stylesheetUrl;
     shadowRoot.appendChild(link);
 
+    // Append the custom script within the shadow DOM
+    const script = document.createElement('script');
+    script.src = 'content/js/windowFunctions.js';
+    shadowRoot.appendChild(script);
+    
     // Create the window body in the shadow root
     const windowBody = document.createElement('div');
     windowBody.className = 'window-body';
@@ -77,14 +82,7 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
     // Load the content into the window body
     $.get(htmlPageUrl, function(data) {
         $(windowBody).html(data);
-        
-        // Add title-bar class to the element that should be draggable
-        const titleBar = shadowRoot.querySelector('.title-bar');
-
-        if (typeof draggableFunction === 'function') {
-            draggableFunction(newDiv, titleBar);
-        } else {
-            console.error('Provided draggableFunction is not a function.');
-        }
     });
+
+
 }
