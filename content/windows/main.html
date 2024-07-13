@@ -1,55 +1,56 @@
 <div class="window" id="main-window">
-    <div class="title-bar">
-        <div class="title-bar-text">
-            <img src="content/assets/images/ultco/ultcoBlue.png" style="height: 1em; vertical-align: middle; margin: -3px -1px;">
-            ult & co.
-        </div>
-        <div class="title-bar-controls">
-            <button aria-label="Help"></button>    
-        </div>
-    </div>
-    <div class="window-body" style="font-size: 0.9em;">
-        <h1 style="font-size: 1.5em;">welcome to ult-co.net</h1>
-
-        <fieldset>
-            <legend style="font-size: 1.2em; text-align: center;">active contests</legend>
-            <ul>
-                <li><strong><a href="" style="font-size: 1em;">#ultec5</a></strong> - deadline: august 1st, 2024 11:59 pm est</li>
-                <li><strong><a href="" style="font-size: 1em;">editor league season 2 (#visionaryel)</a></strong> - team signup deadline: july 12th, 2024 3:00 pm est</li>
-            </ul>
-        </fieldset>
-
-        <fieldset>
-            <legend style="font-size: 1.2em; text-align: center;">resources</legend>
-            <ul>
-                <li><a href="https://drive.google.com/drive/folders/1epSFEFIwJvsvmmHTNx9RLj_kEgSOZWDf" style="font-size: 1em;">ult & co. assets</a></li>
-                <li><a href="https://drive.google.com/drive/folders/1UOuubERoWoiggUeaciBdc2QmAZDI7XDh?usp=drive_link" style="font-size: 1em;">large clip drive for game editing</a></li>
-            </ul>
-        </fieldset>
-
-        <fieldset>
-            <legend style="font-size: 1.2em; text-align: center;">follow us</legend>
-            <div style="display: flex; align-items: center; justify-content: center;">
-                <a href="https://twitter.com/ultco_" style="margin-right: 10px;">
-                    <img src="content/assets/images/social/twitter.png" style="height: 5em; vertical-align: middle;">
-                </a>
-                <a href="https://www.youtube.com/@ultco" style="margin-right: 10px;">
-                    <img src="content/assets/images/social/youtube.png" style="height: 5em; vertical-align: middle;">
-                </a>
-                <a href="https://discord.gg/gkKM44aMhV">
-                    <img src="content/assets/images/social/discord.png" style="height: 5em; vertical-align: middle;">
-                </a>
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="content/assets/images/ultco/ultcoBlue.png" style="height: 1em; vertical-align: middle; margin: -3px -1px;">
+                ult & co.
             </div>
-        </fieldset>
-    </div>
-    <div class="status-bar">
-        <p class="status-bar-field" style="text-align: right">website programmed by <b>hora64_</b></p>
-    </div>
-</div>
+            <div class="title-bar-controls">
+                <button aria-label="Help"></button>    
+            </div>
+        </div>
+        <div class="window-body" style="font-size: 0.9em;">
+            <h1 style="font-size: 1.5em;">welcome to ult-co.net</h1>
 
-<script>
-    $(document).ready(function() {
-        // Initialize draggable functionality
-        initDraggable('#main-window', '.title-bar');
-    });
-</script>
+            <fieldset>
+                <legend style="font-size: 1.2em; text-align: center;">active contests</legend>
+                <ul>
+                    <li><strong><a href="javascript:void(0);" onclick="initializeShadowContent('ultec5-container', 'main-window', 'path/to/your/styles.css', 'content/windows/ultec5.html')" style="font-size: 1em;">#ultec5</a></strong> - deadline: august 1st, 2024 11:59 pm est</li>
+                    <li><strong><a href="" style="font-size: 1em;">editor league season 2 (#visionaryel)</a></strong> - team signup deadline: july 12th, 2024 3:00 pm est</li>
+                </ul>
+            </fieldset>
+
+            <fieldset>
+                <legend style="font-size: 1.2em; text-align: center;">resources</legend>
+                <ul>
+                    <li><a href="https://drive.google.com/drive/folders/1epSFEFIwJvsvmmHTNx9RLj_kEgSOZWDf" style="font-size: 1em;">ult & co. assets</a></li>
+                    <li><a href="https://drive.google.com/drive/folders/1UOuubERoWoiggUeaciBdc2QmAZDI7XDh?usp=drive_link" style="font-size: 1em;">large clip drive for game editing</a></li>
+                </ul>
+            </fieldset>
+
+            <fieldset>
+                <legend style="font-size: 1.2em; text-align: center;">follow us</legend>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <a href="https://twitter.com/ultco_" style="margin-right: 10px;">
+                        <img src="content/assets/images/social/twitter.png" style="height: 5em; vertical-align: middle;">
+                    </a>
+                    <a href="https://www.youtube.com/@ultco" style="margin-right: 10px;">
+                        <img src="content/assets/images/social/youtube.png" style="height: 5em; vertical-align: middle;">
+                    </a>
+                    <a href="https://discord.gg/gkKM44aMhV">
+                        <img src="content/assets/images/social/discord.png" style="height: 5em; vertical-align: middle;">
+                    </a>
+                </div>
+            </fieldset>
+        </div>
+        <div class="status-bar">
+            <p class="status-bar-field" style="text-align: right">website programmed by <b>hora64_</b></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initDraggable, initializeShadowContent } from './content/js/windowFunctions.js';
+        $(document).ready(function() {
+            // Initialize draggable functionality
+            initDraggable('#main-window', '.title-bar');
+        });
+    </script>
