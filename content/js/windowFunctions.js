@@ -77,7 +77,16 @@ export function initializeShadowContent(containerId, windowId, stylesheetUrl, ht
     // Load the content into the window body
     $.get(htmlPageUrl, function(data) {
         $(windowBody).html(data);
+        // Import the module script into the shadow DOM
+        const scriptModule = document.createElement('script');
+        scriptModule.type = 'module';
+        scriptModule.textContent = `
+            import { initDraggable } from './content/js/windowFunctions.js';
+            $(document).ready(function() {
+                // Initialize draggable functionality
+                initDraggable('#${windowId}', '.title-bar');
+            });
+        `;
+        shadowRoot.appendChild(scriptModule);
     });
-
-
 }
