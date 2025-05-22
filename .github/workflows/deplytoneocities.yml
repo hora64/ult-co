@@ -1,15 +1,15 @@
 # Author: Bret Comnes
 # License: MIT
 
-name: Deploy to neocities
+name: Deploy to Neocities
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch: # allows manual triggering
+  workflow_dispatch:
 
-concurrency: # prevent concurrent deploys doing strange things
+concurrency:
   group: deploy-to-neocities
   cancel-in-progress: true
 
@@ -18,12 +18,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    # When the dist_dir is ready, deploy it to neocities
-    - name: Deploy to neocities
-      uses: bcomnes/deploy-to-neocities@v3.0.2
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Deploy to Neocities
+      uses: bcomnes/deploy-to-neocities@v3
       with:
         api_key: ${{ secrets.NEOCITIES_API_TOKEN }}
         cleanup: true
         neocities_supporter: true
+        preview_before_deploy: true
         dist_dir: ult-co.public
