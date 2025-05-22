@@ -25,4 +25,4 @@ jobs:
       with:
         api_token: ${{ secrets.NEOCITIES_API_KEY }}
         cleanup: true
-        dist_dir: configured.media
+        dist_dir: ult-co.public
