@@ -1,6 +1,3 @@
-# Author: Bret Comnes
-# License: MIT
-
 name: Deploy to Neocities
 
 on:
@@ -20,6 +17,18 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+
+    - name: 🔍 Debug Secret Availability
+      run: |
+        echo "Checking NEOCITIES_API_TOKEN environment variable..."
+        if [ -z "$NEOCITIES_API_TOKEN" ]; then
+          echo "❌ NEOCITIES_API_TOKEN is missing!"
+          exit 1
+        else
+          echo "✅ NEOCITIES_API_TOKEN is available (masked length: ${#NEOCITIES_API_TOKEN})"
+        fi
+      env:
+        NEOCITIES_API_TOKEN: ${{ secrets.NEOCITIES_API_TOKEN }}
 
     - name: Deploy to Neocities
       uses: bcomnes/deploy-to-neocities@v3
