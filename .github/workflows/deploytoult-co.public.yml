@@ -10,6 +10,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
+      with:
+        ref: main
 
     - name: Remove Old ult-co.public Folder Contents
       run: |
@@ -30,6 +32,6 @@ jobs:
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git add ult-co.public/
         git commit -m "Deploy content to ult-co.public folder"
-        git push
+        git push origin main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
