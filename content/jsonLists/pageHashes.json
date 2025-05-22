@@ -1,0 +1,31 @@
+{
+    "ultec5-info": "content/windows/contests/ultec5/ultec5-info.html",
+    "visionaryec-info": "content/windows/contests/editorLeagueS2.html",
+    
+    "editorLeagueS2-info": "content/windows/contests/editorLeagueS2.html",
+    "editorLeagueS2": "content/windows/contests/editorLeagueS2.html",
+    
+    "blxec-resultsVideo": "https://youtu.be/KtmTuyYq9wI?si=b0XLDfdGFdK1-iXN",
+    "ultec-resultsVideo": "https://youtu.be/0a6wy0XmHSk?si=I-m72ZE4XqR15Xug",
+    "ultec2-resultsVideo": "https://youtu.be/WEFUE8lBoM8?si=P4qt99_wBqXDTtul",
+    "horaec-resultsVideo": "https://youtu.be/Cshn_om0mQM?si=Wr4-trxIAseAvKfN",
+    
+    "ultec3-judgingSheet": "content/windows/contests/ultec3.html",
+    "ultec3-resultsVideo": "https://youtu.be/VrrLrvZIzrs?si=doDaAAjEflLHL_ea",
+    
+    "ultec4-judgingSheet": "content/windows/contests/ultec4.html",
+    "ultec4-resultsVideo": "https://youtu.be/7bfZu1CHq-U?si=yR_0bjGWkc-FWuAw",
+    
+    "ariultec-judgingSheet": "content/windows/contests/ariultec.html",
+    "ariultec-resultsVideo": "https://youtu.be/VHBUpGmiD9s?si=SWcxSDQNYtTcWeY5",
+    
+    "digitalfootprint":"content/windows/easterEgg/digitalfootprint.html",
+    "eclipsa": "content/windows/easterEgg/eclipsaPoem.html",
+    "assets":"content/windows/assets.html",
+    "mobileError": "content/windows/mobileError.html",
+    "wiiTest":"content/windows/wii.html",
+    "ultcomp":"content/windows/contests/ultcomp.html",
+    "judgingSheetTest":"content/windows/contests/resultsTest.html",
+    "digtalfootprint)":"content/windows/easterEgg/digitalfootprint.html",
+    "sandsoftime": "content/windows/easterEgg/sandsOfTime.html"
+}

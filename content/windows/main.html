@@ -1,53 +1,69 @@
-<div class="window" id="main-window">
+<div class="window color glass" id="mainPage" style="width: 644px; height: 500px;">
     <div class="title-bar">
-        <div class="title-bar-text">
-            <img src="content/assets/images/ultco/ultcoBlue.png" style="height: 1em; vertical-align: middle; margin: -3px -1px;">
-            ult & co.
-        </div>
+        <div class="title-bar-text">Ult & Co.</div>
         <div class="title-bar-controls">
-            <button aria-label="Help"></button>
+        <button aria-label="Close"></button>
         </div>
     </div>
-    <div class="window-body" style="font-size: 0.9em;">
-        <h1 style="font-size: 1.5em;">welcome to ult-co.net</h1>
-
-        <fieldset>
-            <legend style="font-size: 1.2em; text-align: center;">active contests</legend>
-            <ul>
-                <li><strong><a href="javascript:void(0);" onclick="initializeShadowContent('ultec5-container', 'main-window', 'path/to/your/styles.css', 'content/windows/ultec5.html')" style="font-size: 1em;">#ultec5</a></strong> - deadline: august 1st, 2024 11:59 pm est</li>
-                <li><strong><a href="" style="font-size: 1em;">editor league season 2 (#visionaryel)</a></strong> - team signup deadline: july 12th, 2024 3:00 pm est</li>
-            </ul>
-        </fieldset>
-
-        <fieldset>
-            <legend style="font-size: 1.2em; text-align: center;">resources</legend>
-            <ul>
-                <li><a href="https://drive.google.com/drive/folders/1epSFEFIwJvsvmmHTNx9RLj_kEgSOZWDf" style="font-size: 1em;">ult & co. assets</a></li>
-                <li><a href="https://drive.google.com/drive/folders/1UOuubERoWoiggUeaciBdc2QmAZDI7XDh?usp=drive_link" style="font-size: 1em;">large clip drive for game editing</a></li>
-            </ul>
-        </fieldset>
-
-        <fieldset>
-            <legend style="font-size: 1.2em; text-align: center;">follow us</legend>
-            <div style="display: flex; align-items: center; justify-content: center;">
-                <a href="https://twitter.com/ultco_" style="margin-right: 10px;">
-                    <img src="content/assets/images/social/twitter.png" style="height: 5em; vertical-align: middle;">
-                </a>
-                <a href="https://www.youtube.com/@ultco" style="margin-right: 10px;">
-                    <img src="content/assets/images/social/youtube.png" style="height: 5em; vertical-align: middle;">
-                </a>
-                <a href="https://discord.gg/gkKM44aMhV">
-                    <img src="content/assets/images/social/discord.png" style="height: 5em; vertical-align: middle;">
-                </a>
-            </div>
-        </fieldset>
-    </div>
-    <div class="status-bar">
-        <p class="status-bar-field" style="text-align: right">website programmed by <b>hora64_</b></p>
+    <div class="window-body has-space has-scrollbar" style="width: 617px; height: 451px; overflow: auto">
+        <!-- Content sections for dynamic tab loading -->
+        <section class="tabs" style="max-width: 601px">
+            <menu role="tablist" aria-label="mainPageTabs">
+                <button role="tab" aria-controls="home-content" id="tab-btn-home" aria-selected="true">Home</button>
+                <button role="tab" aria-controls="events-content" id="tab-btn-events">Events</button>
+                <button role="tab" aria-controls="contact-content" id="tab-btn-contact">Contact</button>
+                <button role="tab" aria-controls="extras-content" id="tab-btn-extras" >Extras</button>
+                <button role="tab" aria-controls="info-content" id="tab-btn-info" disabled>Info</button>
+                
+            </menu>
+            <div id="home-content" class="tab-content"></div>
+            <div id="info-content" class="tab-content"></div>
+            <div id="events-content" class="tab-content"></div>
+            <div id="contact-content" class="tab-content"></div>
+            <div id="extras-content" class="tab-content"></div>
+        </section>
     </div>
 </div>
-<script type="module">
-    import { initializeShadowContent } from './content/js/windowFunctions.js';
-    // Initialize shadow content with draggable functionality for the main window
-    initializeShadowContent('main-container', 'main-window', 'path/to/your/styles.css', 'path/to/your/content.html');
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="content/scripts/utilities.js"></script>
+<script src="content/scripts/windowFunctions.js"></script>
+<script src="content/scripts/settingsManager.js"></script>
+<script>
+$(document).ready(function() {
+    // Load initial content for mainPage
+    loadTabContent("mainPage", "#home-content", "content/windows/main/home.html");
+    // Event listeners for tab buttons within the mainPage
+    $("#tab-btn-home").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#home-content", "content/windows/main/home.html");
+    });
+
+    $("#tab-btn-info").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#info-content", "content/windows/main/info.html");
+    });
+
+
+    $("#tab-btn-events").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#events-content", "content/windows/main/events.html");
+    });
+
+    $("#tab-btn-contact").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#contact-content", "content/windows/main/contact.html");
+    });
+    $("#tab-btn-extras").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#extras-content", "content/windows/main/extras.html");
+    });
+});
 </script>
+
