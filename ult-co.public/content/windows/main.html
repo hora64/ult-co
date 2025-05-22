@@ -1,0 +1,69 @@
+<div class="window color glass" id="mainPage" style="width: 644px; height: 500px;">
+    <div class="title-bar">
+        <div class="title-bar-text">Ult & Co.</div>
+        <div class="title-bar-controls">
+        <button aria-label="Close"></button>
+        </div>
+    </div>
+    <div class="window-body has-space has-scrollbar" style="width: 617px; height: 451px; overflow: auto">
+        <!-- Content sections for dynamic tab loading -->
+        <section class="tabs" style="max-width: 601px">
+            <menu role="tablist" aria-label="mainPageTabs">
+                <button role="tab" aria-controls="home-content" id="tab-btn-home" aria-selected="true">Home</button>
+                <button role="tab" aria-controls="events-content" id="tab-btn-events">Events</button>
+                <button role="tab" aria-controls="contact-content" id="tab-btn-contact">Contact</button>
+                <button role="tab" aria-controls="extras-content" id="tab-btn-extras" >Extras</button>
+                <button role="tab" aria-controls="info-content" id="tab-btn-info" disabled>Info</button>
+                
+            </menu>
+            <div id="home-content" class="tab-content"></div>
+            <div id="info-content" class="tab-content"></div>
+            <div id="events-content" class="tab-content"></div>
+            <div id="contact-content" class="tab-content"></div>
+            <div id="extras-content" class="tab-content"></div>
+        </section>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="content/scripts/utilities.js"></script>
+<script src="content/scripts/windowFunctions.js"></script>
+<script src="content/scripts/settingsManager.js"></script>
+<script>
+$(document).ready(function() {
+    // Load initial content for mainPage
+    loadTabContent("mainPage", "#home-content", "content/windows/main/home.html");
+    // Event listeners for tab buttons within the mainPage
+    $("#tab-btn-home").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#home-content", "content/windows/main/home.html");
+    });
+
+    $("#tab-btn-info").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#info-content", "content/windows/main/info.html");
+    });
+
+
+    $("#tab-btn-events").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#events-content", "content/windows/main/events.html");
+    });
+
+    $("#tab-btn-contact").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#contact-content", "content/windows/main/contact.html");
+    });
+    $("#tab-btn-extras").click(function() {
+        selectTab(this, "mainPage");
+        unloadTabContent("mainPage", ".tab-content"); // Unload content of all tabs within mainPage
+        loadTabContent("mainPage", "#extras-content", "content/windows/main/extras.html");
+    });
+});
+</script>
+

@@ -1,0 +1,51 @@
+<article role="tabpanel" id="sound-settings">
+    <fieldset>
+        <legend>Startup Settings</legend>
+        <fieldset>
+            <legend>Select a startup sound</legend>
+            <div class="field-row">
+                <input id="startupOption1" type="radio" name="startupSoundSelect" value="content/assets/audio/7startup.mp3" onclick="applyStartupSound(this.value)" checked>
+                <label for="startupOption1">Windows 7</label>
+            </div>
+            <div class="field-row">
+                <input id="startupOption2" type="radio" name="startupSoundSelect" value="content/assets/audio/longhornStartup.mp3" onclick="applyStartupSound(this.value)">
+                <label for="startupOption2">Longhorn</label>
+            </div>
+            <!-- Add more options as needed -->
+        </fieldset>
+
+        <!-- Volume Control Slider -->
+        <fieldset>
+            <legend>Volume Control</legend>
+            <input type="range" id="volumeControl" name="volume" min="0" max="1" step="0.01" value="0.2" oninput="applyStartupVolume(this.value)" onmouseup="applyStartupVolume(this.value,false)">
+        </fieldset>
+
+        <!-- Button to play the selected sound -->
+        <button onclick="playStartupSound()">Play Selected Sound</button>
+    </fieldset>
+</article>
+
+<script>
+    // Function to set initial values based on local storage
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve saved startup sound selection from local storage
+        const savedStartupSound = loadFromLocalStorage('startupSound');
+        if (savedStartupSound) {
+            // Set the checked attribute for the corresponding radio button
+            const radioInput = document.querySelector(`input[value="${savedStartupSound}"]`);
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        }
+
+        // Retrieve saved volume level from local storage
+        const savedVolume = loadFromLocalStorage('startupSoundVolume');
+        if (savedVolume) {
+            // Set the value of the volume control slider
+            const volumeControl = document.getElementById('volumeControl');
+            if (volumeControl) {
+                volumeControl.value = savedVolume;
+            }
+        }
+    });
+</script>

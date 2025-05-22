@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/webamp@1.5.0/built/webamp.bundle.min.js"></script>
+</head>
+<body>
+    <div id="winamp-container"></div>
+    <script>
+
+        function removeDuplicateTracks(tracks) {
+            const uniqueUrls = new Set();
+            return tracks.filter(track => {
+                if (uniqueUrls.has(track.url)) {
+                    return false;
+                } else {
+                    uniqueUrls.add(track.url);
+                    return true;
+                }
+            });
+        }
+
+        function addWinampClassToCss() {
+            const styleSheets = document.styleSheets;
+
+            for (let i = 0; i < styleSheets.length; i++) {
+                const rules = styleSheets[i].cssRules || styleSheets[i].rules;
+
+                for (let j = 0; j < rules.length; j++) {
+                    if (rules[j].selectorText) {
+                        rules[j].selectorText = ".winamp " + rules[j].selectorText;
+                    }
+                }
+            }
+        }
+
+        async function initializeWebamp() {
+            const Webamp = window.Webamp;
+
+            // Load initial tracks and skins from JSON files
+            const [initialTracks, availableSkins] = await Promise.all([
+                loadJsonData('content/jsonLists/webampSongs.json'),
+                loadJsonData('content/jsonLists/webampSkins.json')
+            ]);
+
+            if (initialTracks.length === 0) {
+                console.error('No tracks available to load.');
+                return;
+            }
+
+            if (availableSkins.length === 0) {
+                console.error('No skins available to load.');
+                return;
+            }
+
+            // Remove duplicate tracks
+            const uniqueTracks = removeDuplicateTracks(initialTracks);
+
+            // Select a random skin
+            const randomSkin = availableSkins[Math.floor(Math.random() * availableSkins.length)];
+
+            console.log(`Loading skin: ${randomSkin.name}, URL: ${randomSkin.url}`);
+
+            uniqueTracks.forEach(track => {
+                console.log(`Loading track: ${track.title} by ${track.artist}, URL: ${track.url}`);
+            });
+
+            const webamp = new Webamp({
+                initialSkin: {
+                    url: randomSkin.url
+                },
+                availableSkins: availableSkins.map(skin => ({
+                    url: skin.url,
+                    name: skin.name
+                })),
+                initialTracks: uniqueTracks.map(track => ({
+                    url: track.url,
+                    defaultName: track.defaultName,
+                    metaData: {
+                        artist: track.artist,
+                        title: track.title
+                    }
+                })),
+                __initialWindowLayout: {
+                    main: {
+                        position: {
+                            x: 0,
+                            y: 0
+                        }
+                    },
+                    equalizer: {
+                        position: {
+                            x: 0,
+                            y: 116
+                        }
+                    },
+                    playlist: {
+                        position: {
+                            x: 0,
+                            y: 232
+                        },
+                        size: [0, 4]
+                    }
+                }
+            });
+
+            if (!Webamp.browserIsSupported()) {
+                alert("Webamp is not supported in your browser.");
+                return;
+            }
+
+            webamp.renderWhenReady(document.getElementById('winamp-container'));
+
+            // Call the function to add winamp class to CSS after rendering Webamp
+            webamp.on('ready', () => {
+                addWinampClassToCss();
+                document.getElementById('winamp-container').classList.add('winamp');
+            });
+        }
+
+        initializeWebamp();
+    </script>
+</body>
+</html>

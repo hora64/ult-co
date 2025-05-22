@@ -1,0 +1,587 @@
+<style>
+/* Add any custom styles here */
+.combobox {
+    position: relative;
+    width: 49.750%;
+}
+
+#tagComboBoxOptions, #fileNameComboBoxOptions, #fileTypeComboBoxOptions {
+    max-height: 200px; /* Increased max-height */
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    display: none;
+}
+
+.asset-list-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.asset {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.filter-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.filter-tag {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-tag button {
+    margin-left: 5px;
+    cursor: pointer;
+    color: red;
+    font-weight: bold;
+}
+
+.range-slider-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.range-slider {
+    flex: 1 1 calc(50% - 10px);
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+.range-slider label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.range-slider div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.range-slider input[type=range] {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.range-slider input[type=text] {
+    width: 50px;
+    text-align: right;
+}
+
+.button-row {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.centered-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.no-results {
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 20px;
+    color: #888;
+}
+</style>
+
+<div class="window color glass active" id="assetSearch" style="width: 800px; height: 800px;">
+    <div class="title-bar">
+        <div class="title-bar-text">Asset Search Engine Alpha</div>
+        <div class="title-bar-controls">
+            <button aria-label="Close" onclick="closeWindow(this)"></button>
+        </div>
+    </div>
+    <div class="window-body has-space has-scrollbar" style="width: 773px; height: 730px;">
+        <div class="container">
+            <fieldset>
+                <legend>Search Filters</legend>
+                <div class="combobox">
+                    <input type="text" id="tagComboBoxInput" role="combobox" aria-owns="tagComboBoxOptions" onfocus="showComboBoxOptions('tagComboBoxOptions')" placeholder="Search tags...">
+                    <button onclick="toggleComboBox('tagComboBoxOptions')"></button>
+                    <ul role="listbox" id="tagComboBoxOptions" class="has-scrollbar" style="display: none;">
+                        <!-- Dynamic options will be inserted here -->
+                    </ul>
+                </div>
+                <div class="combobox">
+                    <input type="text" id="fileNameComboBoxInput" role="combobox" aria-owns="fileNameComboBoxOptions" onfocus="showComboBoxOptions('fileNameComboBoxOptions')" placeholder="Search file names...">
+                    <button onclick="toggleComboBox('fileNameComboBoxOptions')"></button>
+                    <ul role="listbox" id="fileNameComboBoxOptions" class="has-scrollbar" style="display: none;">
+                        <!-- Dynamic options will be inserted here -->
+                    </ul>
+                </div>
+                <div class="combobox">
+                    <input type="text" id="fileTypeComboBoxInput" role="combobox" aria-owns="fileTypeComboBoxOptions" onfocus="showComboBoxOptions('fileTypeComboBoxOptions')" placeholder="Search file types...">
+                    <button onclick="toggleComboBox('fileTypeComboBoxOptions')"></button>
+                    <ul role="listbox" id="fileTypeComboBoxOptions" class="has-scrollbar" style="display: none;">
+                        <!-- Dynamic options will be inserted here -->
+                    </ul>
+                </div>
+                <div class="range-slider-container">
+                    <div class="range-slider">
+                        <label for="videoLengthRange">Video Length (seconds):</label>
+                        <div>
+                            <input type="range" id="videoLengthRange" min="0" max="1" step="0.1" oninput="updateRangeValue('videoLengthRange', 'videoLengthValue')">
+                            <input type="text" id="videoLengthValue" value="0" oninput="updateRangeSlider('videoLengthRange', 'videoLengthValue')">
+                        </div>
+                    </div>
+                    <div class="range-slider">
+                        <label for="fpsRange">Frame Rate (FPS):</label>
+                        <div>
+                            <input type="range" id="fpsRange" min="0" max="1" step="0.01" oninput="updateRangeValue('fpsRange', 'fpsValue')">
+                            <input type="text" id="fpsValue" value="0" oninput="updateRangeSlider('fpsRange', 'fpsValue')">
+                        </div>
+                    </div>
+                    <div class="range-slider">
+                        <label for="widthRange">Width (pixels):</label>
+                        <div>
+                            <input type="range" id="widthRange" min="0" max="1" step="10" oninput="updateRangeValue('widthRange', 'widthValue')">
+                            <input type="text" id="widthValue" value="0" oninput="updateRangeSlider('widthRange', 'widthValue')">
+                        </div>
+                    </div>
+                    <div class="range-slider">
+                        <label for="heightRange">Height (pixels):</label>
+                        <div>
+                            <input type="range" id="heightRange" min="0" max="1" step="10" oninput="updateRangeValue('heightRange', 'heightValue')">
+                            <input type="text" id="heightValue" value="0" oninput="updateRangeSlider('heightRange', 'heightValue')">
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Selected Filters</legend>
+                <div class="filter-section" id="selectedFilters">
+                    <!-- Selected tags will be displayed here -->
+                </div>
+            </fieldset>
+            <fieldset class="has-scrollbar">
+                <legend>Assets</legend>
+                <div class="asset-list-container has-scrollbar" id="assetListContainer">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+            </fieldset>
+            <div class="centered-buttons">
+                <button class="button" onclick="downloadSelected()">Download Selected Assets</button>
+                <button class="button" onclick="unselectAllDownloads()">Unselect All Downloads</button>
+            </div>
+        </div>
+    </div>
+    <div class="status-bar" style="width: 785px;">
+        <p class="status-bar-field">Files larger than 100MB will open on a separate window. Please enable pop-ups and multiple downloads.</p>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="content/scripts/utilities.js"></script>
+<script src="content/scripts/windowFunctions.js"></script>
+<script src="content/scripts/settingsManager.js"></script>
+<script>
+// Global variables to manage assets
+let downloadArray = [];
+let assets = [];
+let filteredAssets = [];
+let selectedFilters = [];
+let currentOffset = 0;
+const assetsPerPage = 150; // Number of assets to load per batch
+const fileSizeLimitMB = 99; // File size limit in MB
+let scrollTimeout = 0;
+const displayedAssetIDs = new Set();
+
+// Fetch and process assets from JSON
+function fetchAssets() {
+    console.log('Fetching assets...');
+    $.getJSON('content/jsonLists/assets.json', function (data) {
+        assets = data;
+        filteredAssets = assets;
+        console.log('Assets fetched:', assets);
+        populateComboBoxes();
+        setSliderRanges();
+        displayAssets();
+    }).fail(function(jqxhr, textStatus, error) {
+        console.error("Failed to fetch assets:", textStatus, error);
+    });
+}
+
+// Set slider ranges based on asset metadata
+function setSliderRanges() {
+    let ranges = {
+        minVideoLength: Infinity, maxVideoLength: -Infinity,
+        minWidth: Infinity, maxWidth: -Infinity,
+        minHeight: Infinity, maxHeight: -Infinity,
+        minFps: Infinity, maxFps: -Infinity
+    };
+
+    assets.forEach(asset => {
+        const metadata = asset.metadata;
+        ranges.minVideoLength = Math.min(ranges.minVideoLength, metadata.videoLength);
+        ranges.maxVideoLength = Math.max(ranges.maxVideoLength, metadata.videoLength);
+        ranges.minWidth = Math.min(ranges.minWidth, metadata.width);
+        ranges.maxWidth = Math.max(ranges.maxWidth, metadata.width);
+        ranges.minHeight = Math.min(ranges.minHeight, metadata.height);
+        ranges.maxHeight = Math.max(ranges.maxHeight, metadata.height);
+        ranges.minFps = Math.min(ranges.minFps, metadata.fps);
+        ranges.maxFps = Math.max(ranges.maxFps, metadata.fps);
+    });
+
+    setRange('videoLengthRange', ranges.minVideoLength, ranges.maxVideoLength);
+    setRange('widthRange', ranges.minWidth, ranges.maxWidth);
+    setRange('heightRange', ranges.minHeight, ranges.maxHeight);
+    setRange('fpsRange', ranges.minFps, ranges.maxFps);
+}
+
+function setRange(rangeId, min, max) {
+    const range = document.getElementById(rangeId);
+    range.min = min;
+    range.max = max;
+    range.value = min;
+    document.getElementById(`${rangeId.replace('Range', 'Value')}`).value = min;
+}
+
+// Populate combo boxes with tags, file names, and file types
+function populateComboBoxes() {
+    const tagOptions = new Set();
+    const fileOptions = new Set();
+    const typeOptions = new Set();
+
+    filteredAssets.forEach(asset => {
+        asset.categoryTags.forEach(tag => tagOptions.add(tag));
+        fileOptions.add(asset.metadata.name);
+        typeOptions.add(asset.metadata.fileType);
+    });
+
+    populateComboBox('tagComboBoxOptions', tagOptions, 'tag');
+    populateComboBox('fileNameComboBoxOptions', fileOptions, 'file');
+    populateComboBox('fileTypeComboBoxOptions', typeOptions, 'type');
+}
+
+function populateComboBox(comboBoxId, options, type) {
+    const comboBoxOptions = document.getElementById(comboBoxId);
+    comboBoxOptions.innerHTML = '';
+
+    options.forEach(option => {
+        const listItem = document.createElement('li');
+        listItem.role = 'option';
+        listItem.textContent = option;
+        listItem.onclick = () => {
+            addFilter(option, type);
+            filterAssets();
+            toggleComboBox(comboBoxId);
+        };
+        comboBoxOptions.appendChild(listItem);
+    });
+}
+
+// Display assets
+function displayAssets() {
+    console.log('Displaying assets...');
+    const assetListContainer = document.getElementById('assetListContainer');
+    const assetsToDisplay = filteredAssets.slice(currentOffset, currentOffset + assetsPerPage);
+    assetsToDisplay.forEach(asset => {
+        if (!displayedAssetIDs.has(asset.metadata.uniqueID)) {
+            const assetElement = createAssetElement(asset);
+            assetListContainer.appendChild(assetElement);
+            displayedAssetIDs.add(asset.metadata.uniqueID);
+        }
+    });
+    currentOffset += assetsPerPage;
+}
+
+function createAssetElement(asset) {
+    const assetElement = document.createElement('div');
+    assetElement.className = 'asset';
+
+    const thumbnail = document.createElement('img');
+    thumbnail.src = asset.googleDrive.thumbnailLink;
+    thumbnail.style.width = '128px';
+    assetElement.appendChild(thumbnail);
+
+    const fileName = document.createElement('div');
+    fileName.className = 'file-name';
+    fileName.textContent = asset.metadata.name;
+    assetElement.appendChild(fileName);
+
+    const buttonRow = document.createElement('div');
+    buttonRow.className = 'button-row';
+
+    const infoButton = document.createElement('button');
+    infoButton.textContent = 'Info';
+    infoButton.disabled = true; // Disable the info button
+    buttonRow.appendChild(infoButton);
+
+    const previewButton = document.createElement('button');
+    previewButton.textContent = 'Preview';
+    previewButton.onclick = () => window.open(asset.googleDrive.previewLink, '_blank');
+    buttonRow.appendChild(previewButton);
+
+    assetElement.appendChild(buttonRow);
+
+    const downloadSelect = document.createElement('input');
+    downloadSelect.type = 'checkbox';
+    downloadSelect.id = asset.metadata.uniqueID;
+    downloadSelect.value = asset.googleDrive.downloadLink;
+    downloadSelect.dataset.filename = asset.metadata.name;
+    downloadSelect.dataset.filetype = asset.metadata.fileType;
+    downloadSelect.dataset.filesize = asset.metadata.size; // Use size from JSON metadata
+    downloadSelect.onchange = () => toggleDownload(downloadSelect);
+
+    const downloadLabel = document.createElement('label');
+    downloadLabel.htmlFor = asset.metadata.uniqueID;
+    downloadLabel.textContent = 'Download';
+
+    assetElement.appendChild(downloadSelect);
+    assetElement.appendChild(downloadLabel);
+
+    return assetElement;
+}
+
+// Filter assets based on selected filters
+function filterAssets() {
+    const filters = {
+        videoLength: document.getElementById('videoLengthRange').value,
+        width: document.getElementById('widthRange').value,
+        height: document.getElementById('heightRange').value,
+        fps: document.getElementById('fpsRange').value
+    };
+
+    filteredAssets = assets.filter(asset =>
+        selectedFilters.every(filter =>
+            filter.type === 'tag' ? asset.categoryTags.includes(filter.value) :
+            filter.type === 'file' ? asset.metadata.name === filter.value :
+            filter.type === 'type' ? asset.metadata.fileType === filter.value : true
+        ) &&
+        asset.metadata.videoLength >= filters.videoLength &&
+        asset.metadata.width >= filters.width &&
+        asset.metadata.height >= filters.height &&
+        asset.metadata.fps >= filters.fps
+    );
+
+    console.log('Filtered assets:', filteredAssets);
+    currentOffset = 0; // Reset offset
+    displayedAssetIDs.clear(); // Clear displayed asset IDs
+    displayFilteredAssets();
+}
+
+// Display filtered assets
+function displayFilteredAssets() {
+    const assetListContainer = document.getElementById('assetListContainer');
+    assetListContainer.innerHTML = '';
+    if (filteredAssets.length === 0) {
+        const noResultsMessage = document.createElement('div');
+        noResultsMessage.className = 'no-results';
+        noResultsMessage.textContent = 'No assets match your criteria.';
+        assetListContainer.appendChild(noResultsMessage);
+    } else {
+        filteredAssets.slice(0, assetsPerPage).forEach(asset => {
+            const assetElement = createAssetElement(asset);
+            assetListContainer.appendChild(assetElement);
+        });
+        currentOffset += assetsPerPage;
+    }
+}
+
+// Add selected filter
+function addFilter(value, type) {
+    if (!selectedFilters.some(filter => filter.value === value && filter.type === type)) {
+        selectedFilters.push({ value, type });
+        displaySelectedFilters();
+    }
+}
+
+// Display selected filters
+function displaySelectedFilters() {
+    const selectedFiltersContainer = document.getElementById('selectedFilters');
+    selectedFiltersContainer.innerHTML = '';
+    selectedFilters.forEach(filter => {
+        const filterTag = document.createElement('div');
+        filterTag.className = 'filter-tag';
+        filterTag.textContent = filter.value;
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'remove';
+        removeButton.onclick = () => removeFilter(filter.value, filter.type);
+        filterTag.appendChild(removeButton);
+
+        selectedFiltersContainer.appendChild(filterTag);
+    });
+}
+
+// Remove selected filter
+function removeFilter(value, type) {
+    selectedFilters = selectedFilters.filter(filter => filter.value !== value || filter.type !== type);
+    displaySelectedFilters();
+    filterAssets();
+}
+
+// Toggle download links in the download array
+function toggleDownload(checkbox) {
+    const downloadLink = checkbox.value;
+    const fileName = checkbox.dataset.filename;
+    const fileType = checkbox.dataset.filetype;
+    const fileSizeMB = parseFloat(checkbox.dataset.filesize) / (1024 * 1024); // Convert bytes to MB
+    const downloadItem = { downloadLink, fileName, fileType, fileSizeMB };
+
+    if (checkbox.checked) {
+        downloadArray.push(downloadItem);
+    } else {
+        downloadArray = downloadArray.filter(item => item.downloadLink !== downloadLink);
+    }
+}
+
+// Unselect all downloads
+function unselectAllDownloads() {
+    const checkboxes = document.querySelectorAll('.asset input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    downloadArray = [];
+}
+
+// Generate a separate page with individual download links for large files
+function downloadSelected() {
+    // Separate large and small files
+    const largeFiles = downloadArray.filter(item => item.fileSizeMB > fileSizeLimitMB);
+    const smallFiles = downloadArray.filter(item => item.fileSizeMB <= fileSizeLimitMB);
+
+    // Log selected assets for download
+    console.log('Selected assets for download:', downloadArray);
+    console.log('Large files:', largeFiles);
+    console.log('Small files:', smallFiles);
+
+    // Generate a separate page for large file downloads
+    if (largeFiles.length > 0) {
+        const downloadPage = window.open('', '_blank');
+        downloadPage.document.write(`
+            <html>
+                <head>
+                    <title>100MB+ Asset Download Links</title>
+                    <link rel="stylesheet" href="https://unpkg.com/7.css">
+                    <style>
+                        a.clicked {
+                            color: red;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Separated 100MB+ Download Links</h1>
+                    <h2>Blame Google Drives Shitty Api For Making It Mandatory To Have User Interaction With These Pages</h2>
+                    <ul>
+        `);
+        largeFiles.forEach(item => {
+            const { downloadLink, fileName, fileType } = item;
+            downloadPage.document.write(`
+                <li><a href="${downloadLink}" target="_blank" onclick="this.classList.add('clicked')">${fileName}.${fileType}</a></li>
+            `);
+        });
+        downloadPage.document.write(`
+                    </ul>
+                </body>
+            </html>
+        `);
+        downloadPage.document.close();
+    }
+
+    // Function to open multiple files simultaneously in iframes
+    function open_files_in_iframes(files) {
+        files.forEach(file => {
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = file.download;
+            document.body.appendChild(iframe);
+            console.log(`Loading ${file.filename} in an iframe.`);
+        });
+    }
+
+    // Prepare the small files for download
+    if (smallFiles.length > 0) {
+        const filesToOpen = smallFiles.map(item => ({
+            download: item.downloadLink,
+            filename: `${item.fileName}.${item.fileType}`
+        }));
+        open_files_in_iframes(filesToOpen);
+    }
+}
+
+// Update range value display
+function updateRangeValue(rangeId, valueId) {
+    const range = document.getElementById(rangeId);
+    const value = document.getElementById(valueId);
+    value.value = range.value;
+    filterAssets();
+}
+
+// Update range slider based on text box input
+function updateRangeSlider(rangeId, valueId) {
+    const range = document.getElementById(rangeId);
+    const value = document.getElementById(valueId);
+    range.value = value.value;
+    filterAssets();
+}
+
+// Toggle combo box visibility
+function toggleComboBox(comboBoxId) {
+    const comboBoxOptions = document.getElementById(comboBoxId);
+    comboBoxOptions.style.display = comboBoxOptions.style.display === 'none' ? 'block' : 'none';
+}
+
+// Show combo box options when input is focused
+function showComboBoxOptions(comboBoxId) {
+    const comboBoxOptions = document.getElementById(comboBoxId);
+    comboBoxOptions.style.display = 'block';
+}
+
+// Hide combo box when clicking outside
+document.addEventListener('click', function(event) {
+    ['tagComboBoxInput', 'fileNameComboBoxInput', 'fileTypeComboBoxInput'].forEach(inputId => {
+        const input = document.getElementById(inputId);
+        const options = document.getElementById(`${inputId}Options`);
+        if (!input.contains(event.target) && !options.contains(event.target)) {
+            options.style.display = 'none';
+        }
+    });
+});
+
+// Load more assets when scrolled to bottom
+$('#assetListContainer').on('scroll', function() {
+    if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+    }
+
+    scrollTimeout = setTimeout(() => {
+        if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {
+            displayAssets(filteredAssets);
+        }
+    }, 500); // 500ms delay
+});
+
+// Fetch assets as soon as the page is loaded
+$(document).ready(function() {
+    fetchAssets();
+});
+</script>
