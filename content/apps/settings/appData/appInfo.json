@@ -1,0 +1,9 @@
+{
+  "ID": "1",
+  "name": "Settings",
+  "creator": "ult & co.",
+  "icon": "hora64/ult-co/content/apps/settings/appData/icon.png",
+  "banner": null,
+  "jingle": null,
+  "page": "hora64/ult-co/content/apps/settings/page/page.html"
+} 

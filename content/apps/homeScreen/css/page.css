@@ -1,0 +1,46 @@
+
+    :root {
+      --scale: 1;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+        background-color: #000000;
+      margin: 0;
+      background: none;
+    }
+    .box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+    #topScreen {
+      width: calc(var(--scale) * 5px);
+      height: calc(var(--scale) * 3px);
+      background: none;
+    }
+    #bottomScreen {
+      width: calc(var(--scale) * 4px);
+      height: calc(var(--scale) * 3px);
+    }
+    .screenContent {
+      transform: scale(var(--scale));
+      transform-origin: top left;
+      width: calc(1px / var(--scale));
+      height: calc(1px / var(--scale));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Scaled element spacing only—no font declarations */
+    .screenContent img,
+    .screenContent button,
+    .screenContent p {
+      margin: calc(var(--scale) * 0.2px);
+      width: calc(var(--scale) * 1px);
+      height: auto;
+    }
