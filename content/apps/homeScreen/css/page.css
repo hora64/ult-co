@@ -9,16 +9,17 @@ body {
 }
 .box {
   display: flex;
-  justify-content: center;
-  align-items: center;
   color: white;
 }
 #topScreen {
   width: 400px;
   height: 240px;
+  margin: auto;
 }
+
 #bottomScreen {
   width: 320px;
   height: 240px;
+  margin: auto;
 }
 
