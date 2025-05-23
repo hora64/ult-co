@@ -10,10 +10,6 @@ function cooldown(cooldownDuration) {
         return true;
     };
 }
-function updateScreenScale() {
-      const vh = window.innerHeight;
-      const scale = vh / 6;
-      document.documentElement.style.setProperty('--scale', scale);
-    }
+
 
 
