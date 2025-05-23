@@ -27,13 +27,18 @@
 
   <script>
     // Apply zoom scaling based on viewport height
-    function updateZoomScale() {
-      const vh = window.innerHeight;
-      const zoomLevel = vh / 480;
-      document.querySelectorAll('.screenContent').forEach(el => {
-        el.style.zoom = zoomLevel;
-      });
-    }
+function updateZoomScale() {
+  const vh = window.innerHeight;
+  const zoomLevel = vh / 480;
+
+  // Apply zoom ONLY to the main .screenContent wrapper
+  const screenContent = document.getElementById('screenContent');
+  if (screenContent) {
+    screenContent.style.zoom = zoomLevel;
+  }
+}
+
+
 
     // Load dynamic content based on hash or show home screen as fallback
     function loadPage() {
