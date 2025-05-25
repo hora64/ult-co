@@ -1,79 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ult & co 3ds ui test</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .screenContent {
-    width: 400px;
-    height: 480px;
-    overflow: hidden;
-    margin: auto;
-}
-  </style>
-</head>
-<body>
-  <div class="screenContent" id="screenContent"></div>
-
-  <script>
-    // Apply zoom scaling based on viewport height
-function updateZoomScale() {
-  const vh = window.innerHeight;
-  const zoomLevel = vh / 480;
-
-  // Apply zoom ONLY to the main .screenContent wrapper
-  const screenContent = document.getElementById('screenContent');
-  if (screenContent) {
-    screenContent.style.zoom = zoomLevel;
-  }
-}
-
-
-
-    // Load dynamic content based on hash or show home screen as fallback
-    function loadPage() {
-      $.getJSON('content/common/jsonList/pageHashes.json', function(data) {
-        console.log("Page Hashes:", data);
-        const hash = window.location.hash.substring(1) || 'main';
-        const entry = data[hash];
-
-        if (entry && entry.type === "app") {
-          $("#screenContent").load(entry.location, function(response, status) {
-            if (status === "error") {
-              console.error(`Error loading content for "${hash}" at "${entry.location}". Loading home screen.`);
-              $("#screenContent").load("content/apps/homeScreen/page/page.html");
-            }
-          });
-        } else {
-          console.warn(`Unsupported or missing type for hash "${hash}". Loading home screen.`);
-          $("#screenContent").load("content/apps/homeScreen/page/page.html");
-        }
-      }).fail(function() {
-        console.error("Failed to load pageHashes.json. Loading home screen.");
-        $("#screenContent").load("content/apps/homeScreen/page/page.html");
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        $("#screenContent").load("content/errorScreen/mobileError.html");
-      } else {
-        loadPage();
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ult & co 3ds ui test</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
       }
 
-      updateZoomScale();
-      window.addEventListener('resize', updateZoomScale);
-    });
-  </script>
-</body>
+      .screenContent {
+        width: 400px;
+        height: 480px;
+        overflow: hidden;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screenContent" id="screenContent"></div>
+    <script>
+      // Apply zoom scaling based on viewport height
+      function updateZoomScale() {
+        const vh = window.innerHeight;
+        const zoomLevel = vh / 480;
+        // Apply zoom ONLY to the main .screenContent wrapper
+        const screenContent = document.getElementById('screenContent');
+        if (screenContent) {
+          screenContent.style.zoom = zoomLevel;
+        }
+      }
+      // Load dynamic content based on hash or show home screen as fallback
+      function loadPage() {
+        $.getJSON('content/common/jsonList/pageHashes.json', function(data) {
+          console.log("Page Hashes:", data);
+          const hash = window.location.hash.substring(1) || 'main';
+          const entry = data[hash];
+          if (entry && entry.type === "app") {
+            $("#screenContent").load(entry.location, function(response, status) {
+              if (status === "error") {
+                console.error(`Error loading content for "${hash}" at "${entry.location}". Loading home screen.`);
+                $("#screenContent").load("content/apps/homeScreen/page/page.html");
+              }
+            });
+          } else {
+            console.warn(`Unsupported or missing type for hash "${hash}". Loading home screen.`);
+            $("#screenContent").load("content/apps/homeScreen/page/page.html");
+          }
+        }).fail(function() {
+          console.error("Failed to load pageHashes.json. Loading home screen.");
+          $("#screenContent").load("content/apps/homeScreen/page/page.html");
+        });
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          $("#screenContent").load("content/errorScreen/mobileError.html");
+        } else {
+          loadPage();
+        }
+        updateZoomScale();
+        window.addEventListener('resize', updateZoomScale);
+      });
+    </script>
+  </body>
 </html>
