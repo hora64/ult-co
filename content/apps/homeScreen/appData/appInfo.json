@@ -2,7 +2,7 @@
   "ID": "0",
   "name": "Home Screen",
   "creator": "ult & co.",
-  "icon": "hora64/ult-co/content/apps/homeScreen/appData/icon.png",
+  "icon": "hora64/ult-co/content/apps/homeScreen/appData/icon_128px.png",
   "banner": null,
   "jingle": null,
   "page": "hora64/ult-co/content/apps/homeScreen/page/page.html"
