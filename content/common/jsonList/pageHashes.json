@@ -1,10 +1,10 @@
 {
   "home": {
     "type": "app",
-    "location": "content/apps/homeScreen/page/page.html"
+    "location": "/content/apps/homeScreen/page/page.html"
   },
   "settings": {
     "type": "app",
-    "location": "content/apps/settings/page/page.html"
+    "location": "/content/apps/settings/page/page.html"
   }
 }

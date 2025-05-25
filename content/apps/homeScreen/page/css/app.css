@@ -2,7 +2,7 @@
     position: relative;
     border: none;
     padding: 0;
-    background: var(--base-image, url('content/apps/homeScreen/page/assets/App_Blank_128px.png')) center/contain no-repeat;
+    background: var(--base-image, url('/content/apps/homeScreen/page/assets/App_Blank_128px.png')) center/contain no-repeat;
     cursor: pointer;
     overflow: hidden;
     user-select: none;

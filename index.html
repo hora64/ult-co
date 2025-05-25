@@ -38,7 +38,7 @@
       }
       // Load dynamic content based on hash or show home screen as fallback
       function loadPage() {
-        $.getJSON('content/common/jsonList/pageHashes.json', function(data) {
+        $.getJSON('/content/common/jsonList/pageHashes.json', function(data) {
           console.log("Page Hashes:", data);
           const hash = window.location.hash.substring(1) || 'main';
           const entry = data[hash];
@@ -46,21 +46,21 @@
             $("#screenContent").load(entry.location, function(response, status) {
               if (status === "error") {
                 console.error(`Error loading content for "${hash}" at "${entry.location}". Loading home screen.`);
-                $("#screenContent").load("content/apps/homeScreen/page/page.html");
+                $("#screenContent").load("/content/apps/homeScreen/page/page.html");
               }
             });
           } else {
             console.warn(`Unsupported or missing type for hash "${hash}". Loading home screen.`);
-            $("#screenContent").load("content/apps/homeScreen/page/page.html");
+            $("#screenContent").load("/content/apps/homeScreen/page/page.html");
           }
         }).fail(function() {
           console.error("Failed to load pageHashes.json. Loading home screen.");
-          $("#screenContent").load("content/apps/homeScreen/page/page.html");
+          $("#screenContent").load("/content/apps/homeScreen/page/page.html");
         });
       }
       document.addEventListener('DOMContentLoaded', function() {
         if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          $("#screenContent").load("content/errorScreen/mobileError.html");
+          $("#screenContent").load("/content/errorScreen/mobileError.html");
         } else {
           loadPage();
         }
