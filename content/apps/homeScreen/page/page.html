@@ -1,14 +1,33 @@
 <!-- External CSS -->
 <link rel="stylesheet" href="content/common/css/page.css">
 <link rel="stylesheet" href="content/common/css/background.css">
+<link rel="stylesheet" href="content/apps/homeScreen/page/css/app.css">
 <body>
   <div id="topScreen" class="box">
     
   </div>
   <div id="bottomScreen" class="box gradient-background">
-
+    <button class="app-button base-icon medium" data-json="content/apps/homeScreen/appData/appInfo.json"></button>
+    <button class="app-button medium" data-json="content/apps/button/appData/appInfo.json"></button>
   </div>
 </body>
+    <script>
+        // Select all buttons with a data-json attribute
+        document.querySelectorAll('.app-button[data-json]').forEach(button => {
+            const jsonFile = button.getAttribute('data-json');
+            fetch(jsonFile)
+                .then(response => {
+                    if (!response.ok) throw new Error(`Failed to load ${jsonFile}`);
+                    return response.json();
+                })
+                .then(jsonData => {
+                    if (jsonData.icon) {
+                        button.style.setProperty('--overlay-image', `url(${jsonData.icon})`);
+                    }
+                })
+                .catch(error => console.error('Error loading JSON for button:', error));
+        });
+    </script>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- External JS -->

@@ -1,0 +1,44 @@
+.app-button {
+    position: relative;
+    border: none;
+    padding: 0;
+    background: var(--base-image, url('content/apps/homeScreen/page/assets/App_Blank_128px.png')) center/contain no-repeat;
+    cursor: pointer;
+    overflow: hidden;
+    user-select: none;
+}
+
+.app-button:active {
+    transform: translateY(2px);
+}
+
+.app-button::after {
+    content: "";
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 70%;
+    height: 70%;
+    background-image: var(--overlay-image, none);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 10%;
+    pointer-events: none;
+    image-rendering: pixelated;
+    user-select: none;
+}
+
+/* Class to replace the base icon */
+.base-icon {
+    --base-image: var(--overlay-image, none); /* Replace base image */
+}
+
+/* Disable overlay for buttons with base-icon */
+.base-icon::after {
+    content: none;
+}
+
+.small { width: 32px; height: 32px; }
+.medium { width: 64px; height: 64px; }
+.large { width: 128px; height: 128px; }
