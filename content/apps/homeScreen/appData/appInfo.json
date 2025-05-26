@@ -2,8 +2,8 @@
   "ID": "0",
   "name": "Home Screen",
   "creator": "ult & co.",
-  "icon": "/content/apps/homeScreen/appData/icon_128px.png",
+  "icon": "/ult-co/content/apps/homeScreen/appData/icon_128px.png",
   "banner": null,
   "jingle": null,
-  "page": "/content/apps/homeScreen/page/page.html"
+  "page": "/ult-co/content/apps/homeScreen/page/page.html"
 }

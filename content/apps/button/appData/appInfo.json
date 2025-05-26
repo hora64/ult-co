@@ -2,8 +2,8 @@
   "ID": "2",
   "name": "Button",
   "creator": "ult & co.",
-  "icon": "/content/apps/button/appData/button_400px.jpg",
+  "icon": "/ult-co/content/apps/button/appData/button_400px.jpg",
   "banner": null,
   "jingle": null,
-  "page": "/content/apps/settings/page/page.html"
+  "page": "/ult-co/content/apps/settings/page/page.html"
 } 

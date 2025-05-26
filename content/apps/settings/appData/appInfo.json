@@ -2,8 +2,8 @@
   "ID": "1",
   "name": "Settings",
   "creator": "ult & co.",
-  "icon": "/content/apps/settings/appData/icon.png",
+  "icon": "/ult-co/content/apps/settings/appData/icon.png",
   "banner": null,
   "jingle": null,
-  "page": "/content/apps/settings/page/page.html"
+  "page": "/ult-co/content/apps/settings/page/page.html"
 } 
