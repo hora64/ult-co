@@ -9,7 +9,7 @@
 }
 
 .app-button:active {
-    transform: translateY(2px);
+    transform: translateY(1px);
 }
 
 .app-button::after {
