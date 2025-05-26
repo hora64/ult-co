@@ -39,6 +39,11 @@
     content: none;
 }
 
+.xsmall { width: 16px; height: 16px; }
 .small { width: 32px; height: 32px; }
-.medium { width: 64px; height: 64px; }
-.large { width: 128px; height: 128px; }
+.medium { width: 48px; height: 48px; }
+.large { width: 64px; height: 64px; }
+.xlarge { width: 96px; height: 96px; }
+.xxl { width: 128px; height: 128px; }
+
+
