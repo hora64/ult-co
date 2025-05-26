@@ -38,6 +38,10 @@
 .base-icon::after {
     content: none;
 }
+.unopened::after {
+    --overlay-image: url("/ult-co/content/apps/homeScreen/page/assets/giftbox_48px.png"); /* Replace icon image */
+}
+
 
 .xsmall { width: 16px; height: 16px; }
 .small { width: 32px; height: 32px; }
