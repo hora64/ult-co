@@ -1,0 +1,22 @@
+{
+  "assets": {
+    "scrollBarMiddle": "assets/redTheme/HorizontalScrollBar_Middle.png",
+    "scrollBarSide": "assets/redTheme/HorizontalScrollBar_Side.png",
+    "selectionGlow": "assets/redTheme/Select_128px.png",
+    "sizeIncrease": "assets/redTheme/PlusSpriteButton_64px.png",
+    "sizeDecrease": "assets/redTheme/MinusSpriteButton_64px.png",
+    "topBar": "assets/redTheme/TopBar.png",
+    "soundClick": "assets/redTheme/sfx/select6.ogg",
+    "soundSelect": "assets/redTheme/sfx/select5.ogg",
+    "soundLaunch": "assets/redTheme/sfx/select3.ogg",
+    "soundSizeUp": "assets/redTheme/sfx/select2.ogg",
+    "soundSizeDown": "assets/redTheme/sfx/select.ogg",
+    "soundGrab": "assets/redTheme/sfx/select.ogg",
+    "soundOpenBox": "assets/redTheme/sfx/open.ogg"
+  },
+  "colors": {
+    "topScreen": "#FF6666",
+    "bottomScreen": "#FF6666",
+    "dsContainer": "#FF0000"
+  }
+}

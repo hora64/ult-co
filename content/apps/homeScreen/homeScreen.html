@@ -1,0 +1,314 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="importmap">
+    {
+      "imports": {
+        "OceanBanner": "./banners/ocean/ocean.js",
+        "UnopenedBanner": "./banners/unopened/unopened.js"
+      }
+    }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+</head>
+<body>
+    <div class="ds-container">
+        <div class="top-screen" id="topScreen"></div>
+        <div class="bottom-screen" id="bottomScreen"></div>
+    </div>
+
+    <script type="module">
+        /**
+         * Creates and injects the import map into the document's head.
+         */
+        function loadImportMap() {
+            const importMapId = 'dynamic-import-map';
+            if (document.getElementById(importMapId)) return;
+            const importMap = {
+                imports: {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+                    "OrbitControls": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/OrbitControls.js",
+                    "GLTFLoader": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js",
+                    "./uiElements/circleLoader.js": "./uiElements/circleLoader.js",
+                    "./uiElements/apps.js": "./uiElements/apps.js",
+                    "./uiElements/appGrid.js": "./uiElements/appGrid.js",
+                    "./banners/ocean/ocean.js": "./banners/ocean/ocean.js",
+                    "./banners/unopened/unopened.js": "./banners/unopened/unopened.js"
+                }
+            };
+            const script = document.createElement('script');
+            script.id = importMapId;
+            script.type = 'importmap';
+            script.textContent = JSON.stringify(importMap);
+            document.head.appendChild(script);
+        }
+
+        /**
+         * Dynamically loads all necessary JavaScript modules for the application.
+         */
+        async function loadModules() {
+            try {
+                const { LoadingCircleWidget } = await import('./uiElements/circleLoader.js');
+                const { AppIcon } = await import('./uiElements/apps.js');
+                const { AppGrid } = await import('./uiElements/appGrid.js');
+                const { OceanBanner } = await import('./banners/ocean/ocean.js');
+                const { UnopenedBanner } = await import('./banners/unopened/unopened.js');
+                const threeModule = await import('three');
+                const { OrbitControls } = await import('OrbitControls');
+                const { GLTFLoader } = await import('GLTFLoader');
+
+                return {
+                    LoadingCircleWidget, AppIcon, AppGrid,
+                    three: threeModule, OrbitControls, GLTFLoader,
+                    OceanBanner, UnopenedBanner
+                };
+            } catch (error) {
+                console.error("A module failed to load:", error);
+                throw error;
+            }
+        }
+
+        /**
+         * Injects all necessary CSS into the document's head.
+         */
+        function injectStyles() {
+            const styleId = '3ds-ui-styles';
+            if (document.getElementById(styleId)) return;
+            const styleSheet = document.createElement('style');
+            styleSheet.id = styleId;
+            styleSheet.innerHTML = `
+                body { background: #333; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+                .ds-container {
+                    width: 400px;
+                    height: 480px;
+                    background: #222;
+                    user-select: none;
+                    -webkit-user-select: none;
+                    overflow: hidden;
+                    image-rendering: crisp-edges;
+                    /* --- ADDED FOR CORRECT SCALING --- */
+
+                    box-sizing: border-box;
+                }
+                .top-screen { width: 100%; aspect-ratio: 400 / 240; height: 240px; width: 400px; background: linear-gradient(rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2)), #000000; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+                .top-screen canvas { display: block; width: 400px !important; height: 240px !important; object-fit: contain; image-rendering: crisp-edges; }
+                .bottom-screen { width: 100%; max-width: 320px; aspect-ratio: 320 / 240; max-height: 240px; display: flex; flex-direction: column; box-sizing: border-box; margin: 0 auto; overflow: hidden; position: relative; background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.2)), #000000; background-blend-mode: screen; z-index: 11; }
+                #Loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; }
+                #bottomScreenGrid { width: 100%; height: 100%; box-sizing: border-box; overflow: hidden; }
+                * { font-family: 'RodinProDB'; font-smooth: never; }
+                @media (max-width: 420px) { .ds-container { border-width: 10px; } }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+        
+        /**
+         * Dynamically loads external CSS stylesheets.
+         */
+        function loadStyleSheets() {
+            const styleSheets = [
+                'css/fonts.css', 'css/base.css', 
+                'css/form-controls.css', 'css/layout.css',
+                'css/controls.css', 'css/fancy-buttons.css'
+            ];
+            styleSheets.forEach(href => {
+                if (!document.querySelector(`link[href="${href}"]`)) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet'; link.type = 'text/css'; link.href = href;
+                    document.head.appendChild(link);
+                }
+            });
+        }
+
+        /**
+         * Creates and appends UI containers to the screens.
+         */
+        function createScreenAssets(topScreen, bottomScreen) {
+            if (!topScreen || !bottomScreen) throw new Error("Parent screen elements could not be found.");
+            const loaderContainer = document.createElement('div');
+            loaderContainer.id = 'Loader';
+            topScreen.appendChild(loaderContainer);
+            const appGridContainer = document.createElement('div');
+            appGridContainer.id = 'bottomScreenGrid';
+            bottomScreen.appendChild(appGridContainer);
+            return { loaderContainer, appGridContainer };
+        }
+
+        // --- UTILITY FUNCTIONS ---
+
+        function saveToLocalStorage(key, data) {
+            if (!key || data === undefined) {
+                console.error('Invalid key or data provided for saving.');
+                return;
+            }
+            try {
+                const isObject = typeof data === 'object' && data !== null;
+                localStorage.setItem(key, isObject ? JSON.stringify(data) : data);
+            } catch (e) {
+                console.error('Error saving data to local storage:', e);
+            }
+        }
+
+        function loadFromLocalStorage(key) {
+            const data = localStorage.getItem(key);
+            if (data === null) return null;
+            try {
+                return JSON.parse(data);
+            } catch (e) {
+                return data;
+            }
+        }
+
+        function clearLocalStorage(key) {
+            try {
+                localStorage.removeItem(key);
+            } catch (e) {
+                console.error('Error clearing local storage:', e);
+            }
+        }
+
+        async function loadJsonData(filePath) {
+            try {
+                const response = await fetch(filePath);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(`Error loading JSON data from ${filePath}:`, error);
+                return null;
+            }
+        }
+
+        function renameClass(oldClassName, elementId, newClassName) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                const targetElements = element.querySelectorAll(`.${oldClassName}`);
+                targetElements.forEach(target => {
+                    target.classList.remove(oldClassName);
+                    target.classList.add(newClassName);
+                });
+            } else {
+                console.error(`Element with id ${elementId} not found.`);
+            }
+        }
+
+        // --- APPLICATION LOGIC ---
+
+        function getSavedThemeLocation() {
+            const savedThemePath = loadFromLocalStorage('themePath');
+            if (savedThemePath) {
+                console.log(`Found saved theme: ${savedThemePath}`);
+                return savedThemePath;
+            } else {
+                console.log('No saved theme found. Loading default.');
+                return 'assets/blackTheme/BlackThemeDefinition.json';
+            }
+        }
+
+        async function loadTheme(themePath, appGrid) {
+            if (!appGrid) {
+                console.error('AppGrid instance was not provided to loadTheme.');
+                return;
+            }
+            if (!themePath) {
+                console.warn('No theme path provided; skipping theme loading.');
+                return;
+            }
+
+            const data = await loadJsonData(themePath);
+            if (!data) {
+                console.error(`Failed to load theme from ${themePath}. The file might be missing or invalid.`);
+                clearLocalStorage('themePath'); // Clear broken path
+                return;
+            }
+            
+            let themeUpdated = false;
+            if (data.colors) {
+                const selectors = { topScreen: '.top-screen', bottomScreen: '.bottom-screen', dsContainer: '.ds-container' };
+                for (const key in selectors) {
+                    if (data.colors[key]) {
+                        const element = document.querySelector(selectors[key]);
+                        if (element) element.style.backgroundColor = data.colors[key];
+                    }
+                }
+                themeUpdated = true;
+            }
+            if (data.assets && typeof appGrid.updateAssetUrls === 'function') {
+                appGrid.updateAssetUrls(data.assets);
+                themeUpdated = true;
+            }
+
+            if (themeUpdated) console.log('Theme update process complete!');
+        }
+        
+        async function main() {
+            const topScreenElement = document.getElementById('topScreen');
+            const bottomScreenElement = document.getElementById('bottomScreen');
+            let loaderWidget;
+
+            try {
+                const modules = await loadModules();
+                const { loaderContainer, appGridContainer } = createScreenAssets(topScreenElement, bottomScreenElement);
+
+                loaderWidget = new modules.LoadingCircleWidget({ parent: loaderContainer });
+                loaderWidget.start();
+
+                let appData = await loadJsonData('./appData.json');
+                if (!appData) throw new Error('Failed to load essential application data from appData.json.');
+
+                appData = appData.map(app => {
+                    if (app.onClick && typeof app.onClick === 'string') {
+                        try {
+                            app.onClick = new Function('app', 'appGrid', `return (${app.onClick})(app, appGrid)`);
+                        } catch (e) {
+                            console.error(`Error creating function from string for app "${app.label}":`, e);
+                            app.onClick = () => console.error(`Invalid onClick handler for ${app.label}`);
+                        }
+                    }
+                    return app;
+                });
+
+                const iconSystem = new modules.AppIcon({
+                    defaultBaseImage: 'assets/blackTheme/BlankApp_64px.png',
+                    unopenedImage: 'assets/img/giftbox_48px.png'
+                });
+
+                const appGridInstance = new modules.AppGrid(appGridContainer, appData, iconSystem, topScreenElement);
+                await appGridInstance.initialize();
+
+                const themePath = getSavedThemeLocation();
+                await loadTheme(themePath, appGridInstance);
+
+            } catch (err) {
+                console.error("Failed to initialize application:", err);
+                if (bottomScreenElement) bottomScreenElement.innerHTML = `<p style='color:red; text-align:center;'>Failed to load application. Check console for details.</p>`;
+            } finally {
+                if (loaderWidget) loaderWidget.stop();
+            }
+        }
+
+        // --- SCALING LOGIC ---
+        /**
+         * Scales an element based on the viewport height.
+         * @param {string} selector - The CSS selector for the element to scale.
+         * @param {number} baseHeight - The base height to compare the viewport against.
+         */
+
+
+        // --- INITIALIZATION ---
+        loadImportMap();
+        injectStyles();
+        loadStyleSheets();
+        main();
+
+        document.addEventListener('selectstart', e => {
+            const target = e.target;
+            if (target.classList.contains('appgrid-size-btn') || target.closest('.app-icon')) {
+                e.preventDefault();
+            }
+        });
+
+    </script>
+</body>
+</html>

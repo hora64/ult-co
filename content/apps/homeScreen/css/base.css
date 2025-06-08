@@ -1,0 +1,19 @@
+
+html,
+body {
+	font-family: 'RodinProDB';
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	background: linear-gradient(rgba(221, 170, 85, 0.5), rgba(0, 0, 0, 0.2)), #FFF8AA;
+	background-blend-mode: screen;
+	color: black;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	z-index: 1;
+}
+
+

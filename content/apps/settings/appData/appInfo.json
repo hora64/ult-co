@@ -1,9 +1,0 @@
-{
-  "ID": "1",
-  "name": "Settings",
-  "creator": "ult & co.",
-  "icon": "/ult-co/content/apps/settings/appData/icon.png",
-  "banner": null,
-  "jingle": null,
-  "page": "/ult-co/content/apps/settings/page/page.html"
-} 

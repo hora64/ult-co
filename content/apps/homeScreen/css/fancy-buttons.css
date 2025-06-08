@@ -1,0 +1,55 @@
+.button-style-1 {
+	position: relative;
+	padding: 5px 8px;
+	margin: 5px;
+	border: none;
+	cursor: pointer;
+	font-weight: bold;
+	border-radius: 12px;
+	color: black;
+	background-color: #DDAA55;
+	z-index: 1;
+	overflow: hidden;
+	font-size: 10px;
+	box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+	transition: none;
+}
+
+.button-style-1::before,
+.button-style-1::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	transition: none;
+}
+
+.button-style-1::before {
+	border: 8px solid transparent;
+	border-radius: 12px;
+	filter: blur(4px);
+	opacity: 0.5;
+	mix-blend-mode: multiply;
+}
+
+.button-style-1::after {
+	border: 2px solid white;
+	border-radius: 12px;
+	filter: blur(4px);
+	opacity: 0.75;
+	mix-blend-mode: screen;
+}
+
+.button-style-1:active {
+	transform: translateY(2px);
+	transition: none;
+}
+
+.button-style-1:active::after {
+	background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.3));
+	mix-blend-mode: multiply;
+	transition: none;
+}

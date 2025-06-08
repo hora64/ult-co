@@ -1,0 +1,112 @@
+[
+  {
+    "id": "app-home",
+    "label": "Home",
+    "description": "",
+    "icon": "assets/blackTheme/HomeScreen_128px.png",
+    "baseIcon": true,
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }"
+  },
+  {
+    "id": "app-contest-info",
+    "label": "Contest Info",
+    "description": "Your goto page for competitions hosted by ult & co.",
+    "icon": "assets/img/Camera_48px.png",
+    "banner": "assets/img/Camera_48px.png",
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }"
+  },
+  {
+    "id": "app-settings",
+    "label": "Settings",
+    "description": "Customize website settings",
+    "icon": "assets/img/Settings_48px.png",
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }"
+  },
+  {
+    "id": "app-ocean-demo",
+    "label": "Ocean Demo",
+    "description": "Test For Website Banner",
+    "icon": "assets/img/Globe_48px.png",
+    "bannerModule": "OceanBanner",
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }"
+  },
+  {
+    "id": "app-new-game",
+    "label": "New Game",
+    "description": "",
+    "unopened": true,
+    "icon": "assets/img/giftbox_48px.png",
+    "actualIcon": "assets/img/button_48px.jpg",
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }",
+    "bannerModule": "OceanBanner",
+    "unopenedBannerModule": "UnopenedBanner",
+    "assetPaths": {
+      "model": "assets/models/mysteryBox.glb"
+    }
+  },
+  {
+    "id": "app-old-website",
+    "label": "Ult & co. v1.0",
+    "description": "Older version of the ult-co.net website",
+    "icon": "assets/img/Link_48px.png",
+    "onClick": "() => window.open('https://www.ult-co.net', '_blank')"
+  },
+  {
+    "id": "app-oc-character-info",
+    "label": "OC Character Info",
+    "description": "",
+    "icon": "assets/img/Users_48px.png",
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }"
+  },
+  {
+    "id": "app-announcements",
+    "label": "Announcements",
+    "description": "Ult & Co. news on channel 5",
+    "icon": "assets/img/Chat_48px.png",
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }"
+  },
+  {
+    "id": "app-music",
+    "label": "Music",
+    "description": "Listen to some original ult & co. music",
+    "icon": "assets/img/Music_48px.png",
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }"
+  },
+  {
+    "id": "app-shop",
+    "label": "Ult & Co. digishop",
+    "description": "",
+    "icon": "assets/img/Cart_48px.png",
+    "onClick": "(app) => { const message = { type: 'launchApp', appId: app.id, label: app.label, location: `apps/${app.id}/index.html` }; if (window.parent !== window) { window.parent.postMessage(message, '*'); } else { console.warn('Not running in an iframe, cannot post message to parent.'); } }"
+  },
+  {
+    "id": "blue-theme",
+    "label": "Change Theme To Blue",
+    "description": "Changes the home screen theme to blue",
+    "icon": "assets/blueTheme/BlueThemeIcon.png",
+    "banner": "assets/img/theme_banner.png",
+    "unopened": true,
+    "unopenedBannerModule": "UnopenedBanner",
+    "onClick": "async (app, appGrid) => { if (!appGrid) { console.error('AppGrid instance was not provided.'); return; } try { const themePath = 'assets/blueTheme/BlueThemeDefinition.json'; console.log(`Attempting to load and save theme: ${themePath}`); const response = await fetch(themePath); if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`); const data = await response.json(); let themeUpdated = false; if (data.colors) { console.log('Applying color data...'); const selectors = { topScreen: '.top-screen', bottomScreen: '.bottom-screen', dsContainer: '.ds-container' }; for (const key in selectors) { if (data.colors[key]) { const element = document.querySelector(selectors[key]); if (element) { element.style.backgroundColor = data.colors[key]; } } } themeUpdated = true; } if (data.assets && typeof appGrid.updateAssetUrls === 'function') { console.log('Passing asset data to handler...'); appGrid.updateAssetUrls(data.assets); themeUpdated = true; } if (themeUpdated) { localStorage.setItem('themePath', themePath); console.log('Theme update process complete! Theme selection saved.'); } else { console.warn(\"Theme file contained no actionable 'assets' or 'colors' data.\"); } } catch (error) { console.error('Failed to change theme:', error); } }"
+  },
+  {
+    "id": "black-theme",
+    "label": "Change Theme To Black",
+    "description": "Changes the home screen theme to black",
+    "icon": "assets/blackTheme/BlackThemeIcon.png",
+    "banner": "assets/img/theme_banner.png",
+    "unopened": true,
+    "unopenedBannerModule": "UnopenedBanner",
+    "onClick": "async (app, appGrid) => { if (!appGrid) { console.error('AppGrid instance was not provided.'); return; } try { const themePath = 'assets/blackTheme/BlackThemeDefinition.json'; console.log(`Attempting to load and save theme: ${themePath}`); const response = await fetch(themePath); if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`); const data = await response.json(); let themeUpdated = false; if (data.colors) { console.log('Applying color data...'); const selectors = { topScreen: '.top-screen', bottomScreen: '.bottom-screen', dsContainer: '.ds-container' }; for (const key in selectors) { if (data.colors[key]) { const element = document.querySelector(selectors[key]); if (element) { element.style.backgroundColor = data.colors[key]; } } } themeUpdated = true; } if (data.assets && typeof appGrid.updateAssetUrls === 'function') { console.log('Passing asset data to handler...'); appGrid.updateAssetUrls(data.assets); themeUpdated = true; } if (themeUpdated) { localStorage.setItem('themePath', themePath); console.log('Theme update process complete! Theme selection saved.'); } else { console.warn(\"Theme file contained no actionable 'assets' or 'colors' data.\"); } } catch (error) { console.error('Failed to change theme:', error); } }"
+  },
+  {
+    "id": "red-theme",
+    "label": "Change Theme To Red",
+    "description": "Changes the home screen theme to red",
+    "icon": "assets/redTheme/RedThemeIcon.png",
+    "banner": "assets/img/theme_banner.png",
+    "unopened": true,
+    "unopenedBannerModule": "UnopenedBanner",
+    "onClick": "async (app, appGrid) => { if (!appGrid) { console.error('AppGrid instance was not provided.'); return; } try { const themePath = 'assets/redTheme/RedThemeDefinition.json'; console.log(`Attempting to load and save theme: ${themePath}`); const response = await fetch(themePath); if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`); const data = await response.json(); let themeUpdated = false; if (data.colors) { console.log('Applying color data...'); const selectors = { topScreen: '.top-screen', bottomScreen: '.bottom-screen', dsContainer: '.ds-container' }; for (const key in selectors) { if (data.colors[key]) { const element = document.querySelector(selectors[key]); if (element) { element.style.backgroundColor = data.colors[key]; } } } themeUpdated = true; } if (data.assets && typeof appGrid.updateAssetUrls === 'function') { console.log('Passing asset data to handler...'); appGrid.updateAssetUrls(data.assets); themeUpdated = true; } if (themeUpdated) { localStorage.setItem('themePath', themePath); console.log('Theme update process complete! Theme selection saved.'); } else { console.warn(\"Theme file contained no actionable 'assets' or 'colors' data.\"); } } catch (error) { console.error('Failed to change theme:', error); } }"
+  }
+]

@@ -1,0 +1,22 @@
+
+#shaderSettingsForm {
+	display: none;
+	opacity: 0;
+	transition: opacity 0.5s ease;
+}
+
+#shaderSettingsForm.show {
+	display: block;
+	opacity: 1;
+}
+
+.form-row {
+	display: flex;
+	gap: 15px;
+	margin-bottom: 15px;
+}
+
+.form-column {
+	flex: 1;
+	min-width: 0;
+}
