@@ -1,0 +1,41 @@
+<div class="window color glass active" id="contestPage" style="width: 450px; height: 418px;">
+    <div class="title-bar">
+        <div class="title-bar-text">#ultcomp</div>
+        <div class="title-bar-controls">
+            <button aria-label="Close" data-action="close-window"></button>
+        </div>
+    </div>
+    <div class="window-body has-space has-scrollbar" style="width: 423px; height: 348px; overflow: auto">
+        <!-- Content sections for dynamic tab loading -->
+        <section class="tabs" style="max-width: 601px">
+            <menu role="tablist" aria-label="contestPageTabs">
+                <button role="tab" aria-controls="ultcomp-info-content" id="tab-btn-ultcomp-Info" aria-selected="true" data-content-id="ultcomp-info-content" data-url="content/windows/contests/ultcomp/info.html">General Rules & Info</button>
+                <button role="tab" aria-controls="round1-content" id="tab-btn-ultcomp-round1" data-content-id="round1-content" data-url="content/windows/contests/ultcomp/round1.html">Round 1</button>
+                <button role="tab" aria-controls="round2-content" id="tab-btn-ultcomp-round2" data-content-id="round2-content" data-url="content/windows/contests/ultcomp/round2.html" disabled>Round 2</button>
+            </menu>
+            <div id="ultcomp-info-content" class="tab-content"></div>
+            <div id="round1-content" class="tab-content"></div>
+            <div id="round2-content" class="tab-content"></div>
+        </section>
+    </div>
+    <div class="status-bar" style="width: 435px;">
+        <p class="status-bar-field">Round #1 Deadline</p>
+        <p class="status-bar-field">August 10th, 2024 3:30pm EST</p>
+        <div id="countdown-ultcomp"></div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Load initial content for contestPage
+    $("#ultcomp-info-content").load("content/windows/contests/ultcomp/info.html");
+    
+    // Start the countdown
+    startCountdown({
+        dom: "countdown-ultcomp",
+        start: new Date("August 1, 2024 15:30:00").getTime(),
+        end: new Date("August 10, 2024 15:30:00").getTime(),
+        onStartMessage: "Round 1 starts soon!"
+    });
+});
+</script>
