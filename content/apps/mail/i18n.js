@@ -129,7 +129,7 @@ export const translations = {
             "resetFilter": "重置筛选"
         }
     }
-    'zh-Hans-CN': {
+    'zh-Hant': {
         "exit": "退出",
         "unopened": "未打開",
         "unopenedMail": "未讀郵件",
@@ -390,3 +390,4 @@ export const translations = {
         }
     }
 };
+
