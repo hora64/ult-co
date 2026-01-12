@@ -128,7 +128,7 @@ export const translations = {
             "applyFilter": "使用筛选",
             "resetFilter": "重置筛选"
         }
-    }
+    },
     'zh-Hant': {
         "exit": "退出",
         "unopened": "未打開",
@@ -390,4 +390,5 @@ export const translations = {
         }
     }
 };
+
 
