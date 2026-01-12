@@ -1,0 +1,88 @@
+/* command-prompt.css */
+
+/* General settings for the body */
+.cmd-body {
+    background-color: #000; /* Black background */
+    margin: 0;
+    padding: 20px;
+}
+
+/* Command prompt text styling */
+.cmd-text {
+    color: #0F0; /* Green text */
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+}
+
+/* Styling for headers */
+h1.cmd-text, h2.cmd-text, h3.cmd-text, h4.cmd-text, h5.cmd-text, h6.cmd-text {
+    color: #0F0; /* Green text */
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+}
+
+/* Styling for paragraphs */
+p.cmd-text {
+    color: #0F0; /* Green text */
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+}
+
+/* Links */
+a.cmd-text {
+    color: #00F; /* Blue text for links */
+    text-decoration: none; /* Remove underline */
+}
+
+a.cmd-text:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* Buttons */
+button.cmd-text {
+    background-color: #0F0; /* Green background */
+    color: #000; /* Black text */
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+}
+
+button.cmd-text:hover {
+    background-color: #0C0; /* Darker green background on hover */
+}
+
+/* Input fields */
+input.cmd-text, textarea.cmd-text {
+    background-color: #000; /* Black background */
+    color: #0F0; /* Green text */
+    border: 1px solid #0F0; /* Green border */
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+}
+
+/* Tables */
+table.cmd-text {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+}
+
+th.cmd-text, td.cmd-text {
+    border: 1px solid #0F0; /* Green border */
+    padding: 10px;
+    text-align: left;
+}
+
+th.cmd-text {
+    background-color: #0F0; /* Green background */
+    color: #000; /* Black text */
+}
+
+/* Blinking cursor effect */
+.blinking-cursor::after {
+    content: '_';
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+}

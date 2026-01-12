@@ -1,0 +1,3961 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contestelations</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.3/build/global/luxon.min.js"></script>
+</head>
+
+<body>
+    <div class="ds-container" id="app-root"></div>
+        <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+            }
+        }
+        </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js'; // Import OrbitControls
+
+        // Global variables to handle contest timing issues.
+        let appInstance = null; // Will hold the app instance once it's created.
+        let initialSlugFromMessage = null; // Will store a slug if it arrives before the app is ready.
+
+        // Global listener to catch messages immediately.
+        window.addEventListener('message', (event) => {
+            // Debug log to confirm message reception in the iframe.
+            console.log("[Contestelations App] Global listener received message:", event.data);
+
+            if (event.data && event.data.type === 'deep-link' && event.data.slug) {
+                if (appInstance && appInstance.allContests.length > 0) {
+                    // If the app is already initialized, handle the deep link immediately.
+                    appInstance.handleDeepLink(event.data.slug);
+                } else {
+                    // If the app is not yet initialized, store the slug to be processed later.
+                    initialSlugFromMessage = event.data.slug;
+                }
+            }
+        });
+
+        // Language data for Contestelations App - Kept as is, as it's essential content.
+        const languageData = {
+            'en-US': `{
+    "exit": "Exit",
+    "activeContests": "Active Contests",
+    "newContests": "New Contests",
+    "searchPlaceholder": "Search Contests...",
+    "noResults": "No contests match your criteria.",
+    "close": "Close Contest",
+    "byOrganizer": "By {organizer}",
+    "sortAndFilter": "Sort & Filter",
+    "applyAndClose": "Apply & Close",
+    "sortBy": "Sort By",
+    "newestFirst": "Newest First",
+    "oldestFirst": "Oldest First",
+    "organizerAZ": "Organizer (A-Z)",
+    "participationStatus": "Participation Status",
+    "all": "All",
+    "joined": "Joined",
+    "notJoined": "Not Joined",
+    "filterByTag": "Filter by Category",
+    "errorLoadingContests": "Contests could not be loaded.",
+    "linkCopied": "Contest Link Copied to Clipboard",
+    "footer": {
+      "exit": "Exit App"
+    }
+}`,
+            'es-ES': `{
+    "exit": "Salir",
+    "activeContests": "Concursos Activos",
+    "newContests": "Nuevos Concursos",
+    "searchPlaceholder": "Buscar Concursos...",
+    "noResults": "No hay concursos que coincidan con sus criterios.",
+    "close": "Cerrar Concurso",
+    "byOrganizer": "Por {organizer}",
+    "sortAndFilter": "Ordenar y Filtrar",
+    "applyAndClose": "Aplicar y Cerrar",
+    "sortBy": "Ordenar por",
+    "newestFirst": "MÃ¡s nuevos primero",
+    "oldestFirst": "MÃ¡s antiguos primero",
+    "organizadorAZ": "Organizador (A-Z)",
+    "participationStatus": "Estado de ParticipaciÃ³n",
+    "all": "Todos",
+    "joined": "Unido",
+    "notJoined": "No Unido",
+    "filterByTag": "Filtrar por CategorÃ­a",
+    "errorLoadingContests": "No se pudieron cargar los concursos.",
+    "linkCopied": "Enlace del concurso copiado al portapapeles",
+    "footer": {
+      "exit": "Salir de la aplicaciÃ³n"
+    }
+}`,
+            'fr-FR': `{
+    "exit": "Quitter",
+    "activeContests": "Concours Actifs",
+    "newContests": "Nouveaux Concours",
+    "searchPlaceholder": "Rechercher des concours...",
+    "noResults": "Aucun concours ne correspond Ã  vos critÃ¨res.",
+    "close": "Fermer le concours",
+    "byOrganizer": "Par {organizer}",
+    "sortAndFilter": "Trier et Filtrer",
+    "applyAndClose": "Appliquer et Fermer",
+    "sortBy": "Trier par",
+    "newestFirst": "Le plus rÃ©cent d'abord",
+    "oldestFirst": "Le plus ancien d'abord",
+    "organizerAZ": "Organisateur (A-Z)",
+    "participationStatus": "Statut de participation",
+    "all": "Tous",
+    "joined": "Rejoint",
+    "notJoined": "Non Rejoint",
+    "filterByTag": "Filtrer par catÃ©gorie",
+    "errorLoadingContests": "Les concours n'ont pas pu Ãªtre chargÃ©s.",
+    "linkCopied": "Lien du concours copiÃ© dans le presse-papiers",
+    "footer": {
+      "exit": "Quitter l'application"
+    }
+}`,
+            'de-DE': `{
+    "exit": "Beenden",
+    "activeContests": "Aktive Wettbewerbe",
+    "newContests": "Neue Wettbewerbe",
+    "searchPlaceholder": "Wettbewerbe suchen...",
+    "noResults": "Keine Wettbewerbe entsprechen Ihren Kriterien.",
+    "close": "Wettbewerb schlieÃŸen",
+    "byOrganizer": "Von {organizer}",
+    "sortAndFilter": "Sortieren & Filtern",
+    "applyAndClose": "Anwenden & SchlieÃŸen",
+    "sortBy": "Sortieren nach",
+    "newestFirst": "Neueste zuerst",
+    "oldestFirst": "Ã„lteste zuerst",
+    "organizerAZ": "Veranstalter (A-Z)",
+    "participationStatus": "Teilnahmestatus",
+    "all": "Alle",
+    "joined": "Beigetreten",
+    "notJoined": "Nicht beigetreten",
+    "filterByTag": "Nach Kategorie filtern",
+    "errorLoadingContests": "Wettbewerbe konnten nicht geladen werden.",
+    "linkCopied": "Link zum Wettbewerb in die Zwischenablage kopiert",
+    "footer": {
+      "exit": "App beenden"
+    }
+}`,
+            'ja-JP': `{
+    "exit": "çµ‚äº†",
+    "activeContests": "ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªã‚³ãƒ³ãƒ†ã‚¹ãƒˆ",
+    "newContests": "æ–°ã—ã„ã‚³ãƒ³ãƒ†ã‚¹ãƒˆ",
+    "searchPlaceholder": "ã‚³ãƒ³ãƒ†ã‚¹ãƒˆã‚’æ¤œç´¢...",
+    "noResults": "æ¡ä»¶ã«åˆã†ã‚³ãƒ³ãƒ†ã‚¹ãƒˆãŒã‚ã‚Šã¾ã›ã‚“ã€‚",
+    "close": "ã‚³ãƒ³ãƒ†ã‚¹ãƒˆã‚’é–‰ã˜ã‚‹",
+    "byOrganizer": "{organizer}ä¸»å‚¬",
+    "sortAndFilter": "ä¸¦ã¹æ›¿ãˆã¨ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼",
+    "applyAndClose": "é©ç”¨ã—ã¦é–‰ã˜ã‚‹",
+    "sortBy": "ä¸¦ã¹æ›¿ãˆ",
+    "newestFirst": "æ–°ã—ã„é †",
+    "oldestFirst": "å¤ã„é †",
+    "organizerAZ": "ä¸»å‚¬è€…å (A-Z)",
+    "participationStatus": "å‚åŠ çŠ¶æ³",
+    "all": "ã™ã¹ã¦",
+    "joined": "å‚åŠ æ¸ˆã¿",
+    "notJoined": "æœªå‚åŠ ",
+    "filterByTag": "ã‚¿ã‚°ã§çµžã‚Šè¾¼ã‚€",
+    "errorLoadingContests": "ã‚³ãƒ³ãƒ†ã‚¹ãƒˆã‚’èª­ã¿è¾¼ã‚ã¾ã›ã‚“ã§ã—ãŸã€‚",
+    "linkCopied": "ã‚³ãƒ³ãƒ†ã‚¹ãƒˆãƒªãƒ³ã‚¯ã‚’ã‚¯ãƒªãƒƒãƒ—ãƒœãƒ¼ãƒ‰ã«ã‚³ãƒ”ãƒ¼ã—ã¾ã—ãŸ",
+    "footer": {
+      "exit": "ã‚¢ãƒ—ãƒªã‚’çµ‚äº†"
+    }
+}`,
+            'ko-KR': `{
+    "exit": "ë‚˜ê°€ê¸°",
+    "activeContests": "í™œì„± ì½˜í…ŒìŠ¤íŠ¸",
+    "newContests": "ìƒˆ ì½˜í…ŒìŠ¤íŠ¸",
+    "searchPlaceholder": "ì½˜í…ŒìŠ¤íŠ¸ ê²€ìƒ‰...",
+    "noResults": "ì¡°ê±´ì— ë§žëŠ” ì½˜í…ŒìŠ¤íŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.",
+    "close": "ì½˜í…ŒìŠ¤íŠ¸ ë‹«ê¸°",
+    "byOrganizer": "{organizer} ì£¼ìµœ",
+    "sortAndFilter": "ì •ë ¬ ë° í•„í„°",
+    "applyAndClose": "ì ìš© ë° ë‹«ê¸°",
+    "sortBy": "ì •ë ¬ ê¸°ì¤€",
+    "newestFirst": "ìµœì‹ ìˆœ",
+    "oldestFirst": "ì˜¤ëž˜ëœìˆœ",
+    "organizerAZ": "ì£¼ìµœìž (A-Z)",
+    "participationStatus": "ì°¸ì—¬ ìƒíƒœ",
+    "all": "ëª¨ë‘",
+    "joined": "ì°¸ì—¬í•¨",
+    "notJoined": "ì°¸ì—¬ ì•ˆ í•¨",
+    "filterByTag": "íƒœê·¸ë¡œ í•„í„°ë§",
+    "errorLoadingContests": "ì½˜í…ŒìŠ¤íŠ¸ë¥¼ ë¶ˆëŸ¬ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.",
+    "linkCopied": "ì½˜í…ŒìŠ¤íŠ¸ ë§í¬ê°€ í´ë¦½ë³´ë“œì— ë³µì‚¬ë˜ì—ˆìŠµë‹ˆë‹¤",
+    "footer": {
+      "exit": "ì•± ë‚˜ê°€ê¸°"
+    }
+}`,
+            'pi-RR': `{
+    "exit": "Walk the Plank",
+    "activeContests": "Active Plunders",
+    "newContests": "Fresh Booty",
+    "searchPlaceholder": "Search the Seas for Plunder...",
+    "noResults": "No contests match yer criteria, savvy?",
+    "close": "Batten Down the Hatches",
+    "byOrganizer": "By ol' {organizer}",
+    "sortAndFilter": "Sort yer Plunder",
+    "applyAndClose": "Aye, Apply & Stow",
+    "sortBy": "Sort By",
+    "newestFirst": "Newest Haul First",
+    "oldestFirst": "Oldest Rags First",
+    "organizerAZ": "Captain (A-Z)",
+    "participationStatus": "Loot Status",
+    "all": "All Hands",
+    "joined": "Plundered",
+    "notJoined": "Untouched",
+    "filterByTag": "Filter by Mark",
+    "errorLoadingContests": "Couldn't hoist the contests!",
+    "linkCopied": "Link Swiped to Yer Logbook!",
+    "footer": {
+      "exit": "Set Sail!"
+    }
+}`
+        };
+        /**
+         * A base class for creating UI components.
+         */
+        class UIComponent {
+            constructor() {
+                this.element = null;
+            }
+            createElement(tag, className, innerHTML = '') {
+                const el = document.createElement(tag);
+                if (className) el.className = className;
+                if (innerHTML) el.innerHTML = innerHTML;
+                return el;
+            }
+        }
+
+        /**
+         * StarParticle class encapsulates a single star's visual and animation logic in Three.js.
+         * It uses a THREE.Sprite and dynamically generated CanvasTexture to mimic the original
+         * 2D canvas drawing function's effects including pulsation, and glow.
+         */
+        class StarParticle {
+            /**
+             * @param {THREE.Scene} scene - The Three.js scene to add the star to.
+             * @param {number} x - Initial X-coordinate of the star.
+             * @param {number} y - Initial Y-coordinate of the star.
+             * @param {number} z - Initial Z-coordinate of the star.
+             * @param {object} [options={}] - Configuration options for the star.
+             * @param {number} [options.scaleFactor=1] - Multiplier for the base scale of the star.
+             * @param {number} [options.overallOpacity=1] - Overall transparency of the star.
+             * @param {number} [options.sparkleSize=24] - Base size for drawing the star and influencing glow.
+             * @param {number} [options.targetColor=0xFFFFFF] - Hex color for the star's glow and gradient.
+             * @param {number} [options.pulsationAmount=0.05] - How much the star pulsates in scale.
+             * @param {number} [options.pulsationSpeed=0.005] - Speed of the star's pulsation.
+             * @param {number} [options.numPoints=4] - Number of points for the star shape (e.g., 3, 4, 5).
+             */
+            constructor(scene, x, y, z, options = {}) {
+                this.scene = scene;
+
+                // Store initial position for reference
+                this.baseX = x;
+                this.baseY = y;
+                this.baseZ = z;
+
+                // Destructure options with default values
+                this.scaleFactor = options.scaleFactor || 1;
+                this.overallOpacity = options.overallOpacity || 1;
+                this.targetColor = new THREE.Color(options.targetColor || 0xFFFFFF); // Store as THREE.Color
+
+                // Properties for the star's shape and animation from the user's new drawing function
+                this.sparkleSize = options.sparkleSize !== undefined ? options.sparkleSize : 24; // Base size for the star
+                this.outerRadius = this.sparkleSize * 0.5;
+                this.innerRadius = this.sparkleSize * 0.15;
+                this.pulsationAmount = options.pulsationAmount !== undefined ? options.pulsationAmount : 0.05; // Varied pulsation amount
+                this.pulsationSpeed = options.pulsationSpeed !== undefined ? options.pulsationSpeed : 0.005; // Varied pulsation speed
+                this.numPoints = options.numPoints !== undefined ? options.numPoints : 4; // Number of points for the star
+
+                // Create an offscreen canvas to draw the star with its glow, which will then
+                // be used as a texture for the Three.js sprite.
+                // The canvas is made larger than the sparkleSize to accommodate the shadowBlur.
+                this.canvas = document.createElement('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                const canvasDimension = this.sparkleSize * 3; // Ensure enough space for the blur
+                this.canvas.width = canvasDimension;
+                this.canvas.height = canvasDimension;
+
+                // Create a CanvasTexture from the offscreen canvas
+                this.canvasTexture = new THREE.CanvasTexture(this.canvas);
+
+                // Create the sprite material.
+                // `map` will be set to `this.canvasTexture`.
+                // `transparent: true` is crucial for opacity and blending.
+                // `blending: THREE.AdditiveBlending` makes the star glow and additively combine colors.
+                // `depthTest: true` and `depthWrite: false` are good for particle effects to prevent depth issues.
+                this.spriteMaterial = new THREE.SpriteMaterial({
+                    map: this.canvasTexture, // Use the canvas texture containing the star and its glow
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    depthTest: true,
+                    depthWrite: false,
+                });
+
+                // Create the Three.js Sprite object
+                this.sprite = new THREE.Sprite(this.spriteMaterial);
+
+                // Set the sprite's initial position in the Three.js scene
+                this.sprite.position.set(this.baseX, this.baseY, this.baseZ);
+
+                // The sprite's scale is set to match the dimensions of its internal canvas texture,
+                // which will then be further scaled by pulsation and scaleFactor in the update method.
+                this.sprite.scale.set(this.canvas.width, this.canvas.height, 1);
+
+                // Add the sprite to the scene
+                this.scene.add(this.sprite);
+
+                // Perform initial draw of the star onto the canvas texture
+                // This is called only once on construction, not every frame for performance.
+                this.drawStarToCanvas();
+            }
+
+            /**
+             * Draws a star shape with a specified number of points onto the internal canvas.
+             * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+             * @param {number} cx - Center X of the star.
+             * @param {number} cy - Center Y of the star.
+             * @param {number} outerRadius - Outer radius of the star points.
+             * @param {number} innerRadius - Inner radius of the star points (where the angles meet).
+             * @param {number} points - Number of points (e.g., 3 for triangle, 5 for pentagram star).
+             */
+            _drawStarPath(ctx, cx, cy, outerRadius, innerRadius, points) {
+                let rot = Math.PI / 2 * 3; // Start from top point (pointing upwards)
+                let x = cx;
+                let y = cy;
+                let step = Math.PI / points;
+
+                ctx.beginPath();
+                ctx.moveTo(cx, cy - outerRadius);
+                for (let i = 0; i < points; i++) {
+                    x = cx + Math.cos(rot) * outerRadius;
+                    y = cy + Math.sin(rot) * outerRadius;
+                    ctx.lineTo(x, y);
+                    rot += step;
+
+                    x = cx + Math.cos(rot) * innerRadius;
+                    y = cy + Math.sin(rot) * innerRadius;
+                    ctx.lineTo(x, y);
+                    rot += step;
+                }
+                ctx.closePath();
+            }
+
+            /**
+             * Draws the star shape and its glow onto the internal canvas.
+             * This method is called only once during construction.
+             */
+            drawStarToCanvas() {
+                if (!this.ctx) return;
+
+                // Clear the canvas for the new frame
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Center coordinates for drawing on the internal canvas
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+
+                this.ctx.save();
+                this.ctx.translate(centerX, centerY);
+
+                this.ctx.globalAlpha = this.overallOpacity;
+
+                const baseColor = this.targetColor;
+
+                const lighterColor = new THREE.Color().copy(baseColor).lerp(new THREE.Color(0xffffff), 0.5).getStyle();
+                const mainColor = baseColor.getStyle();
+                const darkerColor = new THREE.Color().copy(baseColor).offsetHSL(0, -0.3, -0.3).getStyle();
+                const glowColor = baseColor.getStyle();
+
+                const gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, this.outerRadius);
+                gradient.addColorStop(0, `rgba(255, 255, 255, 0.9)`);
+                gradient.addColorStop(0.3, lighterColor);
+                gradient.addColorStop(0.7, mainColor);
+                gradient.addColorStop(1, darkerColor);
+                this.ctx.fillStyle = gradient;
+
+                this.ctx.shadowColor = glowColor;
+                this.ctx.shadowBlur = this.sparkleSize * 1.0;
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 0;
+
+                // Draw the star shape based on numPoints
+                this._drawStarPath(this.ctx, 0, 0, this.outerRadius, this.innerRadius, this.numPoints);
+                this.ctx.fill();
+
+                this.ctx.shadowColor = 'transparent';
+                this.ctx.shadowBlur = 0;
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 0;
+
+                this.ctx.globalAlpha = 1.0;
+
+                this.ctx.restore();
+
+                this.canvasTexture.needsUpdate = true;
+            }
+
+            /**
+             * Updates the star's visual properties (scale) based on the current animation time.
+             */
+            update(time) {
+                const pulsatingScale = 1 + Math.sin(time * this.pulsationSpeed) * this.pulsationAmount;
+                this.sprite.scale.set(
+                    this.canvas.width * pulsatingScale * this.scaleFactor,
+                    this.canvas.height * pulsatingScale * this.scaleFactor,
+                    1
+                );
+                this.sprite.rotation.z = 0;
+            }
+
+            // Dispose of resources
+            dispose() {
+                this.scene.remove(this.sprite);
+                this.sprite.material.map.dispose();
+                this.sprite.material.dispose();
+            }
+        }
+
+        /**
+         * ShootingStar class for creating and animating a single shooting star.
+         * It uses a THREE.Sprite with a dynamically drawn canvas texture for the trail.
+         */
+        class ShootingStar {
+            /**
+             * @param {THREE.Scene} scene - The Three.js scene to add the shooting star to.
+             */
+            constructor(scene) {
+                this.scene = scene;
+
+                this.canvas = document.createElement('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = 512; // Canvas for the trail (length)
+                this.canvas.height = 128; // Canvas for the trail (width/glow)
+
+                this.canvasTexture = new THREE.CanvasTexture(this.canvas);
+                this.material = new THREE.SpriteMaterial({
+                    map: this.canvasTexture,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    depthTest: false,
+                    depthWrite: false,
+                });
+                this.sprite = new THREE.Sprite(this.material);
+                this.scene.add(this.sprite);
+
+                this.speed = 2000; // units per second
+                this.lifespan = 0.8; // seconds
+                this.currentLife = 0;
+
+                this.reset();
+            }
+
+            /**
+             * Draws the elongated, glowing trail onto the internal canvas.
+             */
+            drawTrail() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Generate a random vibrant color for the shooting star
+                const randomHue = Math.random();
+                const headColor = new THREE.Color().setHSL(randomHue, 1.0, 0.9).getStyle(); // Very bright head
+                const midColor = new THREE.Color().setHSL(randomHue, 0.9, 0.6).getStyle(); // Middle of trail
+                const tailColor = new THREE.Color().setHSL(randomHue, 0.7, 0.4).getStyle(); // End of trail
+
+                const headSize = this.canvas.height * 0.15; // Radius of the star's head
+                const tailLength = this.canvas.width * 0.8; // Total length of the tail
+
+                this.ctx.save();
+                // Translate to where the head will be drawn, and then draw tail stretching to the left
+                this.ctx.translate(this.canvas.width - headSize, this.canvas.height / 2);
+
+                // Draw the glowing head (circle)
+                this.ctx.fillStyle = headColor;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, headSize, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Draw the tail (tapering shape)
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, 0); // Start at the head's center
+                this.ctx.lineTo(-tailLength, -headSize * 0.2); // Top point of the tail
+                this.ctx.lineTo(-tailLength, headSize * 0.2);  // Bottom point of the tail
+                this.ctx.closePath();
+
+                const tailGradient = this.ctx.createLinearGradient(0, 0, -tailLength, 0); // Gradient along the tail's length
+                tailGradient.addColorStop(0, midColor);
+                tailGradient.addColorStop(0.7, tailColor);
+                tailGradient.addColorStop(1, 'rgba(0,0,0,0)'); // Fully transparent at the very end
+
+                this.ctx.fillStyle = tailGradient;
+                this.ctx.fill();
+
+                // Add intense glow effect for the entire star/trail
+                this.ctx.shadowColor = headColor;
+                this.ctx.shadowBlur = headSize * 4; // Wider, more intense blur
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 0;
+                this.ctx.fill(); // Re-fill to apply shadow
+
+                this.ctx.restore(); // Restore context state
+
+                this.canvasTexture.needsUpdate = true;
+            }
+
+            /**
+             * Resets the shooting star's position and properties for a new journey.
+             */
+            reset() {
+                const spawnBoundary = 1500; // Define a large boundary for shooting stars to travel through
+                const startPosition = new THREE.Vector3();
+                const endPosition = new THREE.Vector3();
+
+                // Randomly choose an axis (x, y, or z) and a side (+/-) for entry
+                const axis = Math.floor(Math.random() * 3); // 0=x, 1=y, 2=z
+                const sign = Math.random() < 0.5 ? 1 : -1;
+
+                if (axis === 0) { // Entry from X faces
+                    startPosition.x = spawnBoundary * sign;
+                    startPosition.y = (Math.random() - 0.5) * spawnBoundary * 2;
+                    startPosition.z = (Math.random() - 0.5) * spawnBoundary * 2;
+                    endPosition.x = -spawnBoundary * sign; // Exit from opposite X face
+                    endPosition.y = (Math.random() - 0.5) * spawnBoundary * 2;
+                    endPosition.z = (Math.random() - 0.5) * spawnBoundary * 2;
+                } else if (axis === 1) { // Entry from Y faces
+                    startPosition.y = spawnBoundary * sign;
+                    startPosition.x = (Math.random() - 0.5) * spawnBoundary * 2;
+                    startPosition.z = (Math.random() - 0.5) * spawnBoundary * 2;
+                    endPosition.y = -spawnBoundary * sign; // Exit from opposite Y face
+                    endPosition.x = (Math.random() - 0.5) * spawnBoundary * 2;
+                    endPosition.z = (Math.random() - 0.5) * spawnBoundary * 2;
+                } else { // Entry from Z faces
+                    startPosition.z = spawnBoundary * sign;
+                    startPosition.x = (Math.random() - 0.5) * spawnBoundary * 2;
+                    startPosition.y = (Math.random() - 0.5) * spawnBoundary * 2;
+                    endPosition.z = -spawnBoundary * sign; // Exit from opposite Z face
+                    endPosition.x = (Math.random() - 0.5) * spawnBoundary * 2;
+                    endPosition.y = (Math.random() - 0.5) * spawnBoundary * 2;
+                }
+
+                this.sprite.position.copy(startPosition);
+                this.velocity = endPosition.sub(startPosition).normalize().multiplyScalar(this.speed);
+
+                // Set sprite scale based on canvas dimensions for the trail (length, width)
+                // Adjust scale to make them visually distinct from dot stars but still large enough
+                this.sprite.scale.set(this.canvas.width * 0.5, this.canvas.height * 0.5, 1);
+                // Align sprite rotation with its movement direction (in 2D on the screen plane)
+                this.sprite.rotation.z = Math.atan2(this.velocity.y, this.velocity.x);
+
+                this.currentLife = 0;
+                this.material.opacity = 1.0;
+                this.drawTrail(); // Redraw trail with new random color and shape
+            }
+
+            /**
+             * Updates the shooting star's position and fade over time.
+             * @param {number} deltaTime - Time elapsed since last frame in seconds.
+             */
+            update(deltaTime) {
+                this.currentLife += deltaTime;
+                if (this.currentLife > this.lifespan) {
+                    this.reset(); // Reset for a new shooting star
+                } else {
+                    this.sprite.position.addScaledVector(this.velocity, deltaTime);
+                    // Fade out towards end of life
+                    this.material.opacity = 1.0 - (this.currentLife / this.lifespan);
+                }
+            }
+
+            // Dispose of resources
+            dispose() {
+                this.scene.remove(this.sprite);
+                this.material.map.dispose();
+                this.material.dispose();
+            }
+        }
+
+
+        // Vertex shader for the procedural skybox
+        const skyboxVertexShader = `
+            varying vec3 vPosition;
+            void main() {
+                vPosition = position;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        // Fragment shader for the procedural skybox
+        const skyboxFragmentShader = `
+            uniform float uTime;
+            varying vec3 vPosition;
+
+            // A simple hash function for pseudo-random numbers in GLSL
+            float hash(float n) { return fract(sin(n) * 43758.5453123); }
+            float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+            float hash(vec3 p) {
+                p = fract(p * 0.3183099 + .1);
+                p = p * dot(p, p + 6.0);
+                return fract(p.x * p.y * p.z);
+            }
+
+            // Classic Perlin noise, 3D version
+            // Source: https://gist.github.com/patriciogonzalezvivo/670c24f3957c6d2eed66e74ac597c58d
+            vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+            vec3 fade(vec3 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
+
+            float cnoise(vec3 P) {
+                vec3 Pi0 = floor(P); // Integer part for indexing
+                vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
+                Pi0 = mod(Pi0, 289.0);
+                Pi1 = mod(Pi1, 289.0);
+                vec3 Pf0 = fract(P); // Fractional part for interpolation
+                vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+                vec3 fade_ft = fade(Pf0);
+                vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+                vec4 iy = vec4(Pi0.yy, Pi1.yy);
+                vec4 iz0 = Pi0.zzzz;
+                vec4 iz1 = Pi1.zzzz;
+
+                vec4 ixy = permute(permute(ix) + iy);
+                vec4 ixyz0 = permute(ixy + iz0);
+                vec4 ixyz1 = permute(ixy + iz1);
+
+                vec4 gx0 = ixyz0 / 7.0;
+                vec4 gy0 = fract(floor(gx0) / 7.0) - 0.5;
+                gx0 = fract(gx0);
+                vec4 gz0 = fract(floor(gy0) / 7.0) - 0.5;
+                gy0 = fract(gy0);
+                vec3 g000 = normalize(vec3(gx0.x,gy0.x,gz0.x));
+                vec3 g100 = normalize(vec3(gx0.y,gy0.y,gz0.y));
+                vec3 g010 = normalize(vec3(gx0.z,gy0.z,gz0.z));
+                vec3 g110 = normalize(vec3(gx0.w,gy0.w,gz0.w));
+                
+                vec4 gx1 = ixyz1 / 7.0;
+                vec4 gy1 = fract(floor(gx1) / 7.0) - 0.5;
+                gx1 = fract(gx1);
+                vec4 gz1 = fract(floor(gy1) / 7.0) - 0.5;
+                gy1 = fract(gy1);
+                vec3 g001 = normalize(vec3(gx1.x,gy1.x,gz1.x));
+                vec3 g101 = normalize(vec3(gx1.y,gy1.y,gz1.y));
+                vec3 g011 = normalize(vec3(gx1.z,gy1.z,gz1.z));
+                vec3 g111 = normalize(vec3(gx1.w,gy1.w,gz1.w));
+
+                vec4 nz = mix(vec4(dot(g000, Pf0), dot(g100, vec3(Pf1.x, Pf0.yz)), dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z)), dot(g110, vec3(Pf1.xy, Pf0.z))),
+                                     vec4(dot(g001, vec3(Pf0.xy, Pf1.z)), dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z)), dot(g011, vec3(Pf0.x, Pf1.yz)), dot(g111, Pf1)), fade_ft.z);
+                
+                return 2.2 * mix(mix(nz.x,nz.y,fade_ft.x), mix(nz.z,nz.w,fade_ft.x), fade_ft.y);
+            }
+
+            void main() {
+                // Sky Gradient based on vertical position
+                vec3 normalizedVPosition = normalize(vPosition);
+                float y_normalized = (normalizedVPosition.y + 1.0) * 0.5; // Remap y from [-1, 1] to [0, 1]
+
+                // Fixed night sky colors
+                vec3 zenithColor = vec3(0.01, 0.01, 0.08); // Dark blue at top
+                vec3 horizonColor = vec3(0.05, 0.02, 0.15); // Slightly purplish dark at horizon
+                vec3 skyColor = mix(zenithColor, horizonColor, pow(1.0 - y_normalized, 2.0)); // Exponential mix for smoother gradient
+
+
+                // Nebula Generation
+                float nebulaDensity = 0.0005; // Overall density/scale of the nebula
+                float nebulaTurbulence = 0.5; // How chaotic the nebula is
+
+                vec3 nebulaPos = vPosition * nebulaDensity;
+                float n1 = cnoise(nebulaPos + uTime * 0.01);
+                float n2 = cnoise(nebulaPos * 2.0 + uTime * 0.02) * 0.5;
+                float n3 = cnoise(nebulaPos * 4.0 + uTime * 0.03) * 0.25;
+                float nebulaValue = (n1 + n2 + n3) * nebulaTurbulence; // Combine noise octaves
+
+                // Clamp noise value to make it more distinct, and apply power for contrast
+                nebulaValue = pow(clamp(nebulaValue * 1.0, 0.0, 1.0), 2.0); // Further reduced intensity
+
+
+                // Nebula colors (faint blues and purples)
+                vec3 nebulaColor1 = vec3(0.05, 0.05, 0.15); // Very dark blue
+                vec3 nebulaColor2 = vec3(0.1, 0.1, 0.3);   // Darker blue
+                vec3 nebulaColor3 = vec3(0.15, 0.05, 0.25); // Dark purple
+                vec3 nebulaColor4 = vec3(0.2, 0.1, 0.35);  // Slightly brighter purple
+
+                // Blend nebula colors based on noise value for varied hues
+                vec3 finalNebulaColor = mix(nebulaColor1, nebulaColor2, nebulaValue);
+                finalNebulaColor = mix(finalNebulaColor, nebulaColor3, smoothstep(0.4, 0.7, nebulaValue));
+                finalNebulaColor = mix(finalNebulaColor, nebulaColor4, smoothstep(0.75, 1.0, nebulaValue));
+
+
+                // Integrate procedural stars into the background (these are the distant "dot" stars)
+                vec3 finalColor = skyColor; // Start with sky gradient
+
+                for (int i = 0; i < 4; i++) { // Layers for stars
+                    float scale = pow(2.0, float(i));
+                    vec3 p = normalizedVPosition * scale * 200.0;
+
+                    float h = hash(floor(p));
+                    vec3 starPos = fract(p) - 0.5;
+                    float dist = length(starPos);
+
+                    float starThreshold = 0.995 - float(i) * 0.002;
+                    float star = smoothstep(0.02, 0.005, dist) * step(starThreshold, h);
+
+                    // Add twinkling based on uTime and hash
+                    float twinkleSpeed = 0.01 + float(i) * 0.005;
+                    float twinkle = hash(floor(p) + uTime * twinkleSpeed) * 0.5 + 0.5;
+                    star *= twinkle;
+
+                    // Changed star base color to yellow hues
+                    vec3 starColorBase = vec3(1.0, 0.9, 0.5); // Yellowish
+                    vec3 starColorOffset = vec3(
+                        hash(p.x * 7.0 + 1.0),
+                        hash(p.y * 13.0 + 2.0),
+                        hash(p.z * 17.0 + 3.0)
+                    ) * 0.2 - 0.1;
+                    vec3 finalStarColor = starColorBase + starColorOffset;
+                    finalStarColor = clamp(finalStarColor, 0.0, 1.0);
+
+                    // Add stars, blending with the existing color and nebula
+                    // Stars will mostly appear on top of the base color and nebula,
+                    // but can also be tinted by the nebula color.
+                    finalColor += star * finalStarColor * (1.0 + float(i) * 0.2);
+                }
+
+                // Blend nebula with the sky color (overriding parts of the sky)
+                finalColor = mix(finalColor, finalNebulaColor, nebulaValue * 0.4); // Even fainter influence of nebula
+
+                gl_FragColor = vec4(finalColor, 1.0);
+            }
+        `;
+
+
+        /**
+         * Manages the top screen of the app, which displays either the home screen info or a contest image.
+         */
+        class TopScreen extends UIComponent {
+            constructor(appInstance) { // Pass the app instance
+                super();
+                this.app = appInstance; // Store app instance to access helpers
+                this.element = this.createElement('div', 'top-screen');
+
+                // Three.js setup
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, 400 / 240, 0.1, 3000); // Increased far clipping plane
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(400, 240);
+                this.renderer.setClearColor(0x000000, 0); // Transparent background
+                this.renderer.domElement.style.position = 'absolute';
+                this.renderer.domElement.style.top = '0';
+                this.renderer.domElement.style.left = '0';
+                this.renderer.domElement.style.width = '100%';
+                this.renderer.domElement.style.height = '100%';
+                this.renderer.domElement.className = 'threejs-canvas';
+                this.element.appendChild(this.renderer.domElement);
+
+                // Add OrbitControls for camera interaction
+                this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true; // Enable damping (inertia)
+                this.controls.dampingFactor = 0.05; // Damping factor for smooth movement
+                this.controls.minDistance = 1; // Minimum zoom distance, allowing close movement from center
+                this.controls.maxDistance = 2000; // Maximum zoom distance, extended to see further objects
+
+                this.contestImageElement = this.createElement('img', 'contest-image');
+                this.element.appendChild(this.contestImageElement);
+
+                this.homeCanvas = this.createElement('canvas', 'home-canvas');
+                this.homeCtx = this.homeCanvas.getContext('2d');
+                this.homeCtx.imageSmoothingEnabled = false; // Disable image smoothing for pixelation
+                this.element.appendChild(this.homeCanvas);
+
+                this.clockInterval = null;
+                this.lastNewContestCount = 0;
+
+                // Three.js specific arrays and objects
+                this.stars = [];
+                this.shootingStars = [];
+                this.dotStars = null; // THREE.Points object for distant dot stars
+                this.threeClock = new THREE.Clock(); // Separate clock for Three.js animations
+
+                // Initialize Lights for the grass plane and overall scene brightness
+                this.mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+                this.ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+                this.moonLight = new THREE.DirectionalLight(0xbbddff, 0);
+                this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x444422, 0.2);
+
+                this._initThreeJSObjects(); // Initialize all Three.js objects
+                this.lastTime = performance.now(); // Initialize lastTime for deltaTime calculation for app-level time
+
+                // Start the animation loop for Three.js
+                this.animateThreeJS();  
+
+                window.addEventListener('resize', () => this.handleResize());
+            }
+
+            _initThreeJSObjects() {
+                // Procedural Skybox
+                const skyboxGeometry = new THREE.SphereGeometry(1000, 32, 32); // Large sphere for the skybox
+                this.skyboxMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        uTime: { value: 0.0 } // Time uniform for animation in the shader
+                    },
+                    vertexShader: skyboxVertexShader,
+                    fragmentShader: skyboxFragmentShader,
+                    side: THREE.BackSide, // Render the inside of the sphere
+                    depthWrite: false // Important for skybox to not obscure other objects
+                });
+                const skybox = new THREE.Mesh(skyboxGeometry, this.skyboxMaterial);
+                this.scene.add(skybox);
+
+                // Add all lights to the scene (needed for the grass material and overall lighting)
+                this.scene.add(this.mainLight);
+                this.scene.add(this.ambientLight);
+                this.scene.add(this.moonLight);
+                this.scene.add(this.hemiLight);
+
+                // Add procedural grass ground plane
+                const grassPlane = this._createGrassGroundPlane();
+                this.scene.add(grassPlane);
+
+                // Adjust camera to look straight ahead
+                this.camera.position.set(0, 0.5, 2.5); // Lowered Y a bit and moved slightly back
+                this.camera.lookAt(0, this.camera.position.y, 0); // Look straight along the horizon at the same Y level
+
+                // Populate Stars
+                this._populateStars();
+            }
+
+            // Function to create a procedural grass ground plane
+            _createGrassGroundPlane() {
+                const geometry = new THREE.PlaneGeometry(10, 10, 32, 32); // Large plane
+                geometry.rotateX(-Math.PI / 2); // Rotate to be flat on the ground
+
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0.0 },
+                        topLightColor: { value: new THREE.Color() },
+                        ambientLightColor: { value: new THREE.Color() },
+                        ambientIntensity: { value: 0.0 },
+                        pixelDensity: { value: 2048.0 }, // Increased for more repetition/pixelation
+                    },
+                    vertexShader: `
+                        varying vec2 vUv;
+                        void main() {
+                            vUv = uv;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        uniform vec3 topLightColor;
+                        uniform vec3 ambientLightColor;
+                        uniform float ambientIntensity;
+                        uniform float pixelDensity;
+                        varying vec2 vUv;
+
+                        float random (vec2 st) {
+                            return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+                        }
+
+                        // Perlin noise (simplified)
+                        float noise(vec2 st) {
+                            vec2 i = floor(st);
+                            vec2 f = fract(st);
+
+                            float a = random(i);
+                            float b = random(i + vec2(1.0, 0.0));
+                            float c = random(i + vec2(0.0, 1.0));
+                            float d = random(i + vec2(1.0, 1.0));
+
+                            vec2 u = f * f * (3.0 - 2.0 * f);
+                            return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+                        }
+
+                        void main() {
+                            // Pixelate UVs by increasing pixelDensity
+                            vec2 pixelatedUv = floor(vUv * pixelDensity) / pixelDensity;
+
+                            float n = noise(pixelatedUv * 5.0); // No time factor, static texture
+
+                            // Define night-themed ground colors - adjusted to be less dark
+                            vec3 darkGroundColor = vec3(0.1, 0.1, 0.15); // Darker base, but not black
+                            vec3 faintLightColor = vec3(0.15, 0.15, 0.25); // Slightly brighter
+
+                            vec3 finalColor = mix(darkGroundColor, faintLightColor, n * 0.7); // Blend based on noise, make it slightly more pronounced
+
+                            // Simulate subtle lighting from the night sky
+                                            // The ambientLightColor and ambientIntensity will be based on the night sky colors.
+                            // topLightColor will be from the moonLight if it's night.
+                            vec3 lightInfluence = ambientLightColor * ambientIntensity * 2.0 + topLightColor * 0.5; // Stronger ambient and faint moon
+                            finalColor = finalColor * lightInfluence;
+
+                            gl_FragColor = vec4(finalColor, 1.0);
+                        }
+                    `,
+                    transparent: true // Needed for transparency on edges potentially, though not explicitly used for that here
+                });
+                this.grassMaterial = material; // Store reference to update uniforms
+                return new THREE.Mesh(geometry, material);
+            }
+
+            /**
+             * Populates the scene with StarParticle instances, Dot Stars, and Shooting Stars.
+             */
+            _populateStars() {
+                // Clear any existing objects from the scene
+                this.stars.forEach(star => star.dispose()); // Dispose resources for StarParticle
+                this.stars = [];
+                this.shootingStars.forEach(sStar => sStar.dispose()); // Dispose resources for ShootingStar
+                this.shootingStars = [];
+                if (this.dotStars) {
+                    this.scene.remove(this.dotStars);
+                    this.dotStars.geometry.dispose();
+                    this.dotStars.material.dispose();
+                    this.dotStars = null;
+                }
+
+                // --- Spawn 4-pointed Stars ---
+                const minStarDistance = 500; // Minimum distance from the camera (per request)
+                const starFieldDepth = 1000; // How far stars extend beyond min distance
+                const numberOfFourPointedStars = 150; // Reduced density for these stars
+                                            
+                for (let i = 0; i < numberOfFourPointedStars; i++) {
+                    // Random positions within a sphere, ensuring minimum distance
+                    const distance = minStarDistance + Math.random() * starFieldDepth; // Range 500-1500 units away
+                    const position = new THREE.Vector3()
+                        .randomDirection()
+                        .multiplyScalar(distance);
+
+                    const scaleFactor = 0.8 + Math.random() * 0.4; // Larger stars (0.8 to 1.2 base scale factor)
+                    const overallOpacity = 0.6 + Math.random() * 0.4; // Slightly more opaque
+                    const sparkleSize = 36 + Math.random() * 12; // Much bigger (36-48 pixels for the texture)
+
+                    // Set target color to a yellow hue
+                    const randomHue = 0.1 + Math.random() * 0.1; // Restrict hue to yellow-orange
+                    const randomSaturation = 0.8 + Math.random() * 0.2; // High saturation for vibrant yellow
+                    const randomLightness = 0.7 + Math.random() * 0.2; // Brightness adjusted for yellow
+                    const randomColor = new THREE.Color().setHSL(randomHue, randomSaturation, randomLightness).getHex();
+
+                    const pulsationAmount = 0.03 + Math.random() * 0.07; // Increased pulsation
+                    const pulsationSpeed = 0.003 + Math.random() * 0.008; // Varied pulsation speed
+
+                    // Randomly choose 3, 4, or 5 points for the star
+                    const numPoints = Math.floor(Math.random() * 3) + 3; // 3, 4, or 5
+
+                    const star = new StarParticle(
+                        this.scene,
+                        position.x,
+                        position.y,
+                        position.z, // Pass z-coordinate
+                        {
+                            scaleFactor, overallOpacity, sparkleSize, targetColor: randomColor,
+                            pulsationAmount, pulsationSpeed, numPoints // Pass numPoints
+                        }
+                    );
+                    this.stars.push(star);
+                }
+
+                // --- Spawn Dot Stars (THREE.Points) ---
+                const numberOfDotStars = 7500; // Reduced density for these stars
+                const dotStarFieldRadius = 5000; // These can be even further away
+                const dotPositions = new Float32Array(numberOfDotStars * 3);
+                const dotColors = new Float32Array(numberOfDotStars * 3);
+                const dotSizes = new Float32Array(numberOfDotStars);
+
+                const color = new THREE.Color();
+
+                for (let i = 0; i < numberOfDotStars; i++) {
+                    const i3 = i * 3;
+
+                    // Random positions within a large sphere
+                    const distance = 1000 + Math.random() * dotStarFieldRadius; // Start further away
+                    const position = new THREE.Vector3()
+                        .randomDirection()
+                        .multiplyScalar(distance);
+
+                    dotPositions[i3] = position.x;
+                    dotPositions[i3 + 1] = position.y;
+                    dotPositions[i3 + 2] = position.z;
+
+                    // Random color for dot stars (subtle, less vibrant than 4-pointed) - now yellow too
+                    color.setHSL(0.1 + Math.random() * 0.1, 0.6 + Math.random() * 0.2, 0.7 + Math.random() * 0.2); // Yellow hues for dot stars
+                    dotColors[i3] = color.r;
+                    dotColors[i3 + 1] = color.g;
+                    dotColors[i3 + 2] = color.b;
+
+                    dotSizes[i] = (4 + Math.random() * 8) * (1 - (distance / (dotStarFieldRadius + 1000))); // Larger base size, scales down with distance
+                }
+
+                const dotGeometry = new THREE.BufferGeometry();
+                dotGeometry.setAttribute('position', new THREE.BufferAttribute(dotPositions, 3));
+                dotGeometry.setAttribute('color', new THREE.BufferAttribute(dotColors, 3));
+                dotGeometry.setAttribute('size', new THREE.BufferAttribute(dotSizes, 1)); // Custom attribute for size
+
+                const dotMaterial = new THREE.PointsMaterial({
+                    size: 1, // Base size, adjusted by 'size' attribute in shader
+                    sizeAttenuation: true, // Points get smaller with distance
+                    vertexColors: true, // Use colors from attribute
+                    transparent: true,
+                    opacity: 0.9, // Overall opacity for dot stars
+                    blending: THREE.AdditiveBlending,
+                    alphaTest: 0.001 // Discard fully transparent pixels
+                });
+
+                this.dotStars = new THREE.Points(dotGeometry, dotMaterial);
+                this.scene.add(this.dotStars);
+
+                // --- Spawn Shooting Stars ---
+                const numberOfShootingStars = 5; // A small number of shooting stars at any given time
+                for (let i = 0; i < numberOfShootingStars; i++) {
+                    const sStar = new ShootingStar(this.scene);
+                    this.shootingStars.push(sStar);
+                }
+            }
+
+
+            animateThreeJS() {
+                // Request the next animation frame, binding 'this' to maintain context
+                this.animationFrameId = requestAnimationFrame(this.animateThreeJS.bind(this));
+
+                const deltaTime = this.threeClock.getDelta(); // Get delta time for frame-rate independent animation
+                const time = this.threeClock.getElapsedTime(); // Get elapsed time in seconds
+
+                // Update app-level time system (if manualTime is false, it uses real-world time)
+                if (!this.app.timeSystem.manualTime && this.app.timeSystem.timeSpeed !== 0) {
+                    const minutesDelta = deltaTime * this.app.timeSystem.timeSpeed * 60; // minutes per second * speed * 60 seconds/minute
+                    this.app.timeSystem.globalTime = (this.app.timeSystem.globalTime + minutesDelta) % 1440;
+                    if (this.app.timeSystem.globalTime < 0) this.app.timeSystem.globalTime += 1440; // Ensure positive
+                    this.app.timeSystem.dayTime = this.app.timeSystem.globalTime;
+                } else {
+                    const now = luxon.DateTime.local();
+                    this.app.timeSystem.dayTime = now.hour * 60 + now.minute;
+                    this.app.timeSystem.globalTime = this.app.timeSystem.dayTime;
+                }
+
+                // Removed day/night cycle calculation. Now using fixed night-time colors.
+                // Apply fixed night-time lighting
+                this.mainLight.intensity = 0.1; // Very dim, mostly ambient contribution
+                this.mainLight.color.set(0x8080ff); // Faint blue light
+                this.mainLight.position.set(-10, 10, -5); // Fixed position for main light (moon-like)
+                this.mainLight.lookAt(0, 0, 0);
+
+                this.moonLight.intensity = 0.5; // Stronger moon presence
+                this.moonLight.color.set(0xbbddff); // Blue-white moon
+                this.moonLight.position.set(10, 5, 10); // Position it differently
+                this.moonLight.lookAt(0, 0, 0);
+
+                this.ambientLight.intensity = 0.3; // Consistent ambient light
+                this.ambientLight.color.set(0x222244); // Dark blue ambient
+                this.hemiLight.intensity = 0.1; // Very subtle hemisphere light
+
+                // Update sky shader uniforms (uTime for animation remains)
+                if (this.skyboxMaterial && this.skyboxMaterial.uniforms) {
+                    this.skyboxMaterial.uniforms.uTime.value = time;
+                }
+
+                // Apply dynamic lighting to bottom screen overlay (now fixed for night)
+                const bottomScreenOverlay = document.getElementById('bottom-screen-overlay');
+                if (bottomScreenOverlay) {
+                    // Fixed night overlay color and opacity
+                    bottomScreenOverlay.style.backgroundColor = `rgba(0, 0, 0, 0.4)`;
+                }
+
+                // Update each 4-pointed star particle's animation state
+                this.stars.forEach(star => {
+                    star.update(time * 1000); // Pass time in milliseconds to StarParticle
+                });
+
+                // Update each shooting star's animation state
+                this.shootingStars.forEach(sStar => {
+                    sStar.update(deltaTime);
+                });
+
+                // Update controls (important for damping to work)
+                this.controls.update();
+
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            showContestImage(imageUrl) {
+                this.contestImageElement.src = imageUrl;
+                this.contestImageElement.style.opacity = '1';
+                this.homeCanvas.style.opacity = '0';
+                this.renderer.domElement.style.opacity = '0.3'; // Make skybox subtle behind image
+                if (this.clockInterval) {
+                    clearInterval(this.clockInterval);
+                    this.clockInterval = null;
+                }
+            }
+
+            showHomeScreen(newContestCount) {
+                this.lastNewContestCount = newContestCount;
+                this.contestImageElement.style.opacity = '0';
+                this.homeCanvas.style.opacity = '1';
+                this.renderer.domElement.style.opacity = '1'; // Full opacity for skybox on home screen
+
+                if (this.clockInterval) clearInterval(this.clockInterval);
+                this.drawHomeInfo(newContestCount, performance.now());
+                this.clockInterval = setInterval(() => this.drawHomeInfo(newContestCount, performance.now()), 1000);
+            }
+
+            drawHomeInfo(newContestCount, time) {
+                const rect = this.homeCanvas.getBoundingClientRect();
+                this.homeCanvas.width = rect.width;
+                this.homeCanvas.height = rect.height;
+                const ctx = this.homeCtx;
+                const width = rect.width;
+                const height = rect.height;
+                ctx.clearRect(0, 0, width, height); // Clear the entire canvas first to make it transparent
+
+                // Top info bar
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(0, 0, width, 30);
+
+                // Use Luxon for date and time, combining into one format string
+                const now = this.app.userTimeZone ? luxon.DateTime.local().setZone(this.app.userTimeZone) : luxon.DateTime.local();
+                const dateTimeAndZone = now.toFormat('MMM d, hh:mm a ZZZZ');
+
+                // Date and Time on the right
+                this.app._drawTextOnCanvas(ctx, dateTimeAndZone, width - 15, 15, '14px "Rodin", sans-serif', 'white', 'right', 'middle');
+
+                // New Contest Count on the left (already on the left as small text)
+                const newContestTextSmall = `${newContestCount} ${this.app.t('newContests')}`;
+                this.app._drawTextOnCanvas(ctx, newContestTextSmall, 15, 15, '14px "Rodin", sans-serif', 'white', 'left', 'middle');
+
+                // Removed the large central text as requested
+            }
+
+            handleResize() {
+                const parentRect = this.element.getBoundingClientRect();
+                this.renderer.setSize(parentRect.width, parentRect.height);
+                this.camera.aspect = parentRect.width / parentRect.height;
+                this.camera.updateProjectionMatrix();
+
+                if (this.homeCanvas.style.opacity === '1') {
+                    this.drawHomeInfo(this.lastNewContestCount, performance.now());
+                }
+            }
+
+            dispose() {
+                // Stop the animation loop
+                if (this.animationFrameId) {
+                    cancelAnimationFrame(this.animationFrameId);
+                }
+
+                // Dispose of renderer and its DOM element
+                if (this.renderer) {
+                    this.renderer.dispose();
+                    if (this.renderer.domElement && this.renderer.domElement.parentNode) {
+                        this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+                    }
+                }
+
+                // Dispose controls
+                if (this.controls) {
+                    this.controls.dispose();
+                }
+
+                // Dispose of geometries and materials for all custom stars
+                this.stars.forEach(star => star.dispose());
+                this.shootingStars.forEach(sStar => sStar.dispose());
+
+                // Dispose of dotStars
+                if (this.dotStars) {
+                    this.scene.remove(this.dotStars);
+                    this.dotStars.geometry.dispose();
+                    this.dotStars.material.dispose();
+                    this.dotStars = null;
+                }
+
+                // Dispose of skybox material
+                if (this.skyboxMaterial) {
+                    this.skyboxMaterial.dispose();
+                    // Remove skybox mesh from scene if it still exists
+                    this.scene.children.forEach(obj => {
+                        if (obj instanceof THREE.Mesh && obj.material === this.skyboxMaterial) {
+                            this.scene.remove(obj);
+                            obj.geometry.dispose();
+                        }
+                    });
+                }
+                
+                // Dispose of grass material
+                if (this.grassMaterial) {
+                    this.grassMaterial.dispose();
+                }
+                // Dispose of lights (they are also added to the scene, so removing scene handles their hierarchy)
+                this.scene.remove(this.mainLight);
+                this.scene.remove(this.ambientLight);
+                this.scene.remove(this.moonLight);
+                this.scene.remove(this.hemiLight);
+
+                // Clear scene to release resources
+                this.scene.clear();
+            }
+        }
+        /**
+         * A custom input field rendered on a canvas.
+         */
+        class CanvasInput extends UIComponent {
+            constructor({
+                value = '',
+                placeholder = '',
+                onUpdate,
+                appInstance
+            }) {
+                super();
+                this.app = appInstance; // Store app instance
+                this.element = this.createElement('div', 'canvas-input-wrapper');
+                this.canvas = this.createElement('canvas');
+                this.element.appendChild(this.canvas);
+                this.ctx = this.canvas.getContext('2d');
+                this.ctx.imageSmoothingEnabled = false; // Disable image smoothing for pixelation
+                this.value = value;
+                this.placeholder = placeholder;
+                this.onUpdate = onUpdate;
+                this.isFocused = false;
+                this.cursorVisible = false;
+                this.element.tabIndex = 0; // Make it focusable
+                this.element.addEventListener('focus', this.handleFocus.bind(this));
+                this.element.addEventListener('blur', this.handleBlur.bind(this));
+                this.element.addEventListener('keydown', this.handleKeyDown.bind(this));
+                this.cursorInterval = null;
+                this.resize();
+            }
+            resize() {
+                const rect = this.element.getBoundingClientRect();
+                if (rect.width === 0) return;
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+                this.draw();
+            }
+            draw() {
+                const ctx = this.ctx;
+                const {
+                    width,
+                    height
+                }= this.canvas.getBoundingClientRect();
+                ctx.clearRect(0, 0, width, height);
+
+                // Draw background with rounded corners and subtle shadow
+                ctx.save(); // Save context state before applying shadow
+
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.2)'; // Subtle shadow
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 2;
+
+                ctx.fillStyle = '#2D313A'; // Dark background color for input field
+                ctx.beginPath();
+                ctx.roundRect(0, 0, width, height, 4); // Apply border-radius directly
+                ctx.fill();
+
+                ctx.restore(); // Restore context state to remove shadow for text
+
+                // Text
+                const textX = 10;
+                const textY = height / 2;
+                if (this.value) {
+                    this.app._drawTextOnCanvas(ctx, this.value, textX, textY, '14px "Rodin", sans-serif', 'white', 'left', 'middle');
+                } else {
+                    this.app._drawTextOnCanvas(ctx, this.placeholder, textX, textY, '14px "Rodin", sans-serif', 'rgba(255,255,255,0.5)', 'left', 'middle');
+                }
+                // Cursor
+                if (this.isFocused && this.cursorVisible) {
+                    // Temporarily set font to measure text width accurately for cursor position
+                    ctx.font = '14px "Rodin", sans-serif';
+                    const textWidth = ctx.measureText(this.value).width;
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(textX + textWidth + 1, textY - 8, 1, 16);
+                }
+            }
+            handleFocus() {
+                this.app.sounds.inputFocus.play(); // Play sound on focus
+                this.isFocused = true;
+                if (this.cursorInterval) clearInterval(this.cursorInterval);
+                this.cursorVisible = true;
+                this.cursorInterval = setInterval(() => {
+                    this.cursorVisible = !this.cursorVisible;
+                    this.draw();
+                }, 500);
+                this.draw();
+            }
+            handleBlur() {
+                this.app.sounds.inputBlur.play(); // Play sound on blur
+                this.isFocused = false;
+                if (this.cursorInterval) clearInterval(this.cursorInterval);
+                this.cursorInterval = null;
+                this.cursorVisible = false;
+                this.draw();
+            }
+            handleKeyDown(e) {
+                if (e.key === 'Backspace') {
+                    this.value = this.value.slice(0, -1);
+                    this.app.sounds.typing.play('s' + Math.floor(Math.random() * 3 + 1)); // Play a random tap sound
+                } else if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
+                    this.value += e.key;
+                    this.app.sounds.typing.play('s' + Math.floor(Math.random() * 3 + 1)); // Play a random tap sound
+                } else if (e.key === "Enter") {
+                    this.element.blur();
+                } else {
+                    return; // Don't prevent default for other keys like arrows, etc.
+                }
+                e.preventDefault();
+                this.onUpdate(this.value);
+                this.draw();
+            }
+            setValue(newValue) {
+                this.value = newValue;
+                this.draw();
+            }
+            setPlaceholder(newPlaceholder) {
+                this.placeholder = newPlaceholder;
+                this.draw();
+            }
+        }
+        /**
+         * Manages the bottom screen, which contains the list, contest, and filter views.
+         */
+        class BottomScreen extends UIComponent {
+            constructor({
+                onContestSelect,
+                onShare,
+                onCloseContest,
+                onSearch,
+                onShowFilter,
+                onFilterChange,
+                sounds,
+                sprites,
+                appInstance
+            }) {
+                super();
+                this.app = appInstance; // Store app instance to access helpers
+                this.element = this.createElement('div', 'bottom-screen');
+                // Callbacks & State
+                this.onContestSelect = onContestSelect;
+                this.onShare = onShare;
+                this.onCloseContest = onCloseContest;
+                this.onSearch = onSearch;
+                this.onShowFilter = onShowFilter;
+                this.onFilterChange = onFilterChange;
+                this.sounds = sounds;
+                this.sprites = sprites;
+                this.marqueeData = {};
+                this.contests = [];
+                this.searchQuery = '';
+                this.currentFeaturedIndex = 0; // Track the currently "focused" featured card
+                // --- DOM Structure ---
+                this.listView = this.createElement('div', 'list-view view');
+                this.contestView = this.createElement('div', 'contest-view view');
+                
+                // New wrapper for the filter view
+                this.filterViewWrapper = this.createElement('div', 'filter-view view');
+                
+                this.element.appendChild(this.listView);
+                this.element.appendChild(this.contestView);
+                this.element.appendChild(this.filterViewWrapper);
+
+                this.animationFrame = null;
+            }
+            setView(mode, data = {}) {
+                this.viewMode = mode;
+                this.listView.classList.toggle('active', mode === 'list');
+                this.contestView.classList.toggle('active', mode === 'contest');
+                this.filterViewWrapper.classList.toggle('active', mode === 'filter'); // Control the wrapper
+
+                if (mode === 'list') {
+                    this.contests = data.contests || [];
+                    this.searchQuery = data.searchQuery || '';
+                    this.renderListView(this.contests, this.searchQuery);
+                    this.startMarqueeAnimation();
+                } else if (mode === 'contest') {
+                    this.renderContestView(data.contest);
+                    this.stopMarqueeAnimation();
+                } else if (mode === 'filter') {
+                    this.renderFilterMenu(data.tags, data.activeFilters, data.onFilterChange, data.tagSearchQuery);
+                    this.stopMarqueeAnimation();
+                }
+            }
+            // Modified to create standard HTML buttons
+            _createButton({
+                text,
+                sprite,
+                onClick,
+                className = '',
+                activeClass = '',
+                pulseColor = null
+            }) {
+                const button = this.createElement('button', `ds-button ${className}`);
+                if (activeClass) {
+                    button.classList.add(activeClass);
+                }
+
+                if (sprite) {
+                    const img = this.createElement('img');
+                    img.src = sprite.src; // Use the loaded image directly
+                    img.alt = text || '';
+                    button.appendChild(img);
+                }
+                if (text) {
+                    button.appendChild(document.createTextNode(text));
+                }
+
+                button.addEventListener('mouseenter', () => {
+                    this.sounds.hover.play(); // Play hover sound
+                    button.classList.add('hover');
+                });
+                button.addEventListener('mouseleave', () => {
+                    button.classList.remove('hover');
+                });
+
+                if (onClick) {
+                    button.addEventListener('click', (e) => {
+                        this.sounds.click.play();
+                        if (pulseColor) {
+                            // Add a pulse effect class for CSS animation
+                            button.classList.add('pulsing');
+                            button.style.setProperty('--pulse-color', pulseColor);
+                            button.addEventListener('animationend', () => {
+                                button.classList.remove('pulsing');
+                            }, { once: true });
+                        }
+                        onClick(e); // Execute original click handler
+                    });
+                }
+                return button;
+            }
+
+            renderListView(contests, searchQuery) {
+                // Clear any existing content in the list view
+                this.listView.innerHTML = ''; 
+
+                // Header for search and filter controls
+                const headerControls = this.createElement('div', 'header-controls');
+                this.canvasSearchInput = new CanvasInput({
+                    placeholder: this.app.t('searchPlaceholder'),
+                    value: searchQuery,
+                    onUpdate: (value) => this.onSearch(value),
+                    appInstance: this.app
+                });
+                headerControls.appendChild(this.canvasSearchInput.element);
+                this.filterButton = this._createButton({
+                    sprite: this.sprites.filter,
+                    onClick: this.onShowFilter,
+                    className: 'filter-button'
+                });
+                headerControls.appendChild(this.filterButton);
+                this.listView.appendChild(headerControls);
+
+                // Featured Contest Wheel Section
+                const featuredWheelSection = this.createElement('div', 'featured-wheel-section');
+                this.featuredContainer = this.createElement('div', 'featured-wheel-container');
+                featuredWheelSection.appendChild(this.featuredContainer);
+                this.listView.appendChild(featuredWheelSection);
+
+                // Attach scroll listener to featuredContainer here, after it's created
+                this.featuredContainer.addEventListener('scroll', () => {
+                    this._updateFeaturedWheelCurve();
+                });
+
+                // Add keyboard navigation to the featured container
+                this.featuredContainer.tabIndex = 0; // Make it focusable
+                this.featuredContainer.addEventListener('keydown', this._handleFeaturedKeyDown.bind(this));
+
+
+                const featuredContests = contests.slice(0, 5); // Example: show up to 5 featured contests
+                featuredContests.forEach((contest, index) => {
+                    const featuredCard = this.createElement('div', 'featured-card');
+                    featuredCard.dataset.slug = contest.slug;
+                    featuredCard.dataset.index = index; // Add data-index for navigation
+
+                    const img = this.createElement('img');
+                    img.src = contest.image || 'https://placehold.co/180x100/3A3F47/FFFFFF?text=No+Image'; // Placeholder for missing images
+                    img.alt = contest.title;
+                    featuredCard.appendChild(img);
+
+                    const title = this.createElement('h3');
+                    title.textContent = contest.title;
+                    featuredCard.appendChild(title);
+
+                    const organizer = this.createElement('p');
+                    organizer.textContent = this.app.t('byOrganizer', { organizer: contest.organizer });
+                    featuredCard.appendChild(organizer);
+
+                    if (!contest.participated) {
+                        const newTag = this.createElement('span', 'new-contest-tag');
+                        newTag.textContent = 'NEW'; // Or a small star icon from sprites
+                        featuredCard.appendChild(newTag);
+                    }
+
+                    featuredCard.addEventListener('click', () => this.onContestSelect(contest));
+                    this.featuredContainer.appendChild(featuredCard);
+                });
+
+                // Call updateFeaturedWheelCurve once after all cards are added to set initial positions
+                this._updateFeaturedWheelCurve();
+
+                // All Contests Grid Section
+                const allContestsGridSection = this.createElement('div', 'all-contests-grid-section');
+                this.allContestsGrid = this.createElement('div', 'all-contests-grid');
+                allContestsGridSection.appendChild(this.allContestsGrid);
+                this.listView.appendChild(allContestsGridSection);
+
+                const regularContests = contests.slice(5); // The rest of the contests
+                if (regularContests.length === 0 && featuredContests.length === 0) {
+                    const noResults = this.createElement('div', 'no-results');
+                    noResults.textContent = this.app.t('noResults');
+                    this.allContestsGrid.appendChild(noResults);
+                } else {
+                    regularContests.forEach(contest => {
+                        const gridItem = this.createElement('div', 'grid-item');
+                        gridItem.dataset.slug = contest.slug;
+
+                        if (contest.iconPath && this.sprites[contest.iconPath]) {
+                            const icon = this.createElement('img', 'grid-item-icon');
+                            icon.src = this.sprites[contest.iconPath].src;
+                            gridItem.appendChild(icon);
+                        }
+
+                        const title = this.createElement('span', 'grid-item-title');
+                        title.textContent = contest.title;
+                        gridItem.appendChild(title);
+
+                        if (!contest.participated) {
+                            const newTag = this.createElement('span', 'new-contest-tag-small');
+                            newTag.textContent = 'NEW';
+                            gridItem.appendChild(newTag);
+                        }
+
+                        gridItem.addEventListener('click', () => this.onContestSelect(contest));
+                        this.allContestsGrid.appendChild(gridItem);
+                    });
+                }
+                
+                // Footer (Exit Button)
+                const footerControls = this.createElement('div', 'footer-controls');
+                this.exitButton = this._createButton({
+                    text: this.app.t('footer.exit'),
+                    onClick: () => this.onCloseContest(true),
+                    className: 'exit-button'
+                });
+                footerControls.appendChild(this.exitButton);
+                this.listView.appendChild(footerControls);
+
+                // No need for canvas specific drawing for list items now
+                // The styling is handled by CSS.
+            }
+
+            _handleFeaturedKeyDown(event) {
+                const cards = Array.from(this.featuredContainer.children);
+                if (cards.length === 0) return;
+
+                if (event.key === 'ArrowRight') {
+                    this.currentFeaturedIndex = Math.min(this.currentFeaturedIndex + 1, cards.length - 1);
+                    this._scrollToCard(this.currentFeaturedIndex);
+                    event.preventDefault(); // Prevent default browser scroll
+                } else if (event.key === 'ArrowLeft') {
+                    this.currentFeaturedIndex = Math.max(this.currentFeaturedIndex - 1, 0);
+                    this._scrollToCard(this.currentFeaturedIndex);
+                    event.preventDefault(); // Prevent default browser scroll
+                }
+            }
+
+            _scrollToCard(index) {
+                const cards = Array.from(this.featuredContainer.children);
+                if (index >= 0 && index < cards.length) {
+                    cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    this.app.sounds.scroll.play(); // Play scroll sound
+                }
+            }
+
+            handleContestCanvasClick(e) {
+                const canvas = this.contestContentCanvas;
+                const rect = canvas.getBoundingClientRect();
+                const scrollOffset = this.scrollableCanvasWrapper.scrollTop;
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top + scrollOffset;
+                const clickedLink = this.app.hyperlinks.find(link => {
+                    return x >= link.rect.x && x <= link.rect.x + link.rect.width && y >= link.rect.y && y <= link.rect.y + link.rect.height;
+                });
+                if (clickedLink) {
+                    const url = clickedLink.url;
+                    if (url.startsWith('youtube:')) {
+                        const videoId = url.substring(8);
+                        window.parent.postMessage({
+                            type: 'open-url',
+                            url: `https://www.youtube.com/watch?v=${videoId}`
+                        }, '*');
+                    } else {
+                        window.parent.postMessage({
+                            type: 'open-url',
+                            url: url
+                        }, '*');
+                    }
+                }
+            }
+            async drawContestContent(text) {
+                this.app.hyperlinks = [];
+                this.app.checkboxes = [];
+                if (this._contestClickListener) {
+                    this.contestContentCanvas.removeEventListener('click', this._contestClickListener);
+                }
+                this._contestClickListener = (e) => this.handleContestCanvasClick(e);
+                this.contestContentCanvas.addEventListener('click', this._contestClickListener);
+                const contentBlocks = this.app._parseContestContent(text || "");
+                await this.app.imageManager.loadImagesFromBlocks(contentBlocks);
+                const ctx = this.contestContentCanvas.getContext('2d');
+                const containerRect = this.scrollableCanvasWrapper.getBoundingClientRect();
+                const horizontalPadding = 10; // Added padding to the contest content
+                const verticalPadding = 10;       // Added padding to the contest content
+                const drawAreaWidth = this.app.contestContentTextWidth - (horizontalPadding * 2); // Adjust draw area for padding
+                let totalMeasuredHeight = verticalPadding; // Start with top padding
+                for (const block of contentBlocks) {
+                    totalMeasuredHeight += this.app._measureBlockHeight(ctx, block, drawAreaWidth) + (this.app.cssVars.blockSpacing || 10);
+                }
+                totalMeasuredHeight += verticalPadding; // Add bottom padding
+                this.contestContentCanvas.width = containerRect.width;
+                // Adjust canvas height to include padding for drawing the background
+                this.contestContentCanvas.height = Math.max(this.scrollableCanvasWrapper.clientHeight, totalMeasuredHeight);
+                this.contestContentCanvas.style.height = `${this.contestContentCanvas.height}px`;
+                ctx.clearRect(0, 0, this.contestContentCanvas.width, this.contestContentCanvas.height);
+                
+                // Draw the subtle dark gray pattern for content background
+                const paperPattern = await this._loadPaperPattern(this.app._createWhitePaperBackgroundCanvas());
+                if (paperPattern) {
+                    ctx.fillStyle = ctx.createPattern(paperPattern, 'repeat');
+                    ctx.fillRect(0, 0, this.contestContentCanvas.width, this.contestContentCanvas.height);
+                }
+
+                let currentY = verticalPadding; // Start drawing content after top padding
+                ctx.textBaseline = 'top';
+                for (const block of contentBlocks) {
+                    const blockHeight = this.app._drawFormattedBlock(ctx, this.htmlOverlay, block, horizontalPadding, currentY, drawAreaWidth);
+                    currentY += blockHeight + (this.app.cssVars.blockSpacing || 10);
+                }
+            }
+
+            // New helper function to load an image from a data URL for patterns
+            async _loadPaperPattern(dataUrl) {
+                return new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = () => resolve(null); // Resolve with null on error
+                    img.src = dataUrl;
+                });
+            }
+
+            renderContestView(contest) {
+                // Clear any previous HTML elements from the overlay
+                // The HTML overlay is for iframes, etc., elements that need to be actual DOM elements
+                // to function.
+                this.htmlOverlay = this.createElement('div', 'contest-html-overlay'); // Recreate to clear contents
+                
+                // Create a scrollable container for the canvas and HTML overlay
+                this.scrollableCanvasWrapper = this.createElement('div', 'scrollable-canvas-wrapper');
+                // The canvas content will be rendered here.
+                this.contestContentCanvas = this.createElement('canvas', 'contest-content-canvas');
+                this.scrollableCanvasWrapper.appendChild(this.contestContentCanvas);
+                this.scrollableCanvasWrapper.appendChild(this.htmlOverlay);
+
+
+                // Clear all children of the contestView to prevent lingering elements
+                this.contestView.innerHTML = '';
+                
+                if (!contest) return;
+                
+                // Contest Header Section (Title, Meta, Share)
+                const header = this.createElement('div', 'contest-header-content');
+                const titleWrapper = this.createElement('div', 'contest-title-wrapper');
+                
+                // Contest Title (H1 now)
+                const contestTitle = this.createElement('h1', 'contest-title-h1');
+                contestTitle.textContent = contest.title;
+
+                this.shareButton = this._createButton({
+                    sprite: this.sprites.share,
+                    onClick: () => this.onShare(),
+                    className: 'share-button',
+                    pulseColor: this.app.cssVars['--ds-accent-blue']
+                });
+                
+                // Contest Metadata (P tag now)
+                const contestMeta = this.createElement('p', 'contest-meta');
+                const contestDateTime = this.app.userTimeZone ? luxon.DateTime.fromISO(contest.date).setZone(this.app.userTimeZone) : luxon.DateTime.fromISO(contest.date);
+                const formattedDate = contestDateTime.toFormat('MM/dd/yy');
+                const formattedTime = contestDateTime.toLocaleString(luxon.DateTime.TIME_SIMPLE);
+                const timeZoneAbbr = contestDateTime.toFormat('ZZZZ');
+                let metaTextParts = [];
+                if (contest.organizer && contest.organizer.trim() !== '') {
+                    metaTextParts.push(this.app.t('byOrganizer', { organizer: contest.organizer }));
+                }
+                if (contest.publisher && contest.publisher.trim() !== '') {
+                    metaTextParts.push(contest.publisher);
+                }
+                metaTextParts.push(`${formattedDate} ${formattedTime} ${timeZoneAbbr}`);
+                contestMeta.textContent = metaTextParts.join(' Â· ');
+
+                titleWrapper.appendChild(contestTitle);
+                titleWrapper.appendChild(this.shareButton);
+                header.appendChild(titleWrapper);
+                header.appendChild(contestMeta);
+                this.contestView.appendChild(header);
+
+                // Contest Body (Scrollable Content)
+                const bodyWrapper = this.createElement('div', 'contest-body-wrapper');
+                bodyWrapper.appendChild(this.scrollableCanvasWrapper);
+                this.contestView.appendChild(bodyWrapper);
+
+                // Contest Footer (Close Button)
+                const footer = this.createElement('div', 'contest-footer');
+                this.closeButton = this._createButton({
+                    text: this.app.t('close'),
+                    onClick: () => this.onCloseContest(false),
+                    className: 'close-button'
+                });
+                footer.appendChild(this.closeButton);
+                this.contestView.appendChild(footer);
+
+                this.drawContestContent(contest.content);
+            }
+
+            async renderFilterMenu(tags, activeFilters, onFilterChange, tagSearchQuery) {
+                this.filterViewWrapper.innerHTML = ''; // Clear existing content
+
+                // Header section - now part of the HTML structure directly
+                const header = this.createElement('div', 'filter-header');
+                const headerTitle = this.createElement('h2');
+                headerTitle.textContent = this.app.t('sortAndFilter');
+                header.appendChild(headerTitle);
+                this.filterViewWrapper.appendChild(header);
+
+                // Content Overlay for buttons and text
+                this._filterContentDiv = this.createElement('div', 'filter-menu-content-overlay');
+                this.filterViewWrapper.appendChild(this._filterContentDiv);
+
+                // Sort By Section
+                const sortByHeading = this.createElement('h3', 'filter-subheading');
+                sortByHeading.textContent = this.app.t('sortBy');
+                this._filterContentDiv.appendChild(sortByHeading);
+
+                const sortOptions = [{
+                    key: 'date-desc',
+                    label: this.app.t('newestFirst')
+                }, {
+                    key: 'date-asc',
+                    label: this.app.t('oldestFirst')
+                }, {
+                    key: 'organizer-asc',
+                    label: this.app.t('organizerAZ')
+                }];
+                const sortGroup = this.createElement('div', 'filter-group');
+                sortOptions.forEach(opt => {
+                    const btn = this._createButton({
+                        text: opt.label,
+                        onClick: () => onFilterChange({ sort: opt.key }, false),
+                        className: `filter-option`,
+                        activeClass: activeFilters.sort === opt.key ? 'active' : ''
+                    });
+                    sortGroup.appendChild(btn);
+                });
+                this._filterContentDiv.appendChild(sortGroup);
+
+                // Participation Status Section
+                const participationStatusHeading = this.createElement('h3', 'filter-subheading');
+                participationStatusHeading.textContent = this.app.t('participationStatus');
+                this._filterContentDiv.appendChild(participationStatusHeading);
+
+                const participationStatusOptions = [{
+                    key: 'all',
+                    label: this.app.t('all')
+                }, {
+                    key: 'joined',
+                    label: this.app.t('joined')
+                }, {
+                    key: 'notJoined',
+                    label: this.app.t('notJoined')
+                }];
+                const participationStatusGroup = this.createElement('div', 'filter-group');
+                participationStatusOptions.forEach(opt => {
+                    const btn = this._createButton({
+                        text: opt.label,
+                        onClick: () => onFilterChange({ participationStatus: opt.key }, false),
+                        className: `filter-option`,
+                        activeClass: activeFilters.participationStatus === opt.key ? 'active' : ''
+                    });
+                    participationStatusGroup.appendChild(btn);
+                });
+                this._filterContentDiv.appendChild(participationStatusGroup);
+
+                // Filter by Tag Section
+                const filterByTagHeading = this.createElement('h3', 'filter-subheading');
+                filterByTagHeading.textContent = this.app.t('filterByTag');
+                this._filterContentDiv.appendChild(filterByTagHeading);
+
+                const tagGroup = this.createElement('div', 'filter-group-tags');
+                const filteredTags = tags; // Assuming tags are pre-filtered or this.allTags
+                filteredTags.forEach(tag => {
+                    const btn = this._createButton({
+                        text: tag,
+                        onClick: () => {
+                            const newTag = activeFilters.tag === tag ? 'All' : tag;
+                            onFilterChange({ tag: newTag }, false);
+                        },
+                        className: `filter-option-tag`,
+                        activeClass: activeFilters.tag === tag ? 'active' : ''
+                    });
+                    tagGroup.appendChild(btn);
+                });
+                this._filterContentDiv.appendChild(tagGroup);
+
+                // Footer (Apply & Close Button)
+                const closeFilterButton = this._createButton({
+                    text: this.app.t('applyAndClose'),
+                    onClick: () => {
+                        this.app.sounds.filterApply.play();
+                        onFilterChange({}, true);
+                    },
+                    className: 'close-filter-button'
+                });
+                this.filterViewWrapper.appendChild(closeFilterButton);
+            }
+            // New function to update the Y position of featured cards to create a curve effect
+            _updateFeaturedWheelCurve() {
+                const container = this.featuredContainer;
+                const cards = Array.from(container.children);
+                const containerWidth = container.clientWidth;
+                const scrollLeft = container.scrollLeft;
+                const centerOfView = scrollLeft + containerWidth / 2;
+
+                const curveStrength = 0.0005; // Adjust this value to control the curve's depth
+
+                cards.forEach(card => {
+                    const cardCenter = card.offsetLeft + card.clientWidth / 2;
+                    const distanceFromCenter = cardCenter - centerOfView;
+                    // Apply a parabolic curve: y = k * x^2
+                    const translateY = curveStrength * Math.pow(distanceFromCenter, 2);
+                    card.style.transform = `translateY(${translateY}px)`;
+                });
+            }
+
+            startMarqueeAnimation() {
+                // This animation loop is now mostly for the new contest tags, which are CSS animated.
+                // However, it now also updates the featured wheel curve.
+                const animateMarquees = () => {
+                    this._updateFeaturedWheelCurve(); // Update the curve effect
+                    this.animationFrame = requestAnimationFrame(animateMarquees);
+                };
+                this.stopMarqueeAnimation();
+                this.animationFrame = requestAnimationFrame(animateMarquees);
+            }
+            stopMarqueeAnimation() {
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                    this.animationFrame = null;
+                }
+            }
+        }
+
+        /**
+         * Helper class to measure text width on a temporary canvas context.
+         */
+        class TextCanvasMeasurer {
+            constructor() {
+                if (!TextCanvasMeasurer.instance) {
+                    this._canvas = document.createElement('canvas');
+                    this._ctx = this._canvas.getContext('2d');
+                    this._ctx.imageSmoothingEnabled = false;
+                    TextCanvasMeasurer.instance = this;
+                }
+                return TextCanvasMeasurer.instance;
+            }
+            measureText(text, font) {
+                this._ctx.font = font;
+                return this._ctx.measureText(text);
+            }
+            estimateWrappedTextHeight(text, font, maxWidth, lineSpacingFactor = 1.0) {
+                this._ctx.font = font;
+                const tempMetrics = this._ctx.measureText('M');
+                const actualLineHeight = (tempMetrics.actualBoundingBoxAscent || 0) + (tempMetrics.actualBoundingBoxDescent || 0);
+                if (maxWidth === Infinity) {
+                    return actualLineHeight * lineSpacingFactor;
+                }
+                const words = text.split(' ');
+                let line = '';
+                let totalHeight = 0;
+                for (let n = 0; n < words.length; n++) {
+                    let testLine = line + (n > 0 ? ' ' : '') + words[n];
+                    let metrics = this._ctx.measureText(testLine);
+                    let testWidth = metrics.width;
+                    if (testWidth > maxWidth && line.length > 0) {
+                        totalHeight += actualLineHeight * lineSpacingFactor;
+                        line = words[n];
+                    } else {
+                        line = testLine;
+                    }
+                }
+                totalHeight += actualLineHeight * lineSpacingFactor;
+                return totalHeight;
+            }
+        }
+        class ImageManager {
+            constructor() {
+                this.cache = new Map();
+            }
+            loadImage(url) {
+                if (this.cache.has(url)) {
+                    return Promise.resolve(this.cache.get(url));
+                }
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    img.onload = () => {
+                        this.cache.set(url, img);
+                        resolve(img);
+                    };
+                    img.onerror = () => {
+                        console.error(`Failed to load image: ${url}`);
+                        this.cache.set(url, null);
+                        resolve(null);
+                    };
+                    img.src = url;
+                });
+            }
+            getImage(url) {
+                return this.cache.get(url) || null;
+            }
+            async loadImagesFromBlocks(blocks) {
+                const mediaUrls = new Set();
+                blocks.forEach(block => {
+                    if (block.type === 'image') {
+                        mediaUrls.add(block.url);
+                    } else if (block.type === 'embed' && block.service === 'youtube') {
+                        mediaUrls.add(`https://img.youtube.com/vi/${block.id}/0.jpg`);
+                    }
+                });
+                const promises = Array.from(mediaUrls).map(url => this.loadImage(url));
+                await Promise.all(promises);
+            }
+        }
+        class ContestelationsApp extends UIComponent {
+            constructor(rootId) {
+                super();
+                this.root = document.getElementById(rootId);
+                this.appId = 'contestelations-app';
+                this.appLabel = 'Contestelations';
+                this.allContests = [];
+                this.filteredContests = [];
+                this.selectedContest = null;
+                this.searchQuery = '';
+                this.tagSearchQuery = '';
+                this.hyperlinks = [];
+                this.checkboxes = [];
+                this.imageManager = new ImageManager();
+                this.sprites = {};
+                this.allTags = [];
+                this.activeFilters = {
+                    sort: 'date-desc',
+                    tag: 'All',
+                    participationStatus: 'all'
+                };
+                this.userTimeZone = null;
+                this.language = localStorage.getItem('userLanguage') || 'en-US';
+                this.translations = {};
+                this.audioSettings = {
+                    volumeMultiplier: {
+                        sfx: 1.0,
+                        music: 1.0
+                    },
+                    backgroundAudio: true,
+                    mute: false
+                };
+                this.sounds = {};
+                this.cssVars = {
+                    '--ds-bg': getComputedStyle(document.documentElement).getPropertyValue('--ds-bg'),
+                    '--ds-bg-grad': getComputedStyle(document.documentElement).getPropertyValue('--ds-bg-grad'),
+                    '--ds-bg-grad-start-color': '#FFD580',
+                    '--ds-bg-grad-end-color': '#DDAA55',
+                    '--ds-text': '#000000',
+                    '--ds-text-subtle': '#333333',
+                    '--ds-accent-blue': '#0d6efd',
+                    '--ds-accent-blue-dark': '#0b5ed7',
+                    '--ds-accent-red': '#dc3545',
+                    '--ds-interactive-bg': 'rgba(0,0,0,0.08)',
+                    '--ds-interactive-hover': 'rgba(0,0,0,0.15)',
+                    '--ds-list-bg': '#DDAA55',
+                    'blockSpacing': 10,
+                    'contestContentHorizontalPadding': 0,
+                    'contestContentVerticalPadding': 15
+                };
+                this.errorCanvas = this.createElement('canvas', 'app-error-display');
+                this.errorCtx = this.errorCanvas.getContext('2d');
+                this.errorCtx.imageSmoothingEnabled = false;
+                this.errorCanvas.width = 300;
+                this.errorCanvas.height = 80;
+                this.root.appendChild(this.errorCanvas);
+                this.errorCanvas.style.display = 'none';
+                this.firstShareDone = false;
+                this.contestContentTextWidth = 256;
+                this.lineSpacingFactor = 1.5;
+                this.contestTitleLineSpacingFactor = 1.2;
+                this.contestTitleTextWidth = 256;
+                this.lastKnownActiveContestCount = 0;
+
+                // Initialize timeSystem with current real time
+                this.timeSystem = {
+                    globalTime: 0, 
+                    dayTime: 0,    
+                    manualTime: false, // Set to false to use static night
+                    timeSpeed: 0,           
+                    sunPosition: new THREE.Vector3(0, 5, 10),
+                    moonPosition: new THREE.Vector3(0, 5, -10),
+                    settings: {
+                        enableVisualEffects: true
+                    },
+                    weatherEffects: {
+                        rain: { active: false, intensity: 0, particles: null },
+                        bloodMoon: { active: false, intensity: 0 }
+                    },
+                    // Define only night colors as the only phase
+                    skyColors: { 
+                        night: { top: new THREE.Color(0.01,0.01,0.08), middle: new THREE.Color(0.05,0.02,0.15), bottom: new THREE.Color(0.005,0.005,0.02) },
+                    },
+                    currentSkyColors: { top: new THREE.Color(0.01,0.01,0.08), middle: new THREE.Color(0.05,0.02,0.15), bottom: new THREE.Color(0.005,0.005,0.02) },
+                    timePhases: [
+                        // Only a single 'night' phase for fixed night sky
+                        { name: "Night", start: 0, end: 24, from: "night", to: "night", sun: t=>0, moon: t=>0.5, ambient: t=>0.3, hsl: t=>[0.6,0.3,0.5] },
+                    ],
+                    updateTime: function(deltaMinutes) {
+                        // This function is now controlled by animateThreeJS based on manualTime and timeSpeed.
+                        // It serves as a placeholder for the overall time logic.
+                    }
+                };
+            }
+            t(key, replacements = {}) {
+                const keys = key.split('.');
+                let value = this.translations;
+                for (const k of keys) {
+                    value = value ? value[k] : undefined;
+                }
+                let str = value || key; // Fallback to the key itself
+                for (const placeholder in replacements) {
+                    str = str.replace(`{${placeholder}}`, replacements[placeholder]);
+                }
+                return str;
+            }
+            loadTranslations() {
+                try {
+                    // Fallback to 'en-US' if the stored language is not found
+                    const langData = languageData[this.language] || languageData['en-US'];
+                    this.translations = JSON.parse(langData);
+                } catch (e) {
+                    console.error("Failed to load or parse translations:", e);
+                    this.translations = JSON.parse(languageData['en-US']); // Always fallback to English
+                }
+            }
+            loadAudioSettings() {
+                try {
+                    const storedSettings = localStorage.getItem('audioSettings');
+                    if (storedSettings) {
+                        const parsedSettings = JSON.parse(storedSettings);
+                        this.audioSettings = {
+                            ...this.audioSettings,
+                            ...parsedSettings
+                        };
+                    }
+                } catch (e) {
+                    console.error('Failed to load audio settings from localStorage:', e);
+                }
+            }
+            saveAudioSettings() {
+                try {
+                    localStorage.setItem('audioSettings', JSON.stringify(this.audioSettings));
+                } catch (e) {
+                    console.error('Failed to save audio settings to localStorage:', e);
+                }
+            }
+            _initializeSounds() {
+                const sfxVolume = 1.0 * this.audioSettings.volumeMultiplier.sfx;
+                const musicVolume = 0.2 * this.audioSettings.volumeMultiplier.music;
+                this.sounds = {
+                    // Played when interacting with generic buttons, e.g., filter options.
+                    click: new Howl({
+                        src: ['https://assets.codepen.io/210284/transform.mp3'],
+                        volume: 0.6 * sfxVolume
+                    }),
+                    // Played when transitioning between list view and contest view.
+                    swoosh: new Howl({
+                        src: ['https://assets.codepen.io/210284/whoosh.mp3'], // Original swoosh sound
+                        volume: 0.5 * sfxVolume
+                    }),
+                    // Played when hovering over interactive elements (buttons, list items, input fields).
+                    hover: new Howl({
+                        src: ['assets/sfx/Hover_1.wav'],
+                        volume: 1.0 * sfxVolume // Increased volume as requested
+                    }),
+                    // Played when the search input field gains focus.
+                    inputFocus: new Howl({
+                        src: ['https://assets.codepen.io/210284/soft-blip.mp3'],
+                        volume: 0.3 * sfxVolume
+                    }),
+                    // Played when the search input field loses focus.
+                    inputBlur: new Howl({
+                        src: ['https://assets.codepen.io/210284/soft-blip-down.mp3'],
+                        volume: 0.3 * sfxVolume
+                    }),
+                    // Played when a general application error message is displayed.
+                    errorBeep: new Howl({
+                        src: ['https://assets.codepen.io/210284/error-beep.mpd'],
+                        volume: 0.4 * sfxVolume
+                    }),
+                    // Played when filters are applied in the filter menu.
+                    filterApply: new Howl({ // Changed source to Start_2.wav
+                        src: ['assets/sfx/Start_2.wav'],
+                        volume: 0.5 * sfxVolume
+                    }),
+                    // Played for individual keystrokes in the search input field.
+                    typing: new Howl({
+                        src: ['https://assets.codepen.io/210284/keyboard-tap.mp3'],
+                        volume: 0.1 * sfxVolume,
+                        sprite: {
+                            s1: [0, 100],
+                            s2: [100, 200],
+                            s3: [200, 300]
+                        }
+                    }),
+                    // Background music that loops throughout the app.
+                    music: new Howl({
+                        src: ['assets/sfx/part-time human.mp3'],
+                        loop: true,
+                        volume: musicVolume
+                    }),
+                    // Played when scrolling content in lists or contests.
+                    scroll: new Howl({
+                        src: ['https://assets.codepen.io/210284/scroll.mp3'],
+                        volume: 0.05 * sfxVolume
+                    }),
+                    // Played when a new contest is opened. (Renamed from unopenedOpen)
+                    contestOpen: new Howl({
+                        src: ['https://assets.codepen.io/210284/notification-ding.mp3'],
+                        volume: 0.7 * sfxVolume
+                    }),
+                    // Played when the share button is pressed.
+                    shareConfirm: new Howl({
+                        src: ['assets/sfx/Start_2.wav'], // Changed share confirmation sound
+                        volume: 0.8 * sfxVolume
+                    }),
+                    // Played when the app is launched from the home screen.
+                    appLaunch: new Howl({
+                        src: ['assets/sfx/Change_Tab_Open.wav'],
+                        volume: 0.7 * sfxVolume
+                    }),
+                    // Played when the user exits the app back to the home screen.
+                    appExit: new Howl({
+                        src: ['assets/sfx/Change_Tab_Close.wav'],
+                        volume: 0.7 * sfxVolume
+                    })
+                };
+            }
+            _applyAudioSettings() {
+                Howler.mute(this.audioSettings.mute);
+                const sfxVolume = 1.0 * this.audioSettings.volumeMultiplier.sfx;
+                const musicVolume = 0.2 * this.audioSettings.volumeMultiplier.music;
+                if (this.sounds.click) this.sounds.click.volume(0.6 * sfxVolume);
+                if (this.sounds.swoosh) this.sounds.swoosh.volume(0.5 * sfxVolume);
+                if (this.sounds.hover) this.sounds.hover.volume(1.0 * sfxVolume);
+                if (this.sounds.inputFocus) this.sounds.inputFocus.volume(0.3 * sfxVolume);
+                if (this.sounds.inputBlur) this.sounds.inputBlur.volume(0.3 * sfxVolume);
+                if (this.sounds.errorBeep) this.sounds.errorBeep.volume(0.4 * sfxVolume);
+                if (this.sounds.filterApply) this.sounds.filterApply.volume(0.5 * sfxVolume);
+                if (this.sounds.typing) this.sounds.typing.volume(0.1 * sfxVolume);
+                if (this.sounds.scroll) this.sounds.scroll.volume(0.05 * sfxVolume);
+                if (this.sounds.contestOpen) this.sounds.contestOpen.volume(0.7 * sfxVolume);
+                if (this.sounds.shareConfirm) this.sounds.shareConfirm.volume(0.8 * sfxVolume);
+                if (this.sounds.appLaunch) this.sounds.appLaunch.volume(0.7 * sfxVolume);
+                if (this.sounds.appExit) this.sounds.appExit.volume(0.7 * sfxVolume);
+                if (this.audioSettings.backgroundAudio) {
+                    Howler.autoSuspend = false;
+                    if (this.sounds.music && !this.sounds.music.playing()) {
+                        this.sounds.music.play();
+                    }
+                    if (this.sounds.music) this.sounds.music.volume(musicVolume);
+                } else {
+                    Howler.autoSuspend = true;
+                    if (this.sounds.music && this.sounds.music.playing()) {
+                        this.sounds.music.pause();
+                    }
+                }
+            }
+            _parseInlineFormatting(text) {
+                const tokens = [];
+                // Corrected regex to properly balance parentheses for the color group
+                const regex = /(?<image>!\[[^\]]*?\]\([^)]+?\))|(?<link>\[[^\]]*?\]\([^)]+?\))|(?<youtube>@\[youtube\]\([^)]+?\))|(?<bold>\*\*.*?\*\*)|(?<italic>\*.*?\*)|(?<underline>__.*?__)|(?<strike>~~.*?~~)|(?<sup>\^.*?\^)|(?<sub>~.*?~)|(?<color>\{color:(#[0-9a-fA-F]{6}|[a-zA-Z]+)\|.*?\})/g;
+
+                let lastIndex = 0;
+                let match;
+                while ((match = regex.exec(text)) !== null) {
+                    if (match.index > lastIndex) {
+                        tokens.push({
+                            text: text.substring(lastIndex, match.index),
+                            style: {}
+                        });
+                    }
+                    const groups = match.groups;
+                    let token;
+                    if (groups.bold) token = {
+                        text: groups.bold.slice(2, -2),
+                        style: {
+                            bold: true
+                        }
+                    };
+                    else if (groups.italic) token = {
+                        text: groups.italic.slice(1, -1),
+                        style: {
+                            italic: true
+                        }
+                    };
+                    else if (groups.underline) token = {
+                        text: groups.underline.slice(2, -2),
+                        style: {
+                            underline: true
+                        }
+                    };
+                    else if (groups.strike) token = {
+                        text: groups.strike.slice(2, -2),
+                        style: {
+                            strikethrough: true
+                        }
+                    };
+                    else if (groups.sup) token = {
+                        text: groups.sup.slice(1, -1),
+                        style: {
+                            script: 'super'
+                        }
+                    };
+                    else if (groups.sub) token = {
+                        text: groups.sub.slice(1, -1),
+                        style: {
+                            script: 'sub'
+                        }
+                    };
+                    else if (groups.color) {
+                        // Extract content within the color tag: {color:COLOR|TEXT}
+                        const colorContent = groups.color.slice(7, -1); // Remove '{color:' and '}'
+                        const separatorIndex = colorContent.indexOf('|');
+                        if (separatorIndex !== -1) {
+                            const color = colorContent.substring(0, separatorIndex);
+                            const content = colorContent.substring(separatorIndex + 1);
+                            token = {
+                                text: content,
+                                style: {
+                                    color
+                                }
+                            };
+                        }
+                    } else if (groups.youtube) {
+                        const [, videoId] = /@\[youtube\]\((.*?)\)/.exec(groups.youtube) || [];
+                        if (videoId) token = {
+                            text: '',
+                            style: {
+                                youtube: videoId
+                            }
+                        };
+                    } else if (groups.image) {
+                        const [, alt, url] = /!\[(.*?)\]\((.*?)\)/.exec(groups.image) || [];
+                        if (url) token = {
+                            text: '',
+                            style: {
+                                image: url,
+                                alt
+                            }
+                        };
+                    } else if (groups.link) {
+                        const [, text, url] = /\[(.*?)\]\((.*?)\)/.exec(groups.link) || [];
+                        if (text) token = {
+                            text,
+                            style: {
+                                link: true,
+                                url
+                            }
+                        };
+                    }
+                    if (token) tokens.push(token);
+                    lastIndex = regex.lastIndex;
+                }
+                if (lastIndex < text.length) {
+                    tokens.push({
+                        text: text.substring(lastIndex),
+                        style: {}
+                    });
+                }
+                return tokens;
+            }
+            /**
+             * Renders inline formatted text onto a canvas context, handling various styles and links.
+             * This function is inherently complex due to supporting custom text formatting (bold, italic, etc.),
+             * links, and embedded media (images, YouTube) within a single text flow.
+             * It calculates required height for wrapping and captures link bounding boxes.
+             */
+            _renderInlineFormattedText(ctx, tokens, x, y, baseFont, baseColor, maxWidth, lineSpacingFactor, measureOnly = false) {
+                ctx.save();
+                let currentX = x;
+                let currentY = y;
+                const baseFontSize = parseInt(baseFont);
+                const fontFamily = baseFont.substring(baseFont.indexOf('px') + 3).trim();
+                const measurer = new TextCanvasMeasurer();
+                const fontMetrics = measurer.measureText("M", baseFont);
+                const baseLineHeight = (fontMetrics.actualBoundingBoxAscent || 0) + (fontMetrics.actualBoundingBoxDescent || 0);
+                const lineHeight = baseLineHeight * lineSpacingFactor;
+                let totalHeight = (tokens.length > 0 && tokens.some(t => t.text || t.style.image || t.style.youtube)) ? lineHeight : 0;
+                const links = [];
+                ctx.textBaseline = 'top'; // Set once for consistency
+
+                const applyStyle = (style) => {
+                    let fontStyle = style.italic ? 'italic ' : '';
+                    fontStyle += style.bold ? 'bold ' : '';
+                    let fontSize = baseFontSize;
+                    let yOffset = 0;
+                    if (style.script) {
+                        fontSize = Math.floor(baseFontSize * 0.8);
+                        yOffset = style.script === 'super' ? -fontSize * 0.4 : (baseFontSize - fontSize) * 0.7;
+                    }
+                    ctx.font = `${fontStyle}${fontSize}px ${fontFamily}`;
+                    ctx.fillStyle = style.color || (style.link ? this.cssVars['--ds-accent-blue'] : baseColor);
+                    return yOffset;
+                };
+
+                for (const token of tokens) {
+                    const mediaUrl = token.style.image || (token.style.youtube ? `https://img.youtube.com/vi/${token.style.youtube}/0.jpg` : null);
+                    if (mediaUrl) {
+                        const img = this.imageManager.getImage(mediaUrl);
+                        if (img && img.complete) {
+                            const aspectRatio = img.height / img.width;
+                            let drawW = Math.min(img.width, maxWidth);
+                            let drawH = drawW / aspectRatio;
+                            let imgX = currentX;
+                            let imgY = currentY;
+
+                            // If not at the start of a line, wrap media to the next line
+                            if (currentX > x && currentX + drawW > x + maxWidth) {
+                                currentX = x;
+                                currentY += lineHeight;
+                                totalHeight += lineHeight;
+                                imgX = currentX;
+                                imgY = currentY;
+                            }
+
+                            if (!measureOnly) {
+                                ctx.drawImage(img, imgX, imgY, drawW, drawH);
+                                if (token.style.youtube) { // Draw play button overlay
+                                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                                    ctx.beginPath();
+                                    ctx.arc(imgX + drawW / 2, imgY + drawH / 2, 30, 0, Math.PI * 2);
+                                    ctx.fill();
+                                    ctx.fillStyle = 'white';
+                                    ctx.beginPath();
+                                    ctx.moveTo(imgX + drawW / 2 - 10, imgY + drawH / 2 - 15);
+                                    ctx.lineTo(imgX + drawW / 2 + 15, imgY + drawH / 2);
+                                    ctx.lineTo(imgX + drawW / 2 - 10, imgY + drawH / 2 + 15);
+                                    ctx.closePath();
+                                    ctx.fill();
+                                    links.push({
+                                        rect: {
+                                            x: imgX,
+                                            y: imgY,
+                                            width: drawW,
+                                            height: drawH
+                                        },
+                                        url: `youtube:${token.style.youtube}`
+                                    });
+                                } else if (token.style.image) {
+                                    links.push({
+                                        rect: {
+                                            x: imgX,
+                                            y: imgY,
+                                            width: drawW,
+                                            height: drawH
+                                        },
+                                        url: token.style.image
+                                    });
+                                }
+                            }
+                            currentY += drawH;
+                            totalHeight += drawH - lineHeight; // Adjust total height based on image
+                            currentX = x; // Reset X for the next block
+                        }
+                        continue;
+                    }
+                    const words = token.text.split(/(\s+)/);
+                    for (const word of words) {
+                        if (word === '') continue;
+                        const yOffset = applyStyle(token.style);
+                        const wordWidth = ctx.measureText(word).width;
+                        if (currentX > x && currentX + wordWidth > x + maxWidth && word.trim() !== '') {
+                            currentX = x;
+                            currentY += lineHeight;
+                            totalHeight += lineHeight;
+                        }
+                        if (!measureOnly) {
+                            if (token.style.bold) {
+                                ctx.lineWidth = 1;
+                                ctx.strokeStyle = ctx.fillStyle;
+                                ctx.strokeText(word, currentX, currentY + yOffset);
+                            }
+                            ctx.fillText(word, currentX, currentY + yOffset);
+                            const textY = currentY + yOffset;
+                            const wordTrimmedWidth = ctx.measureText(word.trim()).width;
+                            // Re-apply fillStyle as it might be changed by ctx.strokeText
+                            ctx.fillStyle = token.style.color || (token.style.link ? this.cssVars['--ds-accent-blue'] : baseColor);
+                            if (token.style.underline || token.style.link) {
+                                ctx.fillRect(currentX, textY + baseFontSize * 1.1, wordTrimmedWidth, 1);
+                            }
+                            if (token.style.strikethrough) {
+                                ctx.fillRect(currentX, textY + baseFontSize * 0.6, wordTrimmedWidth, 1);
+                            }
+                            if (token.style.link) {
+                                links.push({
+                                    rect: {
+                                        x: currentX,
+                                        y: currentY,
+                                        width: wordTrimmedWidth,
+                                        height: lineHeight
+                                    },
+                                    url: token.style.url
+                                });
+                            }
+                        }
+                        currentX += wordWidth;
+                    }
+                }
+                ctx.restore();
+                return {
+                    height: totalHeight,
+                    links
+                };
+            }
+            // Uses TextCanvasMeasurer for efficient text height estimation
+            _estimateTextHeight(font, text = '', maxWidth = Infinity, lineSpacingFactorToUse = this.lineSpacingFactor) {
+                const measurer = new TextCanvasMeasurer();
+                return measurer.estimateWrappedTextHeight(text, font, maxWidth, lineSpacingFactorToUse);
+            }
+            /**
+             * Draws text on a canvas context with advanced wrapping and styling.
+             * This function uses TextCanvasMeasurer for efficient text measurement.
+             */
+            _drawTextOnCanvas(ctx, text, x, y, font, color, textAlign = 'left', textBaseline = 'alphabetic', maxWidth = Infinity, lineSpacingFactorToUse = this.lineSpacingFactor) {
+                if (!ctx) {
+                    console.error("Canvas rendering context is null. Cannot draw text.");
+                    return 0;
+                }
+                ctx.save();
+                ctx.font = font;
+                ctx.fillStyle = color !== undefined && color !== null ? color : 'black';
+                ctx.textAlign = textAlign;
+                ctx.textBaseline = textBaseline;
+
+                const measurer = new TextCanvasMeasurer(); // Use existing measurer instance
+                const fontMetrics = measurer.measureText('M', font);
+                const actualLineHeight = (fontMetrics.actualBoundingBoxAscent || 0) + (fontMetrics.actualBoundingBoxDescent || 0);
+
+                if (maxWidth === Infinity) {
+                    ctx.fillText(text, x, y);
+                    ctx.restore();
+                    return actualLineHeight * lineSpacingFactorToUse;
+                } else {
+                    const words = text.split(' ');
+                    let line = '';
+                    let currentY = y;
+                    let totalHeightUsed = 0;
+                    for (let n = 0; n < words.length; n++) {
+                        let testLine = line + (n > 0 ? ' ' : '') + words[n];
+                        let metrics = measurer.measureText(testLine, font); // Use measurer
+                        let testWidth = metrics.width;
+                        if (testWidth > maxWidth && line.length > 0) {
+                            ctx.fillText(line, x, currentY);
+                            totalHeightUsed += actualLineHeight * lineSpacingFactorToUse;
+                            currentY += actualLineHeight * lineSpacingFactorToUse;
+                            line = words[n];
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    ctx.fillText(line, x, currentY);
+                    totalHeightUsed += actualLineHeight * lineSpacingFactorToUse;
+                    ctx.restore();
+                    return totalHeightUsed;
+                }
+            }
+            // Removed _drawNewContestStar as it's now CSS-driven
+            _showAppError(messageKey) {
+                this.sounds.errorBeep.play();
+                const message = this.t(messageKey); // Get translated error message
+                const ctx = this.errorCtx;
+                const canvas = this.errorCanvas;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw background with rounded corners and shadow
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 4;
+                ctx.fillStyle = '#444B57'; // Dark gray error background
+                ctx.beginPath();
+                ctx.roundRect(0, 0, canvas.width, canvas.height, 8); // Rounded corners
+                ctx.fill();
+                ctx.restore();
+
+                this._drawTextOnCanvas(ctx, message, canvas.width / 2, canvas.height / 2, '16px "Rodin", sans-serif', 'red', 'center', 'middle');
+                this.errorCanvas.style.display = 'block';
+                clearTimeout(this.errorTimer);
+                this.errorTimer = setTimeout(() => {
+                    this.errorCanvas.style.display = 'none';
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }, 5000);
+            }
+            // Removed _drawDynamicSparkle as it's not used directly here
+            _drawSparkleEffect() {
+                const sparkleCanvas = this.createElement('canvas', 'sparkle-overlay');
+                this.root.appendChild(sparkleCanvas);
+                const ctx = sparkleCanvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false;
+                sparkleCanvas.width = 100;
+                sparkleCanvas.height = 100;
+                sparkleCanvas.style.position = 'absolute';
+                const shareButtonRect = this.bottomScreen.shareButton.getBoundingClientRect();
+                const appRect = this.root.getBoundingClientRect();
+                sparkleCanvas.style.left = `${shareButtonRect.left - appRect.left + (shareButtonRect.width / 2) - (sparkleCanvas.width / 2)}px`;
+                sparkleCanvas.style.top = `${shareButtonRect.top - appRect.top + (shareButtonRect.height / 2) - (sparkleCanvas.height / 2)}px`;
+                sparkleCanvas.style.pointerEvents = 'none';
+                let startTime = performance.now();
+                const duration = 800;
+                const animateSparkle = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = elapsed / duration;
+                    if (progress < 1) {
+                        ctx.clearRect(0, 0, sparkleCanvas.width, sparkleCanvas.height);
+                        const opacity = 1 - progress;
+                        const radius = 5 + progress * 20;
+                        ctx.strokeStyle = `rgba(255, 255, 0, ${opacity})`;
+                        ctx.lineWidth = 2;
+                        for (let i = 0; i < 8; i++) {
+                            ctx.beginPath();
+                            const angle = (Math.PI * 2 / 8) * i;
+                            const startX = sparkleCanvas.width / 2 + Math.cos(angle) * (radius * 0.5);
+                            const startY = sparkleCanvas.height / 2 + Math.sin(angle) * (radius * 0.5);
+                            const endX = sparkleCanvas.width / 2 + Math.cos(angle) * radius;
+                            const endY = sparkleCanvas.height / 2 + Math.sin(angle) * radius;
+                            ctx.moveTo(startX, startY);
+                            ctx.lineTo(endX, endY);
+                            ctx.stroke();
+                        }
+                        requestAnimationFrame(animateSparkle);
+                    } else {
+                        sparkleCanvas.remove();
+                    }
+                };
+                requestAnimationFrame(animateSparkle);
+            }
+            _measureBlockHeight(ctx, block, maxWidth) {
+                const baseFont = '14px "Rodin", sans-serif';
+                const lineSpacingFactor = this.lineSpacingFactor;
+                switch (block.type) {
+                    case 'paragraph':
+                        {
+                            if (block.tokens.length === 1 && block.tokens[0].text === ' ') return 14 * lineSpacingFactor;
+                            return this._renderInlineFormattedText(ctx, block.tokens, 0, 0, baseFont, 'black', maxWidth, lineSpacingFactor, true).height;
+                        }
+                    case 'hr':
+                        return 10;
+                    case 'checkbox':
+                        {
+                            const textHeight = this._renderInlineFormattedText(ctx, block.tokens, 0, 0, baseFont, 'black', maxWidth - 22, lineSpacingFactor, true).height;
+                            return Math.max(20, textHeight);
+                        }
+                    case 'image':
+                        {
+                            const img = this.imageManager.getImage(block.url);
+                            if (img && img.complete) {
+                                return (maxWidth / img.width) * img.height;
+                            }
+                            return 50;
+                        }
+                    case 'embed':
+                        return maxWidth * 9 / 16;
+                    case 'list':
+                        {
+                            let totalListHeight = 0;
+                            block.items.forEach(item => {
+                                const itemX = (item.level + 1) * 20 + 15;
+                                const itemMaxWidth = maxWidth - itemX;
+                                totalListHeight += this._renderInlineFormattedText(ctx, item.tokens, 0, 0, baseFont, 'black', itemMaxWidth, lineSpacingFactor, true).height;
+                            });
+                            return totalListHeight;
+                        }
+                    case 'table':
+                        {
+                            let totalTableHeight = 30;
+                            const colWidth = maxWidth / block.headers.length;
+                            block.rows.forEach(row => {
+                                let maxRowHeight = 30;
+                                row.forEach(cell => {
+                                    const {
+                                        height
+                                    } = this._renderInlineFormattedText(ctx, cell, 0, 0, baseFont, 'black', colWidth - 10, lineSpacingFactor, true);
+                                    maxRowHeight = Math.max(maxRowHeight, height + 10);
+                                });
+                                totalTableHeight += maxRowHeight;
+                            });
+                            return totalTableHeight;
+                        }
+                }
+                return 0;
+            }
+            /**
+             * Draws a formatted content block onto the canvas. This is a complex function
+             * as it handles various block types (paragraphs, horizontal rules, checkboxes,
+             * images, embedded media, lists, and tables), each with its own rendering logic.
+             * This function relies on `_renderInlineFormattedText` for internal text rendering.
+             */
+            _drawFormattedBlock(ctx, htmlOverlay, block, x, y, maxWidth) {
+                const baseFont = '14px "Rodin", sans-serif';
+                const baseColor = this.cssVars['--ds-text'];
+                const lineSpacingFactor = this.lineSpacingFactor;
+                const verticalPadding = this.cssVars.contestContentVerticalPadding;
+                switch (block.type) {
+                    case 'paragraph':
+                        {
+                            if (block.tokens.length === 1 && block.tokens[0].text === ' ') return 14 * lineSpacingFactor;
+                            const {
+                                height,
+                                links
+                            } = this._renderInlineFormattedText(ctx, block.tokens, x, y, baseFont, baseColor, maxWidth, lineSpacingFactor, false);
+                            this.hyperlinks.push(...links);
+                            return height;
+                        }
+                    case 'hr':
+                        {
+                            ctx.fillStyle = '#666666'; // Darker gray for HR
+                            ctx.fillRect(x, y + 4, maxWidth, 1);
+                            return 10;
+                        }
+                    case 'checkbox':
+                        {
+                            const boxSize = 14;
+                            const boxY = y + (20 - boxSize) / 2;
+                            ctx.strokeStyle = '#FFFFFF'; // White checkbox border
+                            ctx.lineWidth = 1;
+                            ctx.strokeRect(x, boxY, boxSize, boxSize);
+                            const checkboxRect = {
+                                x: x,
+                                y: boxY,
+                                width: boxSize,
+                                height: boxSize
+                            };
+                            this.checkboxes.push({
+                                rect: checkboxRect,
+                                checked: block.checked
+                            });
+                            if (block.checked) {
+                                ctx.fillStyle = '#FFFFFF'; // White checkmark
+                                ctx.beginPath();
+                                ctx.moveTo(x + 3, boxY + 7);
+                                ctx.lineTo(x + 6, boxY + 10);
+                                ctx.lineTo(x + 11, boxY + 4);
+                                ctx.lineWidth = 1.5;
+                                ctx.stroke();
+                            }
+                            const {
+                                height,
+                                links
+                            } = this._renderInlineFormattedText(ctx, block.tokens, x + boxSize + 8, y, baseFont, '#FFFFFF', maxWidth - (boxSize + 8), lineSpacingFactor, false); // Text is white
+                            this.hyperlinks.push(...links);
+                            return Math.max(20, height);
+                        }
+                    case 'image':
+                        {
+                            const img = this.imageManager.getImage(block.url);
+                            if (img) {
+                                const imgHeight = (maxWidth / img.width) * img.height;
+                                ctx.drawImage(img, x, y, maxWidth, imgHeight);
+                                return imgHeight;
+                            }
+                            ctx.fillStyle = 'rgba(255,255,255,0.1)'; // Light translucent gray for loading image
+                            ctx.fillRect(x, y, maxWidth, 50);
+                            this._drawTextOnCanvas(ctx, 'Loading Image...', x + maxWidth / 2, y + 25, '12px "Rodin", sans-serif', 'rgba(255,255,255,0.4)', 'center', 'middle'); // Text is lighter gray
+                            return 50;
+                        }
+                    case 'embed':
+                        {
+                            const embedHeight = (maxWidth * 9 / 16);
+                            const iframe = this.createElement('iframe', 'embedded-media');
+                            iframe.style.position = 'absolute';
+                            iframe.style.left = `${x}px`;
+                            iframe.style.top = `${y - verticalPadding}px`;
+                            iframe.style.width = `${maxWidth}px`;
+                            iframe.style.height = `${embedHeight}px`;
+                            iframe.setAttribute('frameborder', '0');
+                            iframe.setAttribute('allowfullscreen', 'true');
+                            if (block.service === 'youtube') {
+                                iframe.src = `https://www.youtube.com/embed/${block.id}`;
+                            }
+                            htmlOverlay.appendChild(iframe);
+                            return embedHeight;
+                        }
+                    case 'list':
+                        {
+                            let currentY = y;
+                            block.items.forEach((item, index) => {
+                                const itemX = x + (item.level * 20);
+                                const itemMaxWidth = maxWidth - (item.level * 20) - 20;
+                                if (block.ordered) {
+                                    this._drawTextOnCanvas(ctx, `${index + 1}.`, itemX, currentY, baseFont, '#FFFFFF', 'left', 'top'); // Text is white
+                                } else {
+                                    ctx.beginPath();
+                                    ctx.arc(itemX + 4, currentY + 7, 3, 0, Math.PI * 2);
+                                    ctx.fillStyle = '#FFFFFF'; // White bullet point
+                                    ctx.fill();
+                                }
+                                const {
+                                    height,
+                                    links
+                                } = this._renderInlineFormattedText(ctx, item.tokens, itemX + 15, currentY, baseFont, '#FFFFFF', itemMaxWidth, lineSpacingFactor, false); // Text is white
+                                this.hyperlinks.push(...links);
+                                currentY += height;
+                            });
+                            return currentY - y;
+                        }
+                    case 'table':
+                        {
+                            ctx.strokeStyle = 'rgba(255,255,255,0.2)'; // Lighter border for dark theme
+                            ctx.lineWidth = 1;
+                            const colWidth = maxWidth / block.headers.length;
+                            let currentY = y;
+                            block.headers.forEach((header, i) => {
+                                const {
+                                    links
+                                } = this._renderInlineFormattedText(ctx, header, x + i * colWidth + 5, currentY + 5, `bold ${baseFont}`, '#FFFFFF', colWidth - 10, lineSpacingFactor, false); // Text is white
+                                this.hyperlinks.push(...links);
+                            });
+                            currentY += 30;
+                            ctx.beginPath();
+                            ctx.moveTo(x, currentY);
+                            ctx.lineTo(x + maxWidth, currentY);
+                            ctx.stroke();
+                            block.rows.forEach(row => {
+                                let maxRowHeight = 30;
+                                row.forEach((cell, i) => {
+                                    const {
+                                        height
+                                    } = this._renderInlineFormattedText(ctx, cell, x + i * colWidth + 5, currentY + 5, baseFont, '#FFFFFF', colWidth - 10, lineSpacingFactor, false); // Text is white
+                                    this.hyperlinks.push(...links);
+                                    maxRowHeight = Math.max(maxRowHeight, height + 10);
+                                });
+                                currentY += maxRowHeight;
+                                ctx.beginPath();
+                                ctx.moveTo(x, currentY);
+                                ctx.lineTo(x + maxWidth, currentY);
+                                ctx.stroke();
+                            });
+                            for (let i = 1; i < block.headers.length; i++) {
+                                ctx.beginPath();
+                                ctx.moveTo(x + i * colWidth, y);
+                                ctx.lineTo(x + i * colWidth, currentY);
+                                ctx.stroke();
+                            }
+                            return currentY - y;
+                        }
+                }
+                return 0;
+            }
+            async loadData() {
+                let contestsData = [];
+                const userLanguageKey = localStorage.getItem('userLanguage') || 'en-US';
+                const url = `contests/${userLanguageKey}.json`;
+
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        contestsData = await response.json();
+                    } else {
+                        console.error(`Could not fetch ${url}, status:`, response.status);
+                        this._showAppError('errorLoadingContests');
+                    }
+                } catch (error) {
+                    console.error(`Error fetching ${url}:`, error);
+                    this._showAppError('errorLoadingContests');
+                }
+                this.allContests = contestsData.map(c => ({
+                    ...c,
+                    participated: false,
+                    visible: c.visible !== undefined ? c.visible : true
+                }));
+                this.loadParticipationStatus();
+                const allTags = new Set();
+                this.allContests.forEach(c => {
+                    c.tags.forEach(t => allTags.add(t));
+                });
+                this.allTags = [...allTags].sort();
+                const allImagePromises = [];
+                const uniqueIconPathsToLoad = new Set();
+                const staticSvgDataUrls = {
+                    filter: `data:image/svg+xml,%3Csvg
+                                xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z'/%3E%3C/svg%3E`,
+                    share: `data:image/svg+xml,%3Csvg
+                                xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z'/%3E%3C/svg%3E`,
+                };
+                Object.keys(staticSvgDataUrls).forEach(key => uniqueIconPathsToLoad.add(key));
+                this.allContests.forEach(contest => {
+                    if (contest.iconPath) {
+                        uniqueIconPathsToLoad.add(contest.iconPath);
+                    }
+                });
+                uniqueIconPathsToLoad.forEach(pathOrKey => {
+                    this.sprites[pathOrKey] = new Image();
+                    allImagePromises.push(new Promise(resolve => {
+                        this.sprites[pathOrKey].onload = resolve;
+                        // Replace fill='black' with fill='white' for static SVGs
+                        if (staticSvgDataUrls[pathOrKey]) {
+                            this.sprites[pathOrKey].src = staticSvgDataUrls[pathOrKey].replace(/fill='black'/g, "fill='white'");
+                        } else {
+                            this.sprites[pathOrKey].src = pathOrKey;
+                        }
+                    }));
+                });
+                await Promise.all(allImagePromises);
+            }
+            loadParticipationStatus() {
+                try {
+                    const participationStatusMap = JSON.parse(localStorage.getItem('contestelations_participationStatusMap') || '{}');
+                    this.allContests.forEach(contest => {
+                        contest.participated = participationStatusMap[contest.slug] === true;
+                    });
+                } catch (e) {
+                    console.error('Failed to load participation status from localStorage:', e);
+                    localStorage.removeItem('contestelations_participationStatusMap');
+                }
+            }
+            saveParticipationStatus() {
+                try {
+                    const participationStatusMap = {};
+                    this.allContests.forEach(contest => {
+                        if (contest.participated) {
+                            participationStatusMap[contest.slug] = true;
+                        }
+                    });
+                    localStorage.setItem('contestelations_participationStatusMap', JSON.stringify(participationStatusMap));
+                } catch (e) {
+                    console.error('Failed to save participation status to localStorage:', e);
+                }
+            }
+            saveTotalActiveContestCount() {
+                try {
+                    const activeContestCount = this.allContests.filter(c => !c.participated && c.visible).length;
+                    localStorage.setItem('contestelations_activeContestCount', activeContestCount.toString());
+                } catch (e) {
+                    console.error('Failed to save total active contest count to localStorage:', e);
+                }
+            }
+            loadTotalActiveContestCount() {
+                try {
+                    const storedCount = localStorage.getItem('contestelations_activeContestCount');
+                    this.lastKnownActiveContestCount = storedCount ? parseInt(storedCount, 10) : 0;
+                } catch (e) {
+                    console.error('Failed to load total active contest count from localStorage:', e);
+                    this.lastKnownActiveContestCount = 0;
+                }
+            }
+            loadUserTimeZone() {
+                try {
+                    this.userTimeZone = localStorage.getItem('userTimeZone');
+                } catch (e) {
+                    console.error('Failed to load user time zone from localStorage:', e);
+                    this.userTimeZone = null;
+                }
+            }
+            async start() {
+                this.injectStyles();
+                this.loadTranslations();
+                await document.fonts.load('1px "Rodin"', ' ');
+                await document.fonts.ready;
+                this.loadAudioSettings();
+                this._initializeSounds();
+                this._applyAudioSettings();
+
+                // Initialize timeSystem with current real time
+                const now = luxon.DateTime.local();
+                this.timeSystem.dayTime = now.hour * 60 + now.minute;
+                this.timeSystem.globalTime = this.timeSystem.dayTime;
+
+                this.topScreen = new TopScreen(this);
+                this.bottomScreen = new BottomScreen({
+                    onContestSelect: (contest) => this.handleContestSelect(contest),
+                    onShare: () => this.handleShare(),
+                    onCloseContest: (isExit) => this.handleCloseContest(isExit),
+                    onSearch: (query) => this.handleSearch(query),
+                    onShowFilter: () => this.bottomScreen.setView('filter', {
+                        tags: this.allTags,
+                        activeFilters: this.activeFilters,
+                        onFilterChange: (f, applyAndClose) => this.handleFilterChange(f, applyAndClose),
+                        tagSearchQuery: this.tagSearchQuery,
+                    }),
+                    onFilterChange: (filters, applyAndClose = false) => this.handleFilterChange(filters, applyAndClose),
+                    sounds: this.sounds,
+                    sprites: this.sprites,
+                    appInstance: this
+                });
+                this.root.appendChild(this.topScreen.element);
+                this.root.appendChild(this.bottomScreen.element);
+
+                // Add the bottom-screen-overlay element
+                this.bottomScreenOverlay = this.createElement('div', 'bottom-screen-overlay');
+                this.root.appendChild(this.bottomScreenOverlay);
+
+                this.loadTotalActiveContestCount();
+                this.loadUserTimeZone();
+                this.topScreen.showHomeScreen(this.lastKnownActiveContestCount);
+                await this.loadData();
+                this.attachEventListeners();
+                this.updateUI();
+
+                // If a slug was stored before the app was ready, handle it now.
+                if (initialSlugFromMessage) {
+                    console.log(`[Contestelations App] Processing stored slug: ${initialSlugFromMessage}`);
+                    await this.handleDeepLink(initialSlugFromMessage);
+                    initialSlugFromMessage = null; // Clear it after use.
+                }
+
+                if (this.audioSettings.backgroundAudio && this.sounds.music) {
+                    this.sounds.music.play();
+                    this.sounds.music.fade(0, 0.2 * this.audioSettings.volumeMultiplier.music, 3000);
+                }
+                this.sounds.appLaunch.play();
+
+                // Signal to the parent window that the app is ready (for other potential interactions)
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: 'app-ready' }, '*');
+                }
+            }
+            attachEventListeners() {
+                // The deep-link message listener is now global to prevent race conditions.
+                // Other event listeners can remain here.
+                document.addEventListener('visibilitychange', () => {
+                    if (this.audioSettings.music && this.sounds.music) {
+                        if (document.hidden && !this.audioSettings.backgroundAudio) {
+                            this.sounds.music.pause();
+                        } else if (!document.hidden && this.audioSettings.backgroundAudio) {
+                            if (!this.sounds.music.playing()) {
+                                this.sounds.music.play();
+                            }
+                        }
+                    }
+                });
+
+                // Debug command listener for time speed
+                window.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'debug-time-speed' && typeof event.data.speed === 'number') {
+                        this.timeSystem.manualTime = (event.data.speed === 0);
+                        this.timeSystem.timeSpeed = event.data.speed;
+                        console.log(`[Contestelations App] Debug: Time speed set to ${event.data.speed}x, manualTime: ${this.timeSystem.manualTime}`);
+                    }
+                });
+                // The featuredContainer scroll listener is now attached within BottomScreen.renderListView
+                // to ensure the element exists when the listener is added.
+            }
+            applyFiltersAndSort() {
+                let result = [...this.allContests];
+                result = result.filter(c => c.visible);
+                if (this.searchQuery) {
+                    const lowerQuery = this.searchQuery.toLowerCase();
+                    result = result.filter(c => c.title.toLowerCase().includes(lowerQuery) || c.organizer.toLowerCase().includes(lowerQuery));
+                }
+                if (this.activeFilters.tag && this.activeFilters.tag !== 'All') {
+                    result = result.filter(c => c.tags.includes(this.activeFilters.tag));
+                }
+                if (this.activeFilters.participationStatus === 'joined') {
+                    result = result.filter(c => c.participated);
+                } else if (this.activeFilters.participationStatus === 'notJoined') {
+                    result = result.filter(c => !c.participated);
+                }
+                switch (this.activeFilters.sort) {
+                    case 'date-asc':
+                        result.sort((a, b) => luxon.DateTime.fromISO(a.date).toMillis() - luxon.DateTime.fromISO(b.date).toMillis());
+                        break;
+                    case 'organizer-asc':
+                        result.sort((a, b) => a.organizer.localeCompare(b.organizer));
+                        break;
+                    default: // date-desc
+                        result.sort((a, b) => luxon.DateTime.fromISO(b.date).toMillis() - luxon.DateTime.fromISO(a.date).toMillis());
+                        break;
+                }
+                this.filteredContests = result;
+            }
+            handleSearch(query) {
+                this.searchQuery = query;
+                this.applyFiltersAndSort();
+                this.bottomScreen.setView('list', {
+                    contests: this.filteredContests,
+                    searchQuery: this.searchQuery,
+                });
+            }
+            _parseContestContent(text) {
+                const blocks = [];
+                const lines = text.split('\n');
+                let inList = false;
+                let inTable = false;
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (/^---\s*$/.test(line)) {
+                        blocks.push({
+                            type: 'hr'
+                        });
+                        continue;
+                    }
+                    let match = line.match(/^@\[(youtube)\]\((.*?)\)/);
+                    if (match) {
+                        blocks.push({
+                            type: 'embed',
+                            service: match[1],
+                            id: match[2]
+                        });
+                        continue;
+                    }
+                    match = line.match(/^!\[(.*?)\]\((.*?)\)/);
+                    if (match) {
+                        blocks.push({
+                            type: 'image',
+                            alt: match[1],
+                            url: match[2]
+                        });
+                        continue;
+                    }
+                    match = line.match(/^\[([ x])\]\s+(.*)/);
+                    if (match) {
+                        blocks.push({
+                            type: 'checkbox',
+                            checked: match[1] === 'x',
+                            tokens: this._parseInlineFormatting(match[2])
+                        });
+                        continue;
+                    }
+                    match = line.match(/^(\s*)(-|[0-9]+\.)\s+(.*)/);
+                    if (match) {
+                        const level = Math.floor(match[1].length / 2);
+                        const ordered = /^[0-9]/.test(match[2]);
+                        const lastBlock = blocks[blocks.length - 1];
+                        if (lastBlock && lastBlock.type === 'list' && lastBlock.ordered === ordered) {
+                            lastBlock.items.push({
+                                level,
+                                tokens: this._parseInlineFormatting(match[3])
+                            });
+                        } else {
+                            blocks.push({
+                                type: 'list',
+                                ordered,
+                                items: [{
+                                    level,
+                                    tokens: this._parseInlineFormatting(match[3])
+                                }]
+                            });
+                        }
+                        continue;
+                    }
+                    if (line.includes('|')) {
+                        const lastBlock = blocks.length > 0 ? blocks[blocks.length - 1] : null;
+                        if (lines[i + 1] && lines[i + 1].includes('|') && /\|-*:/.test(lines[i + 1])) {
+                            const headers = line.split('|').slice(1, -1).map(h => this._parseInlineFormatting(h.trim()));
+                            blocks.push({
+                                type: 'table',
+                                headers,
+                                rows: []
+                            });
+                            i++;
+                            continue;
+                        } else if (lastBlock && lastBlock.type === 'table') {
+                            const row = line.split('|').slice(1, -1).map(c => this._parseInlineFormatting(c.trim()));
+                            lastBlock.rows.push(row);
+                            continue;
+                        }
+                    }
+                    if (line.trim() !== '') {
+                        blocks.push({
+                            type: 'paragraph',
+                            tokens: this._parseInlineFormatting(line)
+                        });
+                    } else {
+                        blocks.push({
+                            type: 'paragraph',
+                            tokens: [{
+                                text: ' ',
+                                styles: []
+                            }]
+                        });
+                    }
+                }
+                return blocks;
+            }
+            handleFilterChange(newFilters, applyAndClose = false) {
+                this.sounds.click.play();
+                if (newFilters.tag && this.activeFilters.tag === newFilters.tag) {
+                    this.activeFilters.tag = 'All';
+                } else {
+                    this.activeFilters = {
+                        ...this.activeFilters,
+                        ...newFilters
+                    };
+                }
+                if (applyAndClose) {
+                    this.sounds.filterApply.play();
+                    this.applyFiltersAndSort();
+                    this.updateUI(true);
+                } else {
+                    this.bottomScreen.renderFilterMenu(this.allTags, this.activeFilters, 
+                                            (f, applyAndCloseFlag) => this.handleFilterChange(f, applyAndCloseFlag), 
+                                            this.tagSearchQuery);
+                }
+            }
+            async handleContestSelect(contest, fromDeepLink = false) {
+                this.sounds.swoosh.play(); // Play swoosh sound for paper peeling effect
+
+                // Set initial state for peeling animation
+                this.bottomScreen.contestView.style.transform = 'translateY(100%)';
+                this.bottomScreen.contestView.style.opacity = '0';
+                this.bottomScreen.contestView.style.transformOrigin = 'bottom center';
+                this.bottomScreen.contestView.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+
+                const wasNotJoined = !contest.participated;
+                this.selectedContest = contest;
+                const contestInMasterList = this.allContests.find(c => c.slug === contest.slug);
+                if (contestInMasterList) {
+                    contestInMasterList.participated = true;
+                    this.saveParticipationStatus();
+                }
+                if (wasNotJoined && !fromDeepLink) {
+                    this.sounds.contestOpen.play();
+                    // No longer need to trigger a canvas-based animation here,
+                    // as the 'new-contest-tag' will simply be removed via updateUI
+                }
+                this.topScreen.showContestImage(contest.image);
+                const updatedContest = {
+                    ...contest,
+                    content: contest.content || 'No content available.'
+                };
+                this.selectedContest = updatedContest;
+                
+                // Trigger view change, which starts the animation via CSS
+                this.bottomScreen.setView('contest', {
+                    contest: updatedContest
+                });
+            }
+
+            // Removed _triggerNewContestAnimation as the new contest tag is now CSS-driven.
+            
+            handleCloseContest(isExit = false) {
+                if (isExit) {
+                    this.sounds.appExit.play();
+                    const message = {
+                        type: 'launchApp',
+                        appId: this.appId,
+                        label: this.appLabel,
+                        location: `content/apps/homeScreen_3DS/homeScreen_3DS.html`
+                    };
+                    if (window.parent !== window) {
+                        window.parent.postMessage(message, '*');
+                    } else {
+                        console.warn('Not running in an iframe, cannot post message to parent.');
+                    }
+                } else {
+                    this.sounds.appExit.play();
+                    this.selectedContest = null;
+                    this.updateUI();
+                }
+            }
+            handleShare() {
+                if (!this.selectedContest) return;
+                this.sounds.shareConfirm.play();
+                if (!this.firstShareDone) {
+                    this.firstShareDone = true;
+                    setTimeout(() => {
+                        this._drawSparkleEffect();
+                    }, 100);
+                }
+                try {
+                    const url = `${window.location.origin}/contest/${this.selectedContest.slug}`;
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = url;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    console.log(this.t('linkCopied'), url);
+                } catch (e) {
+                    console.error('Clipboard copy failed:', e);
+                }
+            }
+            async handleDeepLink(slug) {
+                const contest = this.allContests.find(c => c.slug === slug);
+                if (contest) {
+                    await this.handleContestSelect(contest, true);
+                } else {
+                    console.warn(`[Contestelations App] Deep link contest with slug "${slug}" not found.`);
+                }
+            }
+            updateUI(resetView = true) {
+                const activeContestCount = this.allContests.filter(c => !c.participated && c.visible).length;
+                this.applyFiltersAndSort();
+                this.saveTotalActiveContestCount();
+                if (this.allContests.length > 0) {
+                    if (resetView) {
+                        this.selectedContest = null;
+                        this.topScreen.showHomeScreen(activeContestCount);
+                        this.bottomScreen.setView('list', {
+                            contests: this.filteredContests,
+                            searchQuery: this.searchQuery,
+                        });
+                    } else {
+                        if (this.bottomScreen.viewMode === 'list') {
+                            this.bottomScreen.setView('list', {
+                                contests: this.filteredContests,
+                                searchQuery: this.searchQuery,
+                            });
+                        } else if (this.bottomScreen.viewMode === 'filter') {
+                             this.bottomScreen.renderFilterMenu(this.allTags, this.activeFilters, 
+                                                (f, applyAndCloseFlag) => this.handleFilterChange(f, applyAndCloseFlag), 
+                                                this.tagSearchQuery);
+                        }
+                    }
+                    this.errorCanvas.style.display = 'none';
+                } else {
+                    if (this.errorCanvas.style.display !== 'block') {}
+                    this.topScreen.contestImageElement.style.opacity = '0';
+                    this.topScreen.homeCanvas.style.opacity = '0';
+                    this.topScreen.renderer.domElement.style.opacity = '0';
+                    this.bottomScreen.listView.classList.remove('active');
+                    this.bottomScreen.contestView.classList.remove('active');
+                    this.bottomScreen.filterViewWrapper.classList.remove('active');
+                }
+            }
+
+            // Function to generate a less rough paper background on a canvas for main backgrounds
+            _createRoughPaperBackgroundCanvas() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 320;
+                canvas.height = 240;
+                const ctx = canvas.getContext('2d');
+
+                // Dark blue/purple for night sky theme
+                ctx.fillStyle = '#100D1A';  
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Add subtle starry texture
+                for (let i = 0; i < 15000; i++) { // Increased density for subtle stars
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const gray = Math.floor(Math.random() * 50) + 200; // Lighter shades for stars
+                    const alpha = Math.random() * 0.1 + 0.05;
+                    ctx.fillStyle = `rgba(${gray}, ${gray}, ${gray}, ${alpha})`;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+
+                // Remove lines as they don't fit the starry sky theme
+                return canvas.toDataURL();
+            }
+
+            // Function to generate a smoother paper background on a canvas for header-like elements
+            _createLightPaperBackgroundCanvas() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 320;
+                canvas.height = 240;
+                const ctx = canvas.getContext('2d');
+
+                // Slightly lighter dark blue/purple for headers
+                ctx.fillStyle = '#2D313A';  
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Add very subtle noise/texture
+                for (let i = 0; i < 5000; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const gray = Math.floor(Math.random() * 30) + 220;
+                    const alpha = Math.random() * 0.1 + 0.04;
+                    ctx.fillStyle = `rgba(${gray}, ${gray}, ${gray}, ${alpha})`;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+
+                // Remove lines
+                return canvas.toDataURL();
+            }
+
+            // Function to generate a smoother, whiter paper background on a canvas for scrolling content
+            _createWhitePaperBackgroundCanvas() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 320;
+                canvas.height = 240;
+                const ctx = canvas.getContext('2d');
+
+                // Subtle dark gray for content background
+                ctx.fillStyle = '#3A3F47';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Add very subtle noise/texture
+                for (let i = 0; i < 3000; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const gray = Math.floor(Math.random() * 20) + 230;
+                    const alpha = Math.random() * 0.05 + 0.02;
+                    ctx.fillStyle = `rgba(${gray}, ${gray}, ${gray}, ${alpha})`;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+
+                // Remove lines
+                return canvas.toDataURL();
+            }
+
+            // New function to generate a procedural paper background (main bottom screen background)
+            _createPaperBackgroundCanvas() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 320;
+                canvas.height = 240;
+                const ctx = canvas.getContext('2d');
+
+                // Dark background color for the main bottom screen
+                ctx.fillStyle = '#1A1C20';  
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Add subtle random speckles for a faint star-like texture
+                for (let i = 0; i < 15000; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const gray = Math.floor(Math.random() * 50) + 200;  
+                    const alpha = Math.random() * 0.08 + 0.02; // More subtle alpha for overall background
+                    ctx.fillStyle = `rgba(${gray}, ${gray}, ${gray}, ${alpha})`;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+
+                // No horizontal lines for a space theme
+                return canvas.toDataURL();
+            }
+
+            // New function to generate a paper envelope background (contest details background)
+            _createEnvelopePaperBackgroundCanvas() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 320;
+                canvas.height = 240;
+                const ctx = canvas.getContext('2d');
+
+                // Slightly darker background for contest details, to distinguish from main list
+                ctx.fillStyle = '#24272D';  
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Add subtle noise/texture
+                for (let i = 0; i < 4000; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const gray = Math.floor(Math.random() * 20) + 230;
+                    const alpha = Math.random() * 0.05 + 0.02;
+                    ctx.fillStyle = `rgba(${gray}, ${gray}, ${gray}, ${alpha})`;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+
+                // No horizontal lines
+                return canvas.toDataURL();
+            }
+
+            injectStyles() {
+                const roughPaperBackgroundDataUrl = this._createRoughPaperBackgroundCanvas();
+                const lightPaperBackgroundDataUrl = this._createLightPaperBackgroundCanvas();
+                const whitePaperBackgroundDataUrl = this._createWhitePaperBackgroundCanvas();
+                const paperBackgroundDataUrl = this._createPaperBackgroundCanvas(); // New paper background
+                const envelopePaperBackgroundDataUrl = this._createEnvelopePaperBackgroundCanvas();
+
+
+                const styleSheet = document.createElement("style");
+                styleSheet.innerText = `
+        :root {
+          --ds-bg: #1A1C20; /* Dark background */
+          --ds-bg-grad: linear-gradient(180deg, #100D1A 0%, #1A1C20 100%); /* Dark gradient */
+          --ds-text: #FFFFFF; /* White text for dark backgrounds */
+          --ds-text-subtle: #BBBBBB; /* Lighter gray for subtle text */
+          --ds-accent-blue: #0d6efd;
+          /* Added from injectStyles() and adapted for the light theme */
+          --ds-bg-modal: #2D313A; /* Dark modal background */
+          --ds-accent-red: #dc3545;
+          --ds-interactive-bg: rgba(255,255,255,0.08); /* Light interactive background */
+          --ds-interactive-hover: rgba(255,255,255,0.15); /* Lighter hover state */
+          --ds-list-bg: #3A3F47; /* Dark list background */
+        }
+
+        @font-face {
+          font-family: "Rodin";
+          src: url("/content/common/fonts/FOT-RodinNTLG Pro DB.otf") format("opentype");
+        }
+
+        body {
+          background: #111; display: flex; align-items: center; justify-content: center;
+          min-height: 100vh; margin: 0; font-family: "Rodin", sans-serif;
+          overflow: hidden; /* Prevent body scroll */
+          image-rendering: pixelated; /* Global pixel rendering for canvases */
+          -webkit-font-smoothing: none;
+        }
+
+        .ds-container {
+          width: 400px; height: 480px; background: black; user-select: none;
+          overflow: hidden; display: flex; flex-direction: column;
+          align-items: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .top-screen {
+            width: 400px;
+            height: 240px;
+            background: transparent; /* Changed to transparent to show Three.js */
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden; /* Important for Three.js canvas clipping */
+        }
+
+        .threejs-canvas {
+            z-index: 1; /* Three.js canvas as background */
+        }
+
+        .contest-image, .home-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+            transition: opacity 0.4s ease-in-out; image-rendering: pixelated;
+            z-index: 2; /* Contest image and home canvas on top of Three.js */
+        }
+
+        .bottom-screen {
+          width: 320px;
+          height: 240px;
+          background: url('${paperBackgroundDataUrl}') repeat; /* New dark background */
+          background-size: cover;
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding-top: 8px;
+          box-sizing: border-box;
+          border-top-left-radius: 20px; /* Curved top-left corner */
+          border-top-right-radius: 20px; /* Curved top-right corner */
+          box-shadow: 0 -5px 15px rgba(0,0,0,0.3); /* Shadow on the curved edge */
+          transform: translateY(0); /* Ensure it's not off-screen initially */
+        }
+        
+        .bottom-screen-overlay {
+            position: absolute;
+            top: 240px; /* Position directly over the bottom-screen */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            height: 240px;
+            pointer-events: none; /* Allow clicks to pass through */
+            z-index: 10; /* Above bottom-screen, below modals */
+            background-color: rgba(0,0,0,0.4); /* Fixed night overlay color */
+        }
+
+
+        .view { width: 100%; height: 100%; display: flex; flex-direction: column; position: absolute; top: 0; left: 0; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, transform 0.3s ease; transform: translateY(15px); pointer-events: none; }
+
+        .view.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+
+        .list-view { align-items: center; background: url('${paperBackgroundDataUrl}') repeat; background-size: cover; }
+
+        .header-controls { /* New class for the top control bar */
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            align-items: center;
+            width: 280px;
+            margin-bottom: 8px;
+            margin-top: 8px;
+            background: url('${lightPaperBackgroundDataUrl}') repeat;
+            background-size: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 0 10px;
+            height: 48px;
+            box-sizing: border-box;
+        }
+
+        .canvas-input-wrapper { flex-grow: 1; height: 36px; overflow: hidden; }
+
+        .canvas-input-wrapper:focus { outline: none; }
+
+        .canvas-input-wrapper canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+
+        .featured-wheel-section { /* Container for the horizontal contest wheel */
+            width: 100%;
+            height: 120px; /* Height for featured cards */
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden; /* Important for scrollbar and wheel effect */
+        }
+
+        .featured-wheel-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: scroll; /* Enable horizontal scrolling */
+            padding: 5px 15px; /* Padding for cards to show partially at edges */
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+            -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+        }
+
+        /* Hide scrollbar for Chrome, Safari, Opera */
+        .featured-wheel-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .featured-card { /* Individual card in the wheel */
+            flex-shrink: 0;
+            cursor: pointer;
+            width: 180px; /* Card width */
+            height: 100%; /* Take full height of container */
+            background-color: #24272D; /* Darker background for featured items */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
+            position: relative; /* For new tag positioning */
+            border: 2px solid transparent; /* For new contest highlight */
+            overflow: hidden; /* Hide overflowing content */
+        }
+        .featured-card img {
+            width: 100%;
+            height: 60px; /* Fixed height for image */
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+        .featured-card h3 {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--ds-text);
+            margin: 0 0 4px 0;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap; /* Prevent wrapping for now, or implement JS for multiline ellipsis */
+        }
+        .featured-card p {
+            font-size: 10px;
+            color: var(--ds-text-subtle);
+            margin: 0;
+        }
+
+        .featured-card:hover {
+            transform: scale(1.03); /* Slight scale on hover */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4); /* More prominent shadow on hover */
+        }
+        .featured-card:not(.participated) {
+            border-color: #FFD700; /* Gold color for new contests */
+        }
+
+        .all-contests-grid-section { /* Container for the grid of all contests */
+            width: 290px;
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden; /* For its internal scroll */
+        }
+
+        .all-contests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px;
+            overflow-y: scroll; /* Enable vertical scrolling */
+            height: 100%; /* Take full height of parent */
+            padding: 8px 0;
+            box-sizing: border-box;
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+            -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+        }
+
+        /* Hide scrollbar for Chrome, Safari, Opera */
+        .all-contests-grid::-webkit-scrollbar {
+            display: none;
+        }
+
+        .grid-item { /* Individual item in the grid */
+            cursor: pointer;
+            background-color: #3A3F47; /* Dark gray for grid items */
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            height: 40px; /* Fixed height for grid items */
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            box-sizing: border-box;
+            position: relative; /* For new tag positioning */
+            overflow: hidden; /* Hide overflowing text */
+        }
+        .grid-item-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            flex-shrink: 0;
+        }
+        .grid-item-title {
+            font-size: 12px;
+            color: var(--ds-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+        }
+        .grid-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* New Contest Tag - CSS based */
+        .new-contest-tag, .new-contest-tag-small {
+            position: absolute;
+            top: 5px; /* Adjust as needed */
+            right: 5px; /* Adjust as needed */
+            background-color: #FFD700; /* Gold color */
+            color: black;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            animation: pulse-new 1.5s infinite alternate; /* Pulsing animation */
+            box-shadow: 0 0 8px #FFD700; /* Glow effect */
+        }
+        .new-contest-tag-small {
+            font-size: 7px;
+            padding: 1px 3px;
+        }
+
+        @keyframes pulse-new {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.7; transform: scale(1.05); }
+        }
+        
+        .footer-controls { /* New class for the bottom control bar */
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: url('${lightPaperBackgroundDataUrl}') repeat; /* Footer has lighter bg */
+            background-size: cover;
+            border-radius: 0; /* No rounding at the very bottom */
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            padding: 0;
+        }
+
+        .no-results {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100px;
+            color: var(--ds-text-subtle);
+            font-size: 14px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .contest-view {
+            background: url('${envelopePaperBackgroundDataUrl}') repeat;
+            background-size: cover;
+            /* Animation for pulling up contest page */
+            transform: translateY(100%); /* Start off-screen at the bottom */
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+            border-top-left-radius: 20px; /* Match main bottom screen curve */
+            border-top-right-radius: 20px;
+        }
+
+        .contest-view.active {
+            transform: translateY(0%); /* Slide up to full view */
+            opacity: 1;
+        }
+
+
+        .contest-header-content { /* Renamed from article-header-content */
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1); /* Lighter border for dark theme */
+            flex-shrink: 0;
+            width: 100%;
+            height: auto; /* Let content dictate height */
+            box-sizing: border-box;
+            background: url('${lightPaperBackgroundDataUrl}') repeat;
+            background-size: cover;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .scrollable-canvas-wrapper { 
+            flex-grow: 1; 
+            overflow-y: scroll; /* Enable scrolling */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+            height: 110px; /* Default height, but flex-grow will adjust */
+            position: relative; /* For absolutely positioned embeds */
+            padding-bottom: 10px; /* Space at bottom for scrolling */
+            box-sizing: border-box;
+        }
+
+        .scrollable-canvas-wrapper::-webkit-scrollbar { display: none; }
+
+        .contest-content-canvas { 
+            display: block; 
+            height: auto; 
+            width: calc(100% - 20px); /* Account for padding */
+            margin: 10px auto; /* Centered with vertical margin */
+            image-rendering: pixelated; 
+            cursor: pointer;
+        }
+
+        .contest-html-overlay { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            pointer-events: none; /* Allow clicks to pass through to canvas */
+            z-index: 10; 
+        }
+
+        .contest-html-overlay > iframe { 
+            pointer-events: auto; /* Make iframes interactive */
+            border-radius: 6px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+        }
+
+        .contest-title-wrapper { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            padding: 0; /* No extra padding here */
+            margin-bottom: 5px;
+        }
+
+        .contest-title-h1 { 
+            font-size: 20px; 
+            font-weight: bold; 
+            color: var(--ds-text); 
+            margin: 0; 
+            line-height: 1.2; 
+            flex-grow: 1;
+            padding-right: 10px; /* Space between title and share button */
+        }
+
+        .contest-meta { 
+            font-size: 12px; 
+            color: var(--ds-text-subtle); 
+            margin: 0; 
+        }
+
+        /* Filter View - Now HTML based */
+        .filter-view { 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: opacity 0.3s ease, transform 0.3s ease; 
+            transform: translateY(15px); 
+            pointer-events: none; 
+            background: url('${roughPaperBackgroundDataUrl}') repeat; /* Background drawn via data URL */
+            background-size: cover;
+            border-top-left-radius: 20px; /* Match main bottom screen curve */
+            border-top-right-radius: 20px;
+        }
+
+        .filter-view.active {
+            opacity: 1; 
+            visibility: visible; 
+            transform: translateY(0); 
+            pointer-events: auto; 
+        }
+
+        .filter-header { 
+            flex-shrink: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            width: 100%; 
+            height: 32px; 
+            box-sizing: border-box;
+            background: url('${lightPaperBackgroundDataUrl}') repeat;
+            background-size: cover;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .filter-header h2 {
+            color: var(--ds-text);
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .filter-menu-content-overlay {
+            flex-grow: 1; /* Takes remaining space */
+            overflow-y: scroll; /* Enable scrolling */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            padding: 10px 15px 50px 15px; /* Padding, with space at bottom for footer button */
+            box-sizing: border-box;
+        }
+        .filter-menu-content-overlay::-webkit-scrollbar { display: none; }
+
+        .filter-subheading { 
+            color: var(--ds-text); 
+            font-size: 14px; 
+            font-weight: bold; 
+            margin: 15px 0 8px 0; /* Spacing for headings */
+            text-align: center;
+        }
+
+        .filter-group, .filter-group-tags { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            justify-content: center; /* Center buttons horizontally */
+            margin-bottom: 8px;
+        }
+
+        /* Reusable button styling */
+        .ds-button {
+            background-color: var(--ds-bg-modal); /* Dark background */
+            color: var(--ds-text);
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-family: "Rodin", sans-serif;
+            font-size: 14px;
+            transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px; /* Space between icon and text */
+            flex-shrink: 0;
+        }
+        .ds-button img {
+            width: 18px; /* Icon size for buttons */
+            height: 18px;
+            image-rendering: crisp-edges; /* Keep icons sharp */
+        }
+        .ds-button:hover {
+            background-color: var(--ds-interactive-hover); /* Lighter on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transform: translateY(-1px);
+        }
+        .ds-button:active {
+            background-color: var(--ds-accent-blue-dark); /* Darker when clicked */
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .ds-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Specific button overrides */
+        .filter-button {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            background-color: transparent; /* No background for filter icon */
+            box-shadow: none; /* No shadow */
+            font-size: 0; /* Hide default text if any */
+        }
+        .filter-button:hover {
+            background-color: rgba(255,255,255,0.1);
+            transform: none;
+            box-shadow: none;
+        }
+        .filter-button:active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .share-button {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            background-color: transparent;
+            box-shadow: none;
+            font-size: 0;
+        }
+        .share-button:hover {
+            background-color: transparent;
+            transform: none;
+            box-shadow: none;
+            filter: drop-shadow(0 0 8px var(--ds-accent-blue)); /* Blue glow on hover */
+        }
+        .share-button:active {
+            background-color: transparent;
+        }
+
+        .close-button, .exit-button, .close-filter-button {
+            width: 100%;
+            height: 40px;
+            border-radius: 6px 6px 0 0; /* Rounded top corners, square bottom */
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Pulse animation for buttons */
+        .ds-button.pulsing {
+            animation: button-pulse 0.5s ease-out;
+            background-color: var(--pulse-color, var(--ds-accent-blue));
+            box-shadow: 0 0 15px var(--pulse-color, var(--ds-accent-blue)), 0 4px 8px rgba(0,0,0,0.3);
+        }
+        @keyframes button-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .filter-option.active, .filter-option-tag.active {
+            background-color: var(--ds-accent-blue);
+            color: white;
+        }
+        .filter-option:hover, .filter-option-tag:hover {
+            background-color: var(--ds-interactive-hover);
+        }
+        .filter-option.active:hover, .filter-option-tag.active:hover {
+            background-color: var(--ds-accent-blue-dark); /* Darker blue on hover when active */
+        }
+
+        .app-error-display { /* border-radius and shadow handled by canvas */ position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 15px 25px; border-radius: 0; box-shadow: none; z-index: 1000; font-family: "Rodin", sans-serif; font-size: 16px; text-align: center; display: none; }
+
+        .sparkle-overlay { z-index: 100; }
+
+        /* No custom scrollbar classes needed for DOM elements. Native is used and hidden by CSS. */
+        `;
+                document.head.appendChild(styleSheet);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = new ContestelationsApp('app-root');
+            appInstance = app; // Make the instance globally available
+            app.start();
+        });
+    </script>
+</body>
+
+</html>

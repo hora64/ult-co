@@ -1,0 +1,252 @@
+﻿/**
+ * UltShop - Default Theme Variables
+ * Color scheme, gradients, and asset paths
+ * 
+ * These can be overridden by custom themes or per-app customization
+ * 
+ * Priority hierarchy:
+ * 1. Inline styles (highest priority)
+ * 2. Theme-specific CSS variables
+ * 3. These default values (fallback)
+ */
+
+:root {
+    /* ========================================
+     * DISPLAY & RESOLUTION
+     * Note: Actual resolution (400x480) defined in app.js
+     * Top screen: 400x240
+     * Bottom screen: 320x240
+     * ======================================== */
+    
+    --ultshop-width: 400px;
+    --ultshop-height: 480px;
+    --ultshop-top-screen-width: 400px;
+    --ultshop-top-screen-height: 240px;
+    --ultshop-bottom-screen-width: 320px;
+    --ultshop-bottom-screen-height: 240px;
+
+
+    /* ========================================
+     * COLOR SCHEME
+     * ======================================== */
+    
+    /* Primary colors */
+    --ultshop-primary: #00BCD4;
+    --ultshop-primary-dark: #00838F;
+    --ultshop-primary-light: #B2EBF2;
+    
+    /* Secondary colors */
+    --ultshop-secondary: #B2EBF2;
+    --ultshop-accent: #FFEB3B;
+    --ultshop-danger: #D32F2F;
+    
+    /* Text colors */
+    --ultshop-text: #000000;
+    --ultshop-text-subtle: #004D40;
+    --ultshop-text-inverse: #FFFFFF;
+    
+    /* Background colors */
+    --ultshop-bg-white: #FFFFFF;
+    --ultshop-bg-light: #E0F7FA;
+    
+    /* Gradients */
+    --ultshop-gradient-start: #E0F7FA;
+    --ultshop-gradient-mid: #B2EBF2;
+    --ultshop-gradient-end: #80DEEA;
+    
+    /* Gradient definitions */
+    --ultshop-top-screen-gradient: linear-gradient(180deg, var(--ultshop-gradient-start) 0%, var(--ultshop-gradient-mid) 100%);
+    --ultshop-bottom-screen-gradient: linear-gradient(180deg, var(--ultshop-gradient-mid) 0%, var(--ultshop-gradient-end) 100%);
+    --ultshop-app-container-gradient: linear-gradient(180deg, var(--ultshop-gradient-mid) 0%, var(--ultshop-gradient-end) 100%);
+
+
+    /* ========================================
+     * ASSET PATHS
+     * ======================================== */
+    
+    /* Base directories */
+    --ultshop-assets-base: '/content/apps/ultshop/assets';
+    --ultshop-images-path: '/content/apps/ultshop/assets/img';
+    --ultshop-sounds-path: '/content/apps/ultshop/assets/sfx';
+    --ultshop-models-path: '/content/apps/ultshop/assets/models';
+    --ultshop-fonts-path: '/content/common/fonts';
+    
+    /* Icon paths */
+    --ultshop-icon-store: '/content/apps/ultshop/assets/icons/store_64px.png';
+    --ultshop-icon-cart: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zm-8.9-5h7.45c.75 0 1.41-.42 1.75-1.04L22 6.41V4H7V3H4c-1.1 0-1.99.9-1.99 2L2 7l3.63 7.59-1.35 2.44C3.12 17.03 3.96 18 5 18h14v-2H5l1.1-2.2zM12 9l-1.41-1.41L12 5.17l1.41 1.42L12 9zm0 4l-1.41-1.41L12 9.17l1.41 1.42L12 13z"/></svg>');
+    
+    /* Product Icon Assets */
+    --ultshop-selection-glow: '/content/apps/homeScreen_3DS/assets/themes/blackTheme/Select_128px.png';
+    --ultshop-default-app-icon: '/content/apps/homeScreen_3DS/assets/themes/BlankAppWhite_64px.png';
+    --ultshop-unopened-icon: '/content/common/assets/giftbox_48px.png';
+    --ultshop-default-background-icon: '/content/apps/homeScreen_3DS/assets/themes/BlankAppWhite_64px.png';
+    
+    /* App Container Background */
+    --ultshop-app-container-bg-image: url('/content/apps/homeScreen_3DS/assets/themes/BlankAppWhite_64px.png');
+    --ultshop-app-container-bg-size: cover;
+    --ultshop-app-container-bg-position: center;
+    --ultshop-app-container-bg-repeat: no-repeat;
+    
+    /* Font paths */
+    --ultshop-font-rodin: '/content/common/fonts/FOT-RodinNTLG Pro DB.otf';
+
+
+    /* ========================================
+     * SOUND EFFECTS
+     * ======================================== */
+    
+    --ultshop-sound-click: '/content/common/sfx/select6.ogg';
+    --ultshop-sound-select: '/content/common/sfx/select5.ogg';
+    --ultshop-sound-hover: '/content/common/sfx/select.ogg';
+    --ultshop-sound-add-cart: '/content/common/sfx/select3.ogg';
+    --ultshop-sound-checkout: '/content/common/sfx/select2.ogg';
+    --ultshop-sound-success: '/content/common/sfx/open.ogg';
+
+
+    /* ========================================
+     * UI COMPONENT STYLES
+     * ======================================== */
+    
+    /* Card shadows */
+    --ultshop-card-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --ultshop-card-shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.2);
+    
+    /* Border radius */
+    --ultshop-border-radius: 8px;
+    --ultshop-border-radius-small: 4px;
+    
+    /* Spacing */
+    --ultshop-spacing-xs: 4px;
+    --ultshop-spacing-sm: 8px;
+    --ultshop-spacing-md: 16px;
+    --ultshop-spacing-lg: 24px;
+    --ultshop-spacing-xl: 32px;
+    
+    /* Transitions */
+    --ultshop-transition-fast: 150ms;
+    --ultshop-transition-normal: 300ms;
+    --ultshop-transition-slow: 500ms;
+
+
+    /* ========================================
+     * TYPOGRAPHY
+     * ======================================== */
+    
+    /* Font families */
+    --ultshop-font-family: 'Rodin', sans-serif;
+    --ultshop-font-family-fallback: sans-serif;
+    
+    /* Font sizes */
+    --ultshop-font-size-xs: 10px;
+    --ultshop-font-size-sm: 11px;
+    --ultshop-font-size-base: 12px;
+    --ultshop-font-size-md: 14px;
+    --ultshop-font-size-lg: 16px;
+    --ultshop-font-size-xl: 18px;
+    --ultshop-font-size-2xl: 20px;
+    --ultshop-font-size-3xl: 32px;
+    
+    /* Font weights */
+    --ultshop-font-weight-normal: 400;
+    --ultshop-font-weight-bold: 700;
+
+
+    /* ========================================
+     * GRID LAYOUT
+     * Note: Grid dimensions are in config.js
+     * These are CSS-specific layout values
+     * ======================================== */
+    
+    --ultshop-grid-gap: 10px;
+    --ultshop-card-padding: 5px;
+
+
+    /* ========================================
+     * Z-INDEX LAYERS
+     * ======================================== */
+    
+    --ultshop-z-base: 0;
+    --ultshop-z-content: 1;
+    --ultshop-z-overlay: 10;
+    --ultshop-z-modal: 100;
+    --ultshop-z-loading: 1000;
+}
+
+
+/**
+ * THEME OVERRIDE EXAMPLES
+ * ========================
+ * 
+ * Custom themes can override these variables:
+ * 
+ * Example 1: Dark Theme
+ * ---------------------
+ * [data-theme="dark"] {
+ *     --ultshop-primary: #64B5F6;
+ *     --ultshop-bg-white: #1E1E1E;
+ *     --ultshop-text: #FFFFFF;
+ *     --ultshop-gradient-start: #2C2C2C;
+ *     --ultshop-gradient-mid: #1E1E1E;
+ *     --ultshop-gradient-end: #121212;
+ * }
+ * 
+ * 
+ * Example 2: Holiday Theme
+ * ------------------------
+ * [data-theme="holiday"] {
+ *     --ultshop-primary: #C62828;
+ *     --ultshop-accent: #FFD54F;
+ *     --ultshop-gradient-start: #EF9A9A;
+ *     --ultshop-gradient-end: #C62828;
+ * }
+ * 
+ * 
+ * Example 3: High Contrast
+ * ------------------------
+ * [data-theme="high-contrast"] {
+ *     --ultshop-primary: #0000FF;
+ *     --ultshop-text: #000000;
+ *     --ultshop-bg-white: #FFFFFF;
+ *     --ultshop-card-shadow: 0 0 0 2px #000000;
+ * }
+ */
+
+
+/**
+ * ACCESSIBILITY OVERRIDES
+ * =======================
+ * 
+ * Respect user preferences:
+ */
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --ultshop-transition-fast: 0ms;
+        --ultshop-transition-normal: 0ms;
+        --ultshop-transition-slow: 0ms;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --ultshop-card-shadow: 0 0 0 2px var(--ultshop-text);
+        --ultshop-border-radius: 0px;
+    }
+}
+
+/* Dark mode preference */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Optionally auto-switch to dark theme */
+        /* Uncomment to enable:
+        --ultshop-bg-white: #1E1E1E;
+        --ultshop-text: #FFFFFF;
+        --ultshop-text-subtle: #B0BEC5;
+        --ultshop-gradient-start: #2C2C2C;
+        --ultshop-gradient-mid: #1E1E1E;
+        --ultshop-gradient-end: #121212;
+        */
+    }
+}

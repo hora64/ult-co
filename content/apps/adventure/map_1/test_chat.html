@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .ds-container {
+            width: 400px;
+            height: 480px;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .top-screen, .bottom-screen {
+            background-color: #FFECB3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .top-screen {
+            width: 400px;
+            height: 240px;
+            position: relative;
+            background-image: repeating-conic-gradient(#c0c0c0 0% 25%, #e0e0e0 0% 50%);
+            background-size: 20px 20px;
+        }
+        .bottom-screen {
+            width: 320px;
+            height: 240px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            position: relative;
+            background: linear-gradient(180deg, #FFECB3, #FFD700);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+        }
+        .chat-input-container {
+            display: flex;
+            width: 100%;
+            gap: 0.5rem;
+        }
+        #chatInput {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border: 1px solid #FFC107;
+            background: linear-gradient(180deg, #FFF8DC, #FFECB3);
+            color: #333;
+            border-radius: 0.5rem;
+        }
+        #sendButton {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: linear-gradient(180deg, #4CAF50, #388E3C);
+            color: #eee;
+            font-weight: bold;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="ds-container">
+        <div class="top-screen">
+            <canvas id="chatCanvas"></canvas>
+        </div>
+        <div class="bottom-screen">
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" placeholder="Type a message...">
+                <button id="sendButton">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { RichTextRenderer } from '../../../common/utils/RichTextRenderer.js';
+        import { TextCanvasMeasurer } from '../../../common/utils/TextCanvasMeasurer.js';
+
+        // Mock app object for RichTextRenderer
+        const mockApp = {
+            cssVars: {
+                '--ds-accent-blue': '#007bff'
+            },
+            timeSystem: {
+                globalTime: 0
+            }
+        };
+
+        const canvas = document.getElementById('chatCanvas');
+        const ctx = canvas.getContext('2d');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+
+        const richTextRenderer = new RichTextRenderer(mockApp);
+        const messages = [];
+        let needsRender = true;
+        const currentUser = "You";
+        const userColors = {
+            [currentUser]: "#0000FF", // Blue for current user
+            "Alice": "#FF0000", // Red
+            "Bob": "#008000", // Green
+        };
+
+        function resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            needsRender = true;
+        }
+
+        function addMessage(user, text) {
+            const parsed = richTextRenderer.parseBlockContent(text);
+            messages.push({ user, blocks: parsed });
+            if (messages.length > 100) { // Keep last 100 messages
+                messages.splice(0, messages.length - 100);
+            }
+            needsRender = true;
+        }
+
+        function renderChat() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const baseFont = "16px sans-serif";
+            const baseColor = "#333";
+            const lineSpacingFactor = 1.2;
+            const padding = 10;
+            let currentY = padding;
+
+            ctx.font = baseFont;
+            ctx.fillStyle = baseColor;
+
+            for (const message of messages) {
+                const user = message.user;
+                const userColor = userColors[user] || baseColor;
+
+                // Render username
+                ctx.fillStyle = userColor;
+                ctx.font = `bold ${baseFont}`;
+                const userMetrics = ctx.measureText(`${user}: `);
+                ctx.fillText(`${user}: `, padding, currentY);
+                ctx.font = baseFont; // Reset font for message content
+
+                let lineStartX = padding + userMetrics.width;
+
+                for (const block of message.blocks) {
+                    if (block.type === 'paragraph') {
+                        const result = richTextRenderer.renderInlineFormattedText(
+                            ctx,
+                            block.tokens,
+                            lineStartX,
+                            currentY,
+                            baseFont,
+                            baseColor,
+                            canvas.width / (window.devicePixelRatio || 1) - (padding * 2),
+                            lineSpacingFactor,
+                            false,
+                            padding // Pass the absolute start X for wrapping
+                        );
+                        currentY += result.height;
+                        if (result.isAnimated) {
+                            needsRender = true;
+                        }
+                    }
+                }
+                currentY += 5; // Space between messages
+            }
+        }
+
+        function animationLoop(time) {
+            mockApp.timeSystem.globalTime = time;
+            if (needsRender) {
+                renderChat();
+                needsRender = false; // Reset flag, will be set to true by animated effects if any
+            }
+            requestAnimationFrame(animationLoop);
+        }
+
+        sendButton.addEventListener('click', () => {
+            const text = chatInput.value;
+            if (text.trim()) {
+                addMessage(currentUser, text);
+                chatInput.value = '';
+            }
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initial setup
+        resizeCanvas();
+        addMessage("Alice", "Welcome to the chat! Try some effects:");
+        addMessage("Bob", "{hologram:blue|Holographic Text}");
+        addMessage("Alice", "{waveText:Hello World!}");
+        addMessage("Bob", "{fire:This is on fire!}");
+        requestAnimationFrame(animationLoop);
+
+    </script>
+</body>
+</html>

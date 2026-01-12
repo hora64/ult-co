@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail App - Article</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.3/build/global/luxon.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js"
+            }
+        }
+    </script>
+    <style>
+        :root{--ds-bg:#f5f7fa;--ds-bg-grad:linear-gradient(180deg,#e0e0e0 0%,#d0d0d0 100%);--ds-text:#1a1a1a;--ds-text-subtle:#666;--ds-accent-blue:#4285F4;--ds-accent-blue-dark:#3367D6;--ds-accent-red:#DB4437;--ds-interactive-bg:rgba(66,133,244,.1);--ds-interactive-hover:rgba(66,133,244,.2);--ds-list-bg:#d0d0d0;}
+        @font-face{font-family:"Rodin";src:url("/content/common/fonts/FOT-RodinNTLG Pro DB.otf") format("opentype");}
+        body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;font-family:"Rodin",sans-serif;overflow:hidden;-webkit-font-smoothing:none;}
+        .ds-container{width:100%;max-width:400px;height:100%;max-height:480px;aspect-ratio:400/480;background:#000;user-select:none;overflow:hidden;display:flex;flex-direction:column;align-items:center;position:relative;}
+        .top-screen{width:100%;height:50%;background:var(--ds-bg);flex-shrink:0;position:relative;overflow:hidden;}
+        .article-image{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transition:opacity .4s ease-in-out;}
+        .three-d-canvas{display:block;width:100%;height:100%;position:absolute;top:0;left:0;z-index:1;}
+        .bottom-screen{width:320px;height:240px;margin:0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding-top:0;box-sizing:border-box;background:var(--ds-bg);border-radius:0;box-shadow:none;}
+        .page-view{width:100%;height:100%;display:flex;flex-direction:column;position:absolute;top:0;left:0;opacity:0;visibility:hidden;transition:opacity .3s ease,transform .3s ease;transform:translateY(15px);pointer-events:none;background-color:transparent;}
+        .page-view.active{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+        .article-display-page{background:transparent;}
+        .accepted-page{background:transparent;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-bottom:40px;box-sizing:border-box;}
+        .accepted-tabs-content-wrapper{flex-grow:1;justify-content:center;width:100%;max-width:320px;position:relative;}
+        .accepted-tab-panel{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s ease;}
+        .accepted-tab-panel.hidden{display:none;}
+        .accepted-tab-panel:not(.hidden){opacity:1;visibility:visible;}
+        .article-header-section{padding:10px 0;flex-shrink:0;width:100%;height:90px;box-sizing:border-box;position:relative;overflow:hidden;}
+        .article-header-section .header-bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1;}
+        .article-title-bar{display:flex;justify-content:space-between;align-items:center;padding:0 10px;height:60px;}
+        .article-main-title{display:block;flex-grow:1;line-height:0;max-width:calc(100% - 34px);}
+        .article-meta-info{display:block;margin:0 10px;width:calc(100% - 20px);height:20px;}
+        .article-body-section{flex-grow:1;display:flex;position:relative;overflow:hidden;width:calc(100% - 20px);margin:0 auto;}
+        .article-scroll-wrapper{overflow-y:auto;scrollbar-width:none;height:110px;position:relative;width:100%;padding-right:6px;}
+        .article-scroll-wrapper::-webkit-scrollbar{display:none;}
+        .article-main-content-canvas{display:block;height:auto;width:100%;margin:0 auto;cursor:pointer;}
+        .article-html-embed-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
+        .article-html-embed-overlay > iframe{pointer-events:auto;border-radius:6px;box-shadow:0 4px 8px rgba(0,0,0,.2);}
+        button{all:unset;}
+        .ui-canvas-button{display:block;cursor:pointer;padding:0;border:none;margin:0;outline:none;height:40px;width:auto;position:relative;}
+        .ui-canvas-button canvas{width:100%;height:100%;transition:none;}
+        .ui-canvas-button:disabled{cursor:not-allowed;opacity:.6;}
+        .ui-custom-scrollbar{position:absolute;right:0;top:0;bottom:0;flex-shrink:0;padding:0 4px;cursor:grab;z-index:2;}
+        .article-action-footer{display:flex;justify-content:center;align-items:center;position:absolute;bottom:0;left:0;right:0;height:40px;padding:0;box-sizing:border-box;}
+        .article-action-footer .flex.w-full{width:100%;}
+        .btn-back,.btn-accept,.btn-full-width-close{display:flex;align-items:center;justify-content:center;gap:5px;}
+        .btn-full-width-close{width:100%;}
+        .scrollable-rules-wrapper{overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-right:6px;}
+        .scrollable-rules-wrapper::-webkit-scrollbar{display:none;}
+        .rules-content-canvas{display:block;height:auto;width:100%;}
+        .app-bottom-navigation{position:absolute;bottom:0;left:0;width:100%;height:40px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -2px 10px rgba(0,0,0,.1);background:var(--ds-list-bg);z-index:100;}
+        .app-bottom-navigation .ui-canvas-button{height:40px;box-shadow:0 2px 4px rgba(0,0,0,.2);}
+        .app-bottom-navigation .ui-canvas-button.active canvas{filter:brightness(1.2);}
+        .sub-tab-navigation{width:32px;flex-shrink:0;height:100%;box-sizing:border-box;padding:0;gap:0;}
+        .sub-tab-navigation .ui-canvas-button{width:100%;margin-bottom:0;height:32px;width:32px;}
+        .sub-tab-content-display{flex-grow:1;height:100%;overflow-y:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;box-sizing:border-box;position:relative;}
+        .sub-tab-content-display::-webkit-scrollbar{display:none;}
+        .sub-tab-content-wrapper{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;visibility:hidden;transition:opacity .3s ease;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:10px;box-sizing:border-box;overflow-y: auto;scrollbar-width: none;-webkit-overflow-scrolling: touch;}
+        .sub-tab-content-wrapper::-webkit-scrollbar {display: none;}
+        .sub-tab-content-wrapper.hidden{display:none;}
+        .sub-tab-content-wrapper:not(.hidden){opacity:1;visibility:visible;}
+        .sub-tab-background-canvas{display:block;width:100%;height:100%;position:absolute;top:0;left:0;z-index:0;}
+        .share-button{height:24px;width:24px;}
+        .nav-arrow{display:block;cursor:default;padding:0;border:none;margin:0;outline:none;height:40px;width:20px;position:relative;opacity:.8;flex-shrink:0;}
+        .nav-arrow canvas{width:100%;height:100%;}
+        .canvas-input-wrapper{width:calc(100% - 20px);height:36px;margin-top:10px;margin-bottom:10px;position:relative;outline:none;flex-shrink:0;}
+        .canvas-input-wrapper canvas{position:absolute;top:0;left:0;width:100%;height:100%;}
+        .color-selector-grid {display: grid;grid-template-columns: repeat(6, 1fr);gap: 5px;width: 100%;max-width: 300px;margin-top: 10px;padding: 5px;box-sizing: border-box;pointer-events: auto;}
+        .color-selector-button {width: 30px;height: 30px;border-radius: 4px;cursor: pointer;box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .color-selector-button:active {transform: translateY(1px);box-shadow: 0 1px 2px rgba(0,0,0,0.2);}
+        .upload-button {margin-top: 10px;margin-bottom: 10px;}
+    </style>
+</head>
+
+<body>
+    <div class="ds-container" id="app-root"></div>
+
+    <script type="module">
+            import * as THREE from 'three';
+            import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
+            import {
+                UIComponent,
+                ImageManager,
+                TextCanvasMeasurer,
+                Scrollbar,
+                CanvasButton,
+                CanvasInput,
+                RichTextRenderer,
+                Article
+            } from '/content/common/utils/index.js';
+
+            // Define tabContentData globally or in a scope accessible by AnnouncementsApp
+            const tabContentData = {
+                welcomeMessage: { // Renamed from rulesAcceptedMessage
+                    titleKey: "acceptedView.title",
+                    messageKey: "acceptedView.message"
+                },
+                teams: {
+                    subTabs: [
+                        { id: 'teamLeader', sprite: 'teamLeader', contentKey: 'acceptedView.teamsContentTeamLeader', placeholderKey: 'acceptedView.teamLeaderPlaceholder' },
+                        { id: 'member1', sprite: 'member1', contentKey: 'acceptedView.teamsContentMember1', placeholderKey: 'acceptedView.member1Placeholder' },
+                        { id: 'member2', sprite: 'member2', contentKey: 'acceptedView.teamsContentMember2', placeholderKey: 'acceptedView.member2Placeholder' },
+                        { id: 'substitute1', sprite: 'substitute1', contentKey: 'acceptedView.teamsContentSubstitute1', placeholderKey: 'acceptedView.substitute1Placeholder' },
+                        { id: 'substitute2', sprite: 'substitute2', contentKey: 'acceptedView.teamsContentSubstitute2', placeholderKey: 'acceptedView.substitute2Placeholder' },
+                        { id: 'teamName', sprite: 'teamName', contentKey: 'acceptedView.teamsContentTeamName', placeholderKey: 'acceptedView.teamNamePlaceholder' }
+                    ]
+                },
+                emblem: {
+                    subTabs: [
+                        { id: 'design', sprite: 'design', contentKey: 'acceptedView.emblemContentDesign' },
+                        { id: 'upload', sprite: 'upload', contentKey: 'acceptedView.emblemContentUpload' }
+                    ]
+                },
+                submit: {
+                    titleKey: "acceptedView.submitTab",
+                    messageKey: "acceptedView.submitContent"
+                }
+            };
+
+            const hardcodedArticle = {
+                slug: "contest-rules",
+                title: "Official Contest Rules",
+                author: "Contest Admin",
+                publisher: "Game Events",
+                date: "2025-07-15T12:00:00Z",
+                image: "https://placehold.co/400x240/ADD8E6/000000?text=Contest+Rules+Header",
+                tags: ["Contest", "Rules", "Event"],
+                content: `
+Welcome to the inaugural Game Contest! Please read these rules carefully.
+
+---
+
+**Eligibility:**
+* Participants must be at least 13 years of age.
+* Teams must consist of 3 main members and up to 2 substitutes.
+* All team members must have a valid game account.
+
+**Submission Guidelines:**
+* Team names must be appropriate and family-friendly.
+* Emblems must be original and not infringe on any copyrights.
+* Emblem images should ideally be square for best display.
+
+**Prizes:**
+* **1st Place:** Exclusive in-game title and rare cosmetic item.
+* **2nd Place:** Unique in-game pet.
+* **3rd Place:** Bundle of in-game currency.
+
+---
+
+`
+            };
+
+            class AnnouncementsApp extends UIComponent {
+                constructor(rootElementId, tabContentData) {
+                    super();
+                    this.rootElementId = rootElementId;
+                    this.container = document.getElementById(rootElementId);
+                    this.translations = {};
+                    this.subTabContentHeights = new Map();
+                    this.articleTitleTextWidth = 256;
+                    this.articleContentTextWidth = 300;
+                    this.articleTitleLineSpacingFactor = 1.2;
+
+                    this.threeDSceneManager = null;
+                    this.dsContainerWidth = 320;
+                    this.dsContainerHeight = 240;
+                    this.rulesAccepted = localStorage.getItem('rulesAccepted') === 'true';
+                    this.errorTimer = null;
+
+                    this.tabContentData = tabContentData;
+
+                    this.imageManager = new ImageManager();
+                    this.richTextRenderer = new RichTextRenderer(this);
+                    this.hyperlinks = [];
+                    this.checkboxes = [];
+                    this.userTimeZone = luxon.DateTime.local().zoneName;
+                    this.cssVars = {
+                        '--ds-text': '#1a1a1a',
+                        '--ds-text-subtle': '#666',
+                        'blockSpacing': 10
+                    };
+                }
+
+                t(key, replacements = {}) {
+                    const keys = key.split('.');let value = this.translations;
+                    for (const k of keys) value = value ? value[k] : undefined;
+                    let str = value || key;
+                    for (const placeholder in replacements) str = str.replace(`{${placeholder}}`, replacements[placeholder]);
+                    return str;
+                }
+
+                _drawTextOnCanvas(ctx, text, x, y, font, color, align, baseline, maxWidth, lineSpacingFactor = 1.5) {
+                    ctx.font = font;
+                    ctx.fillStyle = color;
+                    ctx.textAlign = align;
+                    ctx.textBaseline = baseline;
+
+                    const measurer = new TextCanvasMeasurer();
+                    const lines = measurer.getWrappedTextLines(text, font, maxWidth);
+                    const lineHeight = measurer.getLineHeight(font) * lineSpacingFactor;
+
+                    lines.forEach((line, index) => {
+                        ctx.fillText(line, x, y + index * lineHeight);
+                    });
+                }
+
+                loadTranslations() {
+                    // Logic for loading translations (if needed)
+                }
+
+                _showAppError(message) {
+                    // Removed message box logic. Now logs to console.
+                    console.error("App Error:", message);
+                }
+
+                async start() {
+                    this.container.innerHTML = ''; // Clear the container
+
+                    const articleData = hardcodedArticle; // Replace with dynamic article loading if needed
+
+                    const topScreen = document.createElement('div');
+                    topScreen.className = 'top-screen';
+                    this.container.appendChild(topScreen);
+
+                    const image = document.createElement('img');
+                    image.src = articleData.image;
+                    image.alt = articleData.title;
+                    image.className = 'article-image';
+                    topScreen.appendChild(image);
+
+                    const bottomScreen = document.createElement('div');
+                    bottomScreen.className = 'bottom-screen';
+                    this.container.appendChild(bottomScreen);
+
+                    const articleComponent = new Article({
+                        appInstance: this,
+                        article: articleData,
+                        onClose: () => console.log("Article closed."),
+                        onShare: () => console.log("Article shared.")
+                    });
+                    bottomScreen.appendChild(articleComponent.element);
+
+
+                    // Hide loading spinner or any other loading indication
+                    // this.messageCanvas.style.display = 'none';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const app = new AnnouncementsApp('app-root', tabContentData);
+                app.start();
+            });
+    </script>
+</body>
+
+</html>

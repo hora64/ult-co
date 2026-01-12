@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLB to FFLShaderMaterial Test - Dual Screen</title>
+    <!-- Tailwind CSS CDN for basic styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+                "OrbitControls": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/OrbitControls.js",
+                "GLTFLoader": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js"
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom styles for the 3DS look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000; /* Fully black background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensure it takes full viewport height */
+            margin: 0;
+            overflow: hidden; /* Hide scrollbars if content overflows slightly */
+            position: relative; /* For positioning global navigation buttons */
+        }
+
+        .ds-container {
+            width: 400px;
+            height: 480px; /* Adjusted height to remove the gap */
+            background: #000000; /* Fully black background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transform-style: preserve-3d; /* For potential 3D effects later */
+            border-radius: 0; /* Removed rounded corners */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* Subtle shadow for depth */
+        }
+
+        .top-screen, .bottom-screen {
+            background-color: #FFECB3; /* Lighter yellow background for screens */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Hide anything outside screen bounds */
+            border-radius: 0; /* Removed rounded corners from screens */
+        }
+
+        .top-screen {
+            width: 400px;
+            height: 240px;
+            position: relative; /* Needed for absolute positioning of message box */
+            background: linear-gradient(180deg, #FFF8DC, #FFECB3); /* Cream to lighter yellow gradient */
+        }
+
+        .bottom-screen {
+            width: 320px; /* Slightly narrower for bottom screen */
+            height: 240px;
+            box-sizing: border-box; /* Include padding in width/height */
+            flex-shrink: 0; /* Prevent shrinking */
+            position: relative; /* For absolute positioning of tab content and buttons */
+            background: linear-gradient(180deg, #FFECB3, #FFD700); /* Lighter yellow to gold gradient */
+            display: grid; /* Use CSS Grid for layout */
+            grid-template-columns: 60px 1fr; /* Left sidebar and main content */
+            grid-template-rows: 1fr; /* Only one row for the content area on the right */
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Interactive elements styling */
+        .tab-content-container {
+            grid-column: 2 / 3; /* Main content area */
+            grid-row: 1 / 2; /* Occupy the single row */
+            display: flex;
+            flex-direction: column; /* Changed to column to stack elements */
+            justify-content: flex-start; /* Align content to the top */
+            align-items: center;
+            padding: 1rem; /* Add some padding */
+            box-sizing: border-box;
+            position: relative; /* For absolute positioning of tab pages and bottom nav */
+            overflow-y: auto; /* Enable scrolling for content */
+        }
+
+        .tab-page {
+            width: 100%;
+            height: auto; /* Allow height to adjust to content */
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 0.75rem;
+            justify-content: flex-start; /* Align content to the top within page */
+            align-items: center;
+            color: #333; /* Darker text for contrast on bright background */
+            text-align: center;
+            padding-bottom: 50px; /* Add padding for bottom navigation bar */
+            box-sizing: border-box;
+        }
+
+        .tab-page.active {
+            display: flex; /* Show active page */
+        }
+
+        .interactive-elements input[type="text"],
+        .interactive-elements textarea,
+        .interactive-elements input[type="file"],
+        .interactive-elements select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #FFC107;
+            background: linear-gradient(180deg, #FFF8DC, #FFECB3);
+            color: #333;
+            font-size: 1rem;
+            text-align: center;
+            border-radius: 0.5rem;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .interactive-elements textarea {
+            min-height: 80px;
+            resize: vertical;
+            text-align: left;
+        }
+
+        .interactive-elements input[type="file"] {
+            text-align: left;
+            padding-left: 0.75rem;
+        }
+        .interactive-elements input[type="file"]::-webkit-file-upload-button {
+            background: linear-gradient(180deg, #FFD700, #FFA500);
+            color: #333;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .interactive-elements input[type="file"]::-webkit-file-upload-button:hover {
+            background: linear-gradient(180deg, #FFA500, #FFD700);
+        }
+
+        .interactive-elements input[type="text"]::placeholder,
+        .interactive-elements textarea::placeholder,
+        .interactive-elements select option {
+            color: #666;
+        }
+
+        /* Navigation Buttons within bottom screen (Removed as they are now in bottom-nav-bar) */
+        .nav-button {
+            display: none; /* Hide old nav-buttons */
+        }
+
+        .message-box {
+            background-color: #FFEBEE;
+            color: #D32F2F;
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.9rem;
+            border: 1px solid #EF9A9A;
+            width: 100%;
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #messageContent {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+
+        /* New styles for color buttons rendered on canvas */
+        #colorPickerCanvas {
+            background: linear-gradient(180deg, #FFF8DC, #FFECB3); /* Cream to light yellow gradient */
+            border: 1px solid #FFC107;
+            border-radius: 0.5rem;
+            touch-action: none; /* Prevent default touch actions like scrolling */
+        }
+
+        /* Tab navigation sidebar on the left */
+        .tab-sidebar {
+            grid-column: 1 / 2;
+            grid-row: 1 / 2; /* Span the single row */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1a1a1a; /* Darker background for sidebar */
+            padding: 1rem 0.5rem;
+            border-right: 1px solid #444;
+            box-sizing: border-box;
+            gap: 1rem; /* Space between sidebar buttons */
+        }
+
+        .tab-sidebar-button {
+            background: none;
+            border: none;
+            color: #bbb;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            transition: color 0.2s ease-in-out;
+            font-size: 0.65rem; /* Smaller font size for sidebar buttons */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            width: 100%; /* Make buttons fill sidebar width */
+        }
+
+        .tab-sidebar-button.active {
+            color: #FFD700; /* Gold color for active tab */
+            font-weight: bold;
+        }
+
+        .tab-sidebar-button svg {
+            width: 24px; /* Smaller icons for sidebar */
+            height: 24px;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Bottom navigation bar (now inside tab-content-container) */
+        .bottom-nav-bar {
+            position: absolute; /* Position relative to .tab-content-container */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: flex-end; /* Align to the right */
+            align-items: center;
+            height: 40px; /* Smaller height for the nav bar */
+            background-color: #222; /* Dark background */
+            border-top: 1px solid #444;
+            padding: 0 0.5rem; /* Smaller padding */
+            box-sizing: border-box;
+            gap: 0.5rem; /* Space between buttons */
+        }
+
+        .bottom-nav-button {
+            background: linear-gradient(180deg, #FFD700, #FFA500);
+            color: #333;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            padding: 0.3rem 0.8rem; /* Smaller padding for buttons */
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: background 0.2s ease-in-out;
+        }
+
+        .bottom-nav-button:hover {
+            background: linear-gradient(180deg, #FFA500, #FFD700);
+        }
+
+        .bottom-nav-button:active {
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Icons for bottom navigation */
+        .bottom-nav-button svg {
+            width: 18px; /* Smaller icons for bottom nav */
+            height: 18px;
+            fill: #333;
+        }
+    </style>
+
+</head>
+<body class="bg-black p-4 font-sans flex flex-col items-center min-h-screen text-white">
+
+    <div class="ds-container">
+        <!-- Top Screen: Three.js Canvas -->
+        <div class="top-screen">
+            <canvas id="myCanvas" width="400" height="240" data-engine="three.js r158"></canvas>
+        </div>
+
+        <!-- Bottom Screen: Interactable UI -->
+        <div class="bottom-screen">
+            <!-- Left Sidebar for Tabs -->
+            <div class="tab-sidebar">
+                <button id="tabButtonCustomization" class="tab-sidebar-button active">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette"><circle cx="12" cy="12" r="10"/><path d="M16.5 7.5l-9 9"/><path d="M15 11l-4 4"/><path d="M12 14l-1 1"/></svg>
+                    <span>Customize</span>
+                </button>
+                <button id="tabButtonAnimation" class="tab-sidebar-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-film"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7h18"/><path d="M3 17h18"/><path d="M17 3v18"/></svg>
+                    <span>Animate</span>
+                </button>
+                <!-- Add more sidebar buttons here as needed -->
+            </div>
+
+            <div class="tab-content-container">
+                <!-- Customization Tab Content -->
+                <div id="customizationTab" class="tab-page active">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-200">Base Color</h3>
+                    <canvas id="colorPickerCanvas" width="280" height="150"></canvas>
+                    <h3 class="text-lg font-semibold mt-4 mb-2 text-gray-200">Emblem Controls</h3>
+                    <button id="loadSecondTextureButton" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors text-sm w-full">Load Texture (Emblem)</button>
+                </div>
+
+                <!-- Animation Tab Content -->
+                <div id="animationTab" class="tab-page">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-200">Animation Controls</h3>
+                    <div class="flex flex-col gap-2 w-full max-w-xs">
+                        <button id="playAnimation0" class="px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors text-sm">Play Animation 0</button>
+                        <button id="playAnimation1" class="px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors text-sm">Play Animation 1</button>
+                        <button id="stopAnimations" class="px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition-colors text-sm">Stop Animations</button>
+                    </div>
+                </div>
+
+                <!-- Bottom Navigation Bar (right side, now inside tab-content-container) -->
+                <div class="bottom-nav-bar">
+                    <button class="bottom-nav-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-left"><path d="m11 17l-5-5 5-5"/><path d="m18 17l-5-5 5-5"/></svg>
+                    </button>
+                    <button class="bottom-nav-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevrons-right"><path d="m13 17 5-5-5-5"/><path d="m6 17 5-5-5-5"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Message Box -->
+    <div id="messageBox" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+            <p id="messageContent" class="text-lg font-semibold text-gray-800 mb-4"></p>
+            <button id="closeMessageBox" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">OK</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'GLTFLoader';
+        import { OrbitControls } from 'OrbitControls';
+
+        // ==============================================
+        // FFLShaderMaterial.js content (embedded)
+        // ==============================================
+
+        /**
+         * @typedef {number} FFLModulateMode
+         * @typedef {number} FFLModulateType
+         * @typedef {number} FFLBlendMode
+         * @typedef {import('three')} THREE
+         */
+
+        /**
+         * @typedef {Object} FFLShaderMaterialParameters
+         * @property {FFLModulateMode} [modulateMode] - Modulate mode.
+         * @property {FFLModulateType} [modulateType] - Modulate type.
+         * @property {FFLBlendMode} [blendMode] - Blending mode for second texture.
+         * @property {import('three').Color|Array<import('three').Color>} [color] -
+         * Constant color assigned to u_const1/2/3 depending on single or array.
+         * @property {boolean} [lightEnable] - Enable lighting. Needs to be off when drawing faceline/mask textures.
+         * @property {import('three').Vector3} [lightDirection] - Light direction.
+         * @property {boolean} [useSpecularModeBlinn] - Whether to override
+         * specular mode on all materials with 0 (Blinn-Phong specular).
+         * @property {import('three').Texture} [map] - Texture map.
+         * @property {import('three').Texture} [map2] - Second texture map for blending.
+         * @property {number} [emblemScale] - Scale factor for the emblem texture.
+         * @property {number} [blendIntensity] - Intensity for texture blending.
+         * @property {number} [time] - Current time for animation.
+         */
+
+        // ---------------------------------------------------------------------
+        // Vertex Shader for FFLShaderMaterial
+        // Derived from MiiDefaultShader.vsh found in Miitomo.
+        // ---------------------------------------------------------------------
+        const _FFLShader_vert = /* glsl */ `
+// Input attribute variables to the vertex shader
+//attribute vec4 position;          //!< Input: Position information
+//attribute vec2 uv;                //!< Input: Texture coordinates
+//attribute vec3 normal;            //!< Input: Normal vector
+// All provided by three.js ^^
+
+// Vertex color is not actually the color of the shape, as such
+// it is a custom attribute _COLOR in the glTF
+
+attribute vec4 _color;             //!< Input: Vertex color
+attribute vec3 tangent;            //!< Input: Tangent vector
+
+// Output to fragment shader
+varying    vec4 v_color;          //!< Output: Vertex color
+varying    vec4 v_position;         //!< Output: Position information
+varying    vec3 v_normal;           //!< Output: Normal vector
+// NOTE: ^^ Those two need to be highp to avoid weird black dot issue on Android
+varying mediump vec3 v_tangent;            //!< Output: Tangent vector
+varying mediump vec2 v_texCoord;           //!< Output: Texture coordinates
+
+// Uniforms
+//uniform mat3 normalMatrix;          //!< Uniform: Normal matrix of the model
+//uniform mat4 modelViewMatrix;         //!< Uniform: Projection matrix
+//uniform mat4 projectionMatrix;          //!< Uniform: Model matrix
+// All provided by three.js ^^
+
+uniform float u_time; // For flag animation
+uniform int u_mode; // To check if it's the flag material (FFL_MODULATE_MODE_TEXTURE_DIRECT)
+
+#define FFL_MODULATE_MODE_TEXTURE_DIRECT 1
+
+// skinning_pars_vertex.glsl.js
+#ifdef USE_SKINNING
+    uniform mat4 bindMatrix;
+    uniform mat4 bindMatrixInverse;
+    uniform highp sampler2D boneTexture;
+    mat4 getBoneMatrix( const in float i ) {
+        int size = textureSize( boneTexture, 0 ).x;
+        int j = int( i ) * 4;
+        int x = j % size;
+        int y = j / size;
+        vec4 v1 = texelFetch( boneTexture, ivec2( x, y ), 0 );
+        vec4 v2 = texelFetch( boneTexture, ivec2( x + 1, y ), 0 );
+        vec4 v3 = texelFetch( boneTexture, ivec2( x + 2, y ), 0 );
+        vec4 v4 = texelFetch( boneTexture, ivec2( x + 3, y ), 0 );
+        return mat4( v1, v2, v3, v4 );
+    }
+#endif
+
+void main()
+{
+
+    // begin_vertex.glsl.js
+    vec3 transformed = vec3( position );
+// skinbase_vertex.glsl.js
+#ifdef USE_SKINNING
+    mat4 boneMatX = getBoneMatrix( skinIndex.x );
+    mat4 boneMatY = getBoneMatrix( skinIndex.y );
+    mat4 boneMatZ = getBoneMatrix( skinIndex.z );
+    mat4 boneMatW = getBoneMatrix( skinIndex.w );
+    // skinning_vertex.glsl.js
+    vec4 skinVertex = bindMatrix * vec4( transformed, 1.0 );
+    vec4 skinned = vec4( 0.0 );
+    skinned += boneMatX * skinVertex * skinWeight.x;
+    skinned += boneMatY * skinVertex * skinWeight.y;
+    skinned += boneMatZ * skinVertex * skinWeight.z;
+    skinned += boneMatW * skinVertex * skinWeight.w;
+    transformed = ( bindMatrixInverse * skinned ).xyz;
+#endif
+
+    // Apply flag-like animation only to the flag material (u_mode == FFL_MODULATE_MODE_TEXTURE_DIRECT)
+    // This creates a wave effect predominantly in the X-axis with slight Y-axis movement.
+    // The wave originates from the "leftmost" side of the flag (lower X values).
+    if (u_mode == FFL_MODULATE_MODE_TEXTURE_DIRECT) {
+        float waveAmplitudeX = 0.0; // Main movement in X (horizontal wave)
+        float waveAmplitudeY = 0.0; // Slight movement in Y (vertical ripple)
+        float waveFrequency = 5.0; // Number of waves along the flag's length
+        float waveSpeed = 2.0; // Speed of the wave animation
+
+        // Use transformed.x to scale the amplitude, making it 0 at the pole (assuming pole is at x=0).
+        // Clamp to prevent excessive amplitude for very wide flags.
+        float poleDistanceFactor = clamp(transformed.x * 2.0, 0.0, 1.0); 
+
+        // Main movement in X (horizontal wave)
+        float displacementX = sin(transformed.x * waveFrequency + u_time * waveSpeed) * waveAmplitudeX * poleDistanceFactor;
+        
+        // Slight movement in Y (vertical ripple)
+        float displacementY = cos(transformed.x * waveFrequency * 1.5 + u_time * waveSpeed * 0.8) * waveAmplitudeY * poleDistanceFactor;
+
+        transformed.x += displacementX;
+        transformed.y += displacementY;
+    }
+
+
+    // Transform vertex coordinates
+    v_position = modelViewMatrix * vec4(transformed, 1.0);
+    gl_Position =  projectionMatrix * v_position;
+
+    vec3 objectNormal = normal;
+    vec3 objectTangent = tangent.xyz;
+// skinnormal_vertex.glsl.js
+#ifdef USE_SKINNING
+    mat4 skinMatrix = mat4( 0.0 );
+    skinMatrix += skinWeight.x * boneMatX;
+    skinMatrix += skinWeight.y * boneMatY;
+    skinMatrix += skinWeight.z * boneMatZ;
+    skinMatrix += skinWeight.w * boneMatW;
+    skinMatrix = bindMatrixInverse * skinMatrix * bindMatrix;
+
+    objectNormal = vec4( skinMatrix * vec4( objectNormal, 0.0 ) ).xyz;
+    objectTangent = vec4( skinMatrix * vec4( objectTangent, 0.0 ) ).xyz;
+
+#endif
+
+    // Transform normal
+    v_normal = normalize(normalMatrix * objectNormal);
+
+    // Output other information
+    v_texCoord = uv;
+    // Safe normalize
+    if (tangent != vec3(0.0, 0.0, 0.0))
+    {
+        v_tangent = normalize(normalMatrix * objectTangent);
+    }
+    else
+    {
+        v_tangent = vec3(0.0, 0.0, 0.0);
+    }
+
+    v_color = _color;
+}
+`;
+
+        // ---------------------------------------------------------------------
+        // Fragment Shader for FFLShaderMaterial
+        // Mostly unmodified from MiiDefaultShader.fsh found in Miitomo.
+        // ---------------------------------------------------------------------
+        const _FFLShader_frag = /* glsl */ `
+//
+//  sample.flg
+//  Fragment shader
+//  Copyright (c) 2014 Nintendo Co., Ltd. All rights reserved.
+//
+//
+
+#ifdef GL_ES
+precision mediump float;
+#else
+#   define lowp
+#   define mediump
+#   define highp
+#endif
+
+
+//
+//  Constant Definitions
+//
+
+/// Modulation modes
+#define FFL_MODULATE_MODE_CONSTANT      0
+#define FFL_MODULATE_MODE_TEXTURE_DIRECT 1
+#define FFL_MODULATE_MODE_RGB_LAYERED   2
+#define FFL_MODULATE_MODE_ALPHA         3
+#define FFL_MODULATE_MODE_LUMINANCE_ALPHA 4
+#define FFL_MODULATE_MODE_ALPHA_OPA     5
+
+/// Specular modes
+#define FFL_SPECULAR_MODE_BLINN 0
+#define FFL_SPECULAR_MODE_ANISO 1
+
+/// Light ON/OFF
+#define FFL_LIGHT_MODE_DISABLE 0
+#define FFL_LIGHT_MODE_ENABLE 1
+
+/// Blending Modes for additional textures
+#define FFL_BLEND_MODE_NONE      0
+#define FFL_BLEND_MODE_ADD       1
+#define FFL_BLEND_MODE_MULTIPLY  2
+#define FFL_BLEND_MODE_SCREEN    3
+
+
+//
+//  Function Definitions
+//
+
+/**
+ * @brief Calculates anisotropic specular reflection.
+ * @param[in] light          Light direction
+ * @param[in] tangent Tangent vector
+ * @param[in] eye            Eye direction
+ * @param[in] power          Sharpness/Power
+ */
+mediump float calculateAnisotropicSpecular(mediump vec3 light, mediump vec3 tangent, mediump vec3 eye, mediump float power )
+{
+    mediump float dotLT = dot(light, tangent);
+    mediump float dotVT = dot(eye, tangent);
+    mediump float dotLN = sqrt(1.0 - dotLT * dotLT);
+    mediump float dotVR = dotLN*sqrt(1.0 - dotVT * dotVT) - dotLT * dotVT;
+
+    return pow(max(0.0, dotVR), power);
+}
+
+/**
+ * @brief Calculates Blinn-Phong specular reflection.
+ * @param[in] light          Light direction
+ * @param[in] normal  Normal vector
+ * @param[in] eye            Eye direction
+ * @param[in] power          Sharpness/Power
+ */
+mediump float calculateBlinnSpecular(mediump vec3 light, mediump vec3 normal, mediump vec3 eye, mediump float power)
+{
+    return pow(max(dot(reflect(-light, normal), eye), 0.0), power);
+}
+
+/**
+ * @brief Blends anisotropic and Blinn-Phong specular values.
+ * @param[in] blend Blend factor
+ * @param[in] blinn Blinn value
+ * @param[in] aniso Anisotropic value
+ */
+mediump float calculateSpecularBlend(mediump float blend, mediump float blinn, mediump float aniso)
+{
+    return mix(aniso, blinn, blend);
+}
+
+/**
+ * @brief Calculates ambient color.
+ * @param[in] light          Light color
+ * @param[in] material Material color
+ */
+mediump vec3 calculateAmbientColor(mediump vec3 light, mediump vec3 material)
+{
+    return light * material;
+}
+
+/**
+ * @brief Calculates diffuse color.
+ * @param[in] light          Light color
+ * @param[in] material Material color
+ * @param[in] ln             Dot product of light and normal
+ */
+mediump vec3 calculateDiffuseColor(mediump vec3 light, mediump vec3 material, mediump float ln)
+{
+    return light * material * ln;
+}
+
+/**
+ * @brief Calculates specular color.
+ * @param[in] light          Light color
+ * @param[in] material       Material color
+ * @param[in] reflection Reflection factor
+ * @param[in] strength   Strength
+ */
+mediump vec3 calculateSpecularColor(mediump vec3 light, mediump vec3 material, mediump float reflection, mediump float strength)
+{
+    return light * material * reflection * strength;
+}
+
+/**
+ * @brief Calculates rim lighting color.
+ * @param[in] color          Rim color
+ * @param[in] normalZ Normal's Z-component
+ * @param[in] width          Rim width
+ * * @param[in] power          Rim sharpness
+ */
+mediump vec3 calculateRimColor(mediump vec3 color, mediump float normalZ, mediump float width, mediump float power)
+{
+    return color * pow(width * (1.0 - abs(normalZ)), power);
+}
+
+/**
+ * @brief Calculates dot product of light direction and normal.
+ * @note Special implementation.
+ */
+mediump float calculateDot(mediump vec3 light, mediump vec3 normal)
+{
+    return max(dot(light, normal), 0.1);
+}
+
+// Varying variables from vertex shader
+varying mediump vec4 v_color;           //!< Output: Vertex color
+varying highp    vec4 v_position;          //!< Output: Position
+varying highp    vec3 v_normal;            //!< Output: Normal vector
+// NOTE: ^^ Those two need to be highp to avoid weird black dot issue on Android
+varying mediump vec3 v_tangent;           //!< Output: Tangent vector
+varying mediump vec2 v_texCoord;          //!< Output: Texture coordinates
+
+/// Constant colors
+uniform mediump vec4  u_const1; ///< const color 1
+uniform mediump vec4  u_const2; ///< const color 2
+uniform mediump vec4  u_const3; ///< const color 3
+
+/// Light settings
+uniform mediump vec3 u_light_ambient;  ///< Ambient light color in camera space
+uniform mediump vec3 u_light_diffuse;  ///< Diffuse light color
+uniform mediump vec3 u_light_dir;      ///< Light direction
+uniform bool u_light_enable;           ///< Enable/Disable lighting
+uniform mediump vec3 u_light_specular; ///< Specular light intensity
+
+/// Material settings
+uniform mediump vec3 u_material_ambient;           ///< Ambient material setting
+uniform mediump vec3 u_material_diffuse;           ///< Diffuse material setting
+uniform mediump vec3 u_material_specular;          ///< Specular material setting
+uniform int u_material_specular_mode;             ///< Specular reflection mode
+uniform mediump float u_material_specular_power; ///< Specular sharpness
+uniform float u_brightness; ///< Brightness multiplier
+uniform float u_gamma;
+uniform float u_ambientIntensity;
+uniform float u_diffuseIntensity;
+/// Modulation setting
+uniform int u_mode;    ///< Drawing mode
+
+/// Rim settings
+uniform mediump vec3  u_rim_color;
+uniform mediump float u_rim_power;
+
+// Samplers
+uniform sampler2D s_texture;  // Original model texture
+uniform sampler2D s_texture2; // Second texture (emblem)
+uniform int u_blendMode;      // Blend mode for original texture over flagPrint
+uniform bool u_blendTextureEnabled; // Enable/disable emblem and blending
+uniform float u_emblemScale;  // Scale factor for the emblem texture
+uniform float u_blendIntensity; // Intensity for blending the original texture over flagPrint
+
+
+// -------------------------------------------------------
+// Main function
+void main()
+{
+    mediump vec4 originalModelTextureColor; // This will be the color from s_texture
+    mediump vec4 finalOutputColor; // This will be the final color before lighting
+
+    mediump float specularPower = u_material_specular_power;
+    mediump float rimWidth      = v_color.a;
+
+    // Get original model texture color (from s_texture)
+    if(u_mode == FFL_MODULATE_MODE_CONSTANT)
+    {
+        originalModelTextureColor = u_const1; // If no texture, use constant color as base
+    }
+    else if(u_mode == FFL_MODULATE_MODE_TEXTURE_DIRECT)
+    {
+        mediump vec4 texel = texture2D(s_texture, v_texCoord);
+        originalModelTextureColor = texel; // Use texture's own RGB and A
+    }
+    else if(u_mode == FFL_MODULATE_MODE_RGB_LAYERED)
+    {
+        mediump vec4 texel = texture2D(s_texture, v_texCoord);
+        originalModelTextureColor = vec4(texel.r * u_const1.rgb + texel.g * u_const2.rgb + texel.b * u_const3.rgb, u_const1.a * texel.a);
+    }
+    else if(u_mode == FFL_MODULATE_MODE_ALPHA)
+    {
+        mediump vec4 texel = texture2D(s_texture, v_texCoord);
+        originalModelTextureColor = vec4(u_const1.rgb, u_const1.a * texel.r);
+    }
+    else if(u_mode == FFL_MODULATE_MODE_LUMINANCE_ALPHA)
+    {
+        mediump vec4 texel = texture2D(s_texture, v_texCoord);
+        originalModelTextureColor = vec4(texel.g * u_const1.rgb, u_const1.a * texel.r);
+    }
+    else if(u_mode == FFL_MODULATE_MODE_ALPHA_OPA)
+    {
+        mediump vec4 texel = texture2D(s_texture, v_texCoord);
+        originalModelTextureColor = vec4(texel.r * u_const1.rgb, u_const1.a);
+    }
+
+    // Avoids little outline around mask elements
+    if(u_mode != FFL_MODULATE_MODE_CONSTANT && originalModelTextureColor.a == 0.0)
+    {
+        discard;
+    }
+
+    // Handle emblem (s_texture2) only if blending is enabled
+    if (u_blendTextureEnabled) {
+        // 1. Rotate 180 degrees: (uv - 0.5) * -1.0 + 0.5
+        // 2. Scale down and center: (rotatedTexCoord - 0.5) * u_emblemScale + 0.5
+        vec2 rotatedTexCoord = (v_texCoord - 0.5) * vec2(-1.0, -1.0) + 0.5;
+        vec2 scaledTexCoord = (rotatedTexCoord - 0.5) * u_emblemScale + 0.5;
+
+        mediump vec4 emblemColor;
+        // Check if scaledTexCoord is outside [0,1] range, and make it transparent if so
+        if (scaledTexCoord.x < 0.0 || scaledTexCoord.x > 1.0 ||
+            scaledTexCoord.y < 0.0 || scaledTexCoord.y > 1.0) {
+            emblemColor = vec4(0.0, 0.0, 0.0, 0.0); // Transparent outside emblem area
+        } else {
+            emblemColor = texture2D(s_texture2, scaledTexCoord);
+        }
+
+        // Calculate flagPrint: base color (u_const1) mixed with emblem (s_texture2)
+        // Using emblem's alpha to blend with u_const1
+        mediump vec4 flagPrint;
+        flagPrint.rgb = mix(u_const1.rgb, emblemColor.rgb, emblemColor.a);
+        // Combine alphas: if emblem is opaque, it dictates the alpha; otherwise, blend with base alpha
+        flagPrint.a = mix(u_const1.a, emblemColor.a, emblemColor.a);
+
+
+        // Now, lighten flagPrint using the original model texture (originalModelTextureColor)
+        // "Lightened via using" suggests a Screen blend mode.
+        switch (u_blendMode) { // Re-using u_blendMode for this new blend operation
+            case FFL_BLEND_MODE_ADD:
+                finalOutputColor.rgb = clamp(flagPrint.rgb + originalModelTextureColor.rgb, 0.0, 1.0);
+                finalOutputColor.a = flagPrint.a + originalModelTextureColor.a * (1.0 - flagPrint.a);
+                break;
+            case FFL_BLEND_MODE_MULTIPLY:
+                finalOutputColor.rgb = flagPrint.rgb * originalModelTextureColor.rgb;
+                finalOutputColor.a = flagPrint.a * originalModelTextureColor.a;
+                break;
+            case FFL_BLEND_MODE_SCREEN:
+                // Calculate screen blend result
+                vec3 screenResultRgb = 1.0 - (1.0 - flagPrint.rgb) * (1.0 - originalModelTextureColor.rgb);
+                float screenResultAlpha = 1.0 - (1.0 - flagPrint.a) * (1.0 - originalModelTextureColor.a);
+                
+                // Mix with original flagPrint based on u_blendIntensity
+                finalOutputColor.rgb = mix(flagPrint.rgb, screenResultRgb, u_blendIntensity);
+                finalOutputColor.a = mix(flagPrint.a, screenResultAlpha, u_blendIntensity);
+                break;
+            case FFL_BLEND_MODE_NONE:
+            default:
+                finalOutputColor = flagPrint; // If no blend mode, just use flagPrint
+                break;
+        }
+    } else {
+        // If blending is disabled (no emblem loaded or blendTextureEnabled is false),
+        // the originalModelTextureColor is the final color.
+        finalOutputColor = originalModelTextureColor;
+    }
+
+
+    if(u_light_enable)
+    {
+        /// Ambient light calculation
+        mediump vec3 ambient = calculateAmbientColor(u_light_ambient.xyz, u_material_ambient.xyz);
+
+        /// Normalize normal vector
+        mediump vec3 norm = normalize(v_normal);
+
+        /// Eye vector
+        mediump vec3 eye = normalize(-v_position.xyz);
+
+        // Light direction dot product
+        mediump float fDot = calculateDot(u_light_dir, norm);
+
+        /// Diffuse calculation
+        mediump vec3 diffuse = calculateDiffuseColor(u_light_diffuse.xyz, u_material_diffuse.xyz, fDot); // Corrected from u_material_diffuses
+
+        /// Specular calculation
+        mediump float specularBlinn = calculateBlinnSpecular(u_light_dir, norm, eye, u_material_specular_power);
+
+        /// Declare variable for specular value
+        mediump float reflection;
+        mediump float strength = v_color.g;
+        if(u_material_specular_mode == 0)
+        {
+            /// Blinn model
+            strength = 1.0;
+            reflection = specularBlinn;
+        }
+        else
+        {
+            /// Anisotropic model
+            mediump float specularAniso = calculateAnisotropicSpecular(u_light_dir, v_tangent, eye, u_material_specular_power);
+            reflection = calculateSpecularBlend(v_color.r, specularBlinn, specularAniso);
+        }
+        /// Get specular color
+        mediump vec3 specular = calculateSpecularColor(u_light_specular.xyz, u_material_specular.xyz, reflection, strength);
+
+        // Calculate rim color
+        mediump vec3 rimColor = calculateRimColor(u_rim_color.rgb, norm.z, rimWidth, u_rim_power);
+
+        // Final color calculation with lighting
+        vec3 baseLinearColor =  (ambient * u_ambientIntensity + diffuse * u_diffuseIntensity) * finalOutputColor.rgb * u_brightness;
+        vec3 gammaColor = pow(baseLinearColor, vec3(1.0 / u_gamma));
+
+        finalOutputColor.rgb = gammaColor + specular + rimColor;
+
+    }
+
+    // Apply brightness before output
+    gl_FragColor = vec4(finalOutputColor.rgb, finalOutputColor.a);
+}
+`;
+        // ---------------------------------------------------------------------
+        // FFLShaderMaterial Class
+        // ---------------------------------------------------------------------
+        /**
+         * Custom THREE.ShaderMaterial using the FFLShader.
+         * @augments {THREE.ShaderMaterial}
+         */
+        class FFLShaderMaterial extends THREE.ShaderMaterial {
+            // Default light and rim light uniforms.
+
+            /**
+             * Blending modes for additional textures.
+             * @enum {number}
+             */
+            static FFLBlendMode = {
+                NONE: 0,
+                ADD: 1,
+                MULTIPLY: 2,
+                SCREEN: 3
+            };
+
+            /**
+             * Default ambient light color.
+             * @type {import('three').Color}
+             */
+            static defaultLightAmbient = new THREE.Color(0.73, 0.73, 0.73) /* .convertSRGBToLinear() */ ;
+            /**
+             * Default diffuse light color.
+             * @type {import('three').Color}
+             */
+            static defaultLightDiffuse = new THREE.Color(0.6, 0.6, 0.6) /* .convertSRGBToLinear() */ ;
+            /**
+             * Default specular light color.
+             * @type {import('three').Color}
+             */
+            static defaultLightSpecular = new THREE.Color(0.7, 0.7, 0.7) /* .convertSRGBToLinear() */ ;
+            /**
+             * Default light direction.
+             * @type {import('three').Vector3}
+             */
+            static defaultLightDir = new THREE.Vector3(-0.4531539381, 0.4226179123, 0.7848858833);
+            /**
+             * Default rim color.
+             * @type {import('three').Color}
+             */
+            static defaultRimColor = new THREE.Color(0.3, 0.3, 0.3) /* .convertSRGBToLinear() */ ;
+            /**
+             * Default rim power (intensity).
+             * @type {number}
+             */
+            static defaultRimPower = 2.0;
+            static defaultBrightness = 1.0;
+            static defaultGamma = 2.2;
+            static defaultDiffuseIntensity = 1.0;
+            static defaultAmbientIntensity = 1.0;
+            /**
+             * Alias for default light direction.
+             * @type {import('three').Vector3}
+             */
+            static defaultLightDirection = this.defaultLightDir;
+
+            /**
+             * Material uniform table mapping to FFLModulateType.
+             * Reference: https://github.com/aboood40091/FFL-Testing/blob/master/src/Shader.cpp
+             * @package
+             */
+            static materialParams = [{
+                        // FFL_MODULATE_TYPE_SHAPE_FACELINE
+                        ambient: new THREE.Color(0.85, 0.75, 0.75) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.75, 0.75, 0.75) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.3, 0.3, 0.3) /* .convertSRGBToLinear() */ ,
+                        specularPower: 1.2,
+                        specularMode: 0
+                    },
+                    {
+                        // FFL_MODULATE_TYPE_SHAPE_BEARD
+                        ambient: new THREE.Color(1.0, 1.0, 1.0) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.7, 0.7, 0.7) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.0, 0.0, 0.0) /* .convertSRGBToLinear() */ ,
+                        specularPower: 40.0,
+                        specularMode: 1
+                    },
+                    {
+                        // FFL_MODULATE_TYPE_SHAPE_NOSE
+                        ambient: new THREE.Color(0.9, 0.85, 0.85) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.75, 0.75, 0.75) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.22, 0.22, 0.22) /* .convertSRGBToLinear() */ ,
+                        specularPower: 1.5,
+                        specularMode: 0
+                    },
+                    {
+                        // FFL_MODULATE_TYPE_SHAPE_FOREHEAD
+                        ambient: new THREE.Color(0.85, 0.75, 0.75) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.75, 0.75, 0.75) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.3, 0.3, 0.3) /* .convertSRGBToLinear() */ ,
+                        specularPower: 1.2,
+                        specularMode: 0
+                    },
+                    {
+                        // FFL_MODULATE_TYPE_SHAPE_HAIR
+                        ambient: new THREE.Color(1.0, 1.0, 1.0) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.7, 0.7, 0.7) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.35, 0.35, 0.35) /* .convertSRGBToLinear() */ ,
+                        specularPower: 10.0,
+                        specularMode: 1
+                    },
+                    {
+                        // FFL_MODULATE_TYPE_SHAPE_CAP
+                        ambient: new THREE.Color(0.75, 0.75, 0.75) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.72, 0.72, 0.72) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.3, 0.3, 0.3) /* .convertSRGBToLinear() */ ,
+                        specularPower: 1.5,
+                        specularMode: 0
+                    },
+                    {
+                        // FFL_MODULATE_TYPE_SHAPE_MASK
+                        ambient: new THREE.Color(1.0, 1.0, 1.0) /* .convertSRGBToLinear() */ ,
+                        diffuses: new THREE.Color(0.7, 0.7, 0.7) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.0, 0.0, 0.0) /* .convertSRGBToLinear() */ ,
+                        specularPower: 40.0,
+                        specularMode: 1
+                    },
+                    {
+                        // FFL_MODULATE_TYPE_SHAPE_NOSELINE
+                        ambient: new THREE.Color(1.0, 1.0, 1.0) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.7, 0.7, 0.7) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.0, 0.0, 0.0) /* .convertSRGBToLinear() */ ,
+                        specularPower: 40.0,
+                        specularMode: 1
+                    },
+                    {
+                        // FFL_MODULATE_TYPE_SHAPE_GLASS
+                        ambient: new THREE.Color(1.0, 1.0, 1.0) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.7, 0.7, 0.7) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.0, 0.0, 0.0) /* .convertSRGBToLinear() */ ,
+                        specularPower: 40.0,
+                        specularMode: 1
+                    },
+
+                    {
+                        // body
+                        ambient: new THREE.Color(0.95622, 0.95622, 0.95622) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(0.49673, 0.49673, 0.49673) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.24099, 0.24099, 0.24099) /* .convertSRGBToLinear() */ ,
+                        specularPower: 3.0,
+                        specularMode: 0
+                    },
+                    {
+                        // pants
+                        ambient: new THREE.Color(0.95622, 0.95622, 0.95622) /* .convertSRGBToLinear() */ ,
+                        diffuse: new THREE.Color(1.08497, 1.08497, 1.08497) /* .convertSRGBToLinear() */ ,
+                        specular: new THREE.Color(0.2409, 0.2409, 0.2409) /* .convertSRGBToLinear() */ ,
+                        specularPower: 3.0,
+                        specularMode: 0
+                    }
+                ];
+
+            /** @typedef {import('three').IUniform<import('three').Vector4>} IUniformVector4 */
+
+            /**
+             * Constructs an FFLShaderMaterial instance.
+             * @param {import('three').ShaderMaterialParameters & FFLShaderMaterialParameters} [options] -
+             * Parameters for the material.
+             */
+            constructor(options = {}) {
+                // Set default uniforms.
+                /** @type {Object<string, import('three').IUniform>} */
+                const uniforms = {
+                    u_light_ambient: {
+                        value: FFLShaderMaterial.defaultLightAmbient
+                    },
+                    u_light_diffuse: {
+                        value: FFLShaderMaterial.defaultLightDiffuse
+                    },
+                    u_light_specular: {
+                        value: FFLShaderMaterial.defaultLightSpecular
+                    },
+                    u_light_dir: {
+                        value: FFLShaderMaterial.defaultLightDir.clone()
+                    },
+                    u_light_enable: {
+                        value: true
+                    }, // Default to true.
+                    u_rim_color: {
+                        value: FFLShaderMaterial.defaultRimColor
+                    },
+                    u_rim_power: {
+                        value: FFLShaderMaterial.defaultRimPower
+                    },
+                    u_brightness: {
+                        value: FFLShaderMaterial.defaultBrightness
+                    },
+                    u_gamma: {
+                        value: FFLShaderMaterial.defaultGamma
+                    },
+                    u_diffuseIntensity: {
+                        value: FFLShaderMaterial.defaultDiffuseIntensity
+                    },
+                    u_ambientIntensity: {
+                        value: FFLShaderMaterial.defaultAmbientIntensity
+                    },
+                    // New uniforms for blending and emblem
+                    s_texture2: {
+                        value: new THREE.TextureLoader().load('/icons/default.png') // Default to the specified emblem image
+                    },
+                    u_blendMode: {
+                        value: FFLShaderMaterial.FFLBlendMode.SCREEN // Default to Lighten (Screen)
+                    },
+                    u_blendTextureEnabled: {
+                        value: false // Only enable if map2 is actually set
+                    },
+                    u_emblemScale: {
+                        value: 2.0 // Default emblem scale to 2.0
+                    },
+                    u_blendIntensity: {
+                        value: 0.1 // Default blend intensity for the original texture
+                    },
+                    u_time: {
+                        value: 0.0 // New uniform for time-based animation
+                    }
+                };
+                // Construct the ShaderMaterial using the shader source.
+                super({
+                    vertexShader: _FFLShader_vert,
+                    fragmentShader: _FFLShader_frag,
+                    uniforms: uniforms
+                });
+
+                // Initialize default values.
+                /** @type {FFLModulateType} */
+                this._modulateType = 0;
+                this.useSpecularModeBlinn = false;
+
+                // Use the setters to set the rest of the uniforms.
+                this.setValues(options);
+            }
+
+            /**
+             * Sets the ambient intensity multiplier.
+             * @param {number} value - Ambient intensity multiplier.
+             */
+            set ambientIntensity(value) {
+                this.uniforms.u_ambientIntensity.value = value;
+            }
+
+            /**
+             * Gets the ambient intensity multiplier.
+             * @returns {number} Ambient intensity multiplier.
+             */
+            get ambientIntensity() {
+                return this.uniforms.u_ambientIntensity.value;
+            }
+
+            /**
+             * Sets the diffuse intensity multiplier.
+             * @param {number} value - Diffuse intensity multiplier.
+             */
+            set diffuseIntensity(value) {
+                this.uniforms.u_diffuseIntensity.value = value;
+            }
+
+            /**
+             * Gets the diffuse intensity multiplier.
+             * @returns {number} Diffuse intensity multiplier.
+             */
+            get diffuseIntensity() {
+                return this.uniforms.u_diffuseIntensity.value;
+            }
+
+            /**
+             * Sets the gamma correction value.
+             * @param {number} value - Gamma value.
+             */
+            set gamma(value) {
+                this.uniforms.u_gamma.value = value;
+            }
+
+            /**
+             * Gets the gamma correction value.
+             * @returns {number} Gamma value.
+             */
+            get gamma() {
+                return this.uniforms.u_gamma.value;
+            }
+
+            /**
+             * Sets the brightness multiplier
+             * @param {number} value - Brightness multiplier (1.0 = no change)
+             */
+            set brightness(value) {
+                this.uniforms.u_brightness.value = value;
+            }
+
+            /**
+             * Gets the brightness multiplier.
+             * @returns {number} Brightness multiplier.
+             */
+            get brightness() {
+                return this.uniforms.u_brightness.value;
+            }
+
+            /**
+             * Gets the constant color (u_const1) uniform as THREE.Color.
+             * @returns {import('three').Color|null} The constant color, or null if it is not set.
+             */
+            get color() {
+                if (!this.uniforms.u_const1) {
+                    // If color is not set, return null.
+                    return null;
+                } else if (this._color3) {
+                    // Use cached THREE.Color instance if it is set.
+                    return this._color3;
+                }
+                // Get THREE.Color from u_const1 (Vector4).
+                const color4 = /** @type {IUniformVector4} */ (this.uniforms.u_const1).value;
+                const color3 = new THREE.Color(color4.x, color4.y, color4.z);
+                this._color3 = color3; // Cache the THREE.Color instance.
+                return color3;
+            }
+
+            /**
+             * Sets the constant color uniforms from THREE.Color.
+             * @param {import('three').Color|Array<import('three').Color>} value - The
+             * constant color (u_const1), or multiple (u_const1/2/3) to set the uniforms for.
+             */
+            set color(value) {
+                /**
+                 * @param {import('three').Color} color - THREE.Color instance.
+                 * @param {number} opacity - Opacity mapped to .a.
+                 * @returns {import('three').Vector4} Vector4 containing color and opacity.
+                 */
+                function toColor4(color, opacity = 1.0) {
+                    return new THREE.Vector4(color.r, color.g, color.b, opacity);
+                }
+                // Set an array of colors, assumed to have 3 elements.
+                if (Array.isArray(value)) {
+                    // Assign multiple color instances to u_const1/2/3.
+                    /** @type {IUniformVector4} */
+                    (this.uniforms.u_const1) = {
+                        value: toColor4(value[0])
+                    };
+                    /** @type {IUniformVector4} */
+                    (this.uniforms.u_const2) = {
+                        value: toColor4(value[1])
+                    };
+                    /** @type {IUniformVector4} */
+                    (this.uniforms.u_const3) = {
+                        value: toColor4(value[2])
+                    };
+                    return;
+                }
+                // Set single color as THREE.Color, defaulting to white.
+                const color3 = value ? value : new THREE.Color(1.0, 1.0, 1.0);
+                /** @type {import('three').Color} */
+                this._color3 = color3;
+                // Assign single color with white as a placeholder.
+                const opacity = this.opacity;
+                if (this._opacity) {
+                    // if _opacity is set then the above returned it, delete when done
+                    delete this._opacity;
+                }
+                /** @type {IUniformVector4} */
+                (this.uniforms.u_const1) = {
+                    value: toColor4(color3, opacity)
+                };
+            }
+
+            /**
+             * Gets the opacity of the constant color.
+             * @returns {number} The opacity value.
+             */
+            // @ts-ignore - Already defined on parent class.
+            get opacity() {
+                if (!this.uniforms.u_const1) {
+                    // Get from _opacity if it is set before constant color.
+                    return this._opacity ? this._opacity : 1;
+                }
+                // Return w (alpha) of the constant color uniform.
+                return /** @type {IUniformVector4} */ (this.uniforms.u_const1).value.w;
+            }
+
+            /**
+             * Sets the opacity of the constant color.
+             * NOTE: that this is actually set in the constructor
+             * of Material, meaning it is the only one set BEFORE uniforms are
+             * @param {number} value - The new opacity value.
+             */
+            // @ts-ignore - Already defined on parent class.
+            set opacity(value) {
+                if (!this.uniforms || !this.uniforms.u_const1) {
+                    // Store here for later when color is set.
+                    this._opacity = 1;
+                    return;
+                }
+                /** @type {IUniformVector4} */
+                (this.uniforms.u_const1).value.w = value;
+            }
+
+            /**
+             * Gets the value of the modulateMode uniform.
+             * @returns {FFLModulateMode|null} The modulateMode value, or null if it is unset.
+             */
+            get modulateMode() {
+                return this.uniforms.u_mode ? this.uniforms.u_mode.value : null;
+            }
+
+            /**
+             * Sets the value of the modulateMode uniform.
+             * @param {FFLModulateMode} value - The new modulateMode value.
+             */
+            set modulateMode(value) {
+                this.uniforms.u_mode = {
+                    value: value
+                };
+            }
+
+            /**
+             * Gets the value determining whether lighting is enabled or not.
+             * @returns {boolean|null} The lightEnable value, or null if it is unset.
+             */
+            get lightEnable() {
+                return this.uniforms.u_light_enable ? this.uniforms.u_light_enable.value : null;
+            }
+
+            /**
+             * Sets the value determining whether lighting is enabled or not.
+             * @param {boolean} value - The lightEnable value.
+             */
+            set lightEnable(value) {
+                this.uniforms.u_light_enable = {
+                    value: value
+                };
+            }
+
+            /**
+             * Sets whether to override specular mode with 0.
+             * @param {boolean} value - The useSpecularModeBlinn value.
+             */
+            set useSpecularModeBlinn(value) {
+                this._useSpecularModeBlinn = value; // Private property.
+                if (this._modulateType !== undefined) {
+                    // Set material again if it was already set.
+                    this.modulateType = this._modulateType;
+                }
+            }
+
+            /**
+             * Gets the value for whether to override specular mode with 0.
+             * @returns {boolean|undefined} The useSpecularModeBlinn value.
+             */
+            get useSpecularModeBlinn() {
+                return this._useSpecularModeBlinn;
+            }
+
+            /**
+             * Gets the modulateType value.
+             * @returns {FFLModulateType|undefined} The modulateType value if it is set.
+             */
+            get modulateType() {
+                // This isn't actually a uniform so this is a private property.
+                return this._modulateType;
+            }
+
+            /**
+             * Sets the material uniforms based on the modulate type value.
+             * @param {FFLModulateType} value - The new modulateType value.
+             */
+            set modulateType(value) {
+                // Get material uniforms for modulate type from materialParams table.
+                const matParam = FFLShaderMaterial.materialParams[value];
+                if (!matParam) {
+                    // Out of bounds modulateType that don't have materials
+                    // are usually for mask/faceline textures, so don't throw error
+                    return;
+                }
+                this._modulateType = value;
+
+                // Set material uniforms from matParam object.
+                this.uniforms.u_material_ambient = {
+                    value: matParam.ambient
+                };
+                this.uniforms.u_material_diffuse = {
+                    value: matParam.diffuse
+                };
+                this.uniforms.u_material_specular = {
+                    value: matParam.specular
+                };
+                this.uniforms.u_material_specular_mode = {
+                    // Force value of 0 if useSpecularModeBlinn is set.
+                    value: this._useSpecularModeBlinn ? 0 : matParam.specularMode
+                };
+                this.uniforms.u_material_specular_power = {
+                    value: matParam.specularPower
+                };
+            }
+
+            /**
+             * Gets the texture map if it is set.
+             * @returns {import('three').Texture|null} The texture map, or null if it is unset.
+             */
+            get map() {
+                return this.uniforms.s_texture ? this.uniforms.s_texture.value : null;
+            }
+
+            /**
+             * Sets the texture map (s_texture uniform).
+             * @param {import('three').Texture} value - The new texture map.
+             */
+            set map(value) {
+                this.uniforms.s_texture = {
+                    value: value
+                };
+            }
+
+            /**
+             * Gets the second texture map if it is set.
+             * @returns {import('three').Texture|null} The second texture map, or null if it is unset.
+             */
+            get map2() {
+                return this.uniforms.s_texture2 ? this.uniforms.s_texture2.value : null;
+            }
+
+            /**
+             * Sets the second texture map (s_texture2 uniform). Also enables/disables blending.
+             * @param {import('three').Texture|null} value - The new second texture map.
+             */
+            set map2(value) {
+                this.uniforms.s_texture2.value = value || new THREE.TextureLoader().load('/icons/default.png'); // Set to default emblem if null
+                this.uniforms.u_blendTextureEnabled.value = (value !== null); // Enable blending only if a texture is provided
+            }
+
+            /**
+             * Gets the blend mode value.
+             * @returns {FFLBlendMode} The blend mode value.
+             */
+            get blendMode() {
+                return this.uniforms.u_blendMode.value;
+            }
+
+            /**
+             * Sets the blend mode value.
+             * @param {FFLBlendMode} value - The new blend mode value.
+             */
+            set blendMode(value) {
+                this.uniforms.u_blendMode.value = value;
+            }
+
+            /**
+             * Gets the emblem scale value.
+             * @returns {number} The emblem scale value.
+             */
+            get emblemScale() {
+                return this.uniforms.u_emblemScale.value;
+            }
+
+            /**
+             * Sets the emblem scale value.
+             * @param {number} value - The new emblem scale value.
+             */
+            set emblemScale(value) {
+                this.uniforms.u_emblemScale.value = value;
+            }
+
+            /**
+             * Gets the blend intensity value.
+             * @returns {number} The blend intensity value.
+             */
+            get blendIntensity() {
+                return this.uniforms.u_blendIntensity.value;
+            }
+
+            /**
+             * Sets the blend intensity value.
+             * @param {number} value - The new blend intensity value.
+             */
+            set blendIntensity(value) {
+                this.uniforms.u_blendIntensity.value = value;
+            }
+
+            /**
+             * Gets the light direction.
+             * @returns {import('three').Vector3} The light direction.
+             */
+            get lightDirection() {
+                // Should always be set as long as this is constructed.
+                return this.uniforms.u_light_dir.value;
+            }
+
+            /**
+             * Sets the light direction.
+             * @param {import('three').Vector3} value - The new light direction.
+             */
+            set lightDirection(value) {
+                this.uniforms.u_light_dir = {
+                    value: value
+                };
+            }
+
+            /**
+             * Sets the time uniform for animation.
+             * @param {number} value - The current time in seconds.
+             */
+            set time(value) {
+                this.uniforms.u_time.value = value;
+            }
+
+            /**
+             * Gets the time uniform for animation.
+             * @returns {number} The current time in seconds.
+             */
+            get time() {
+                return this.uniforms.u_time.value;
+            }
+        }
+
+        // ==============================================
+        // blobShadow.js content (embedded)
+        // ==============================================
+
+        /**
+         * Creates and manages a blob shadow for a given 3D object.
+         * @param {THREE.Object3D} targetObject - The object to cast the shadow.
+         * @param {THREE.Scene} scene - The Three.js scene to add the shadow to.
+         * @param {object} [options] - Configuration options for the shadow.
+         * @param {number} [options.color=0x000000] - Color of the shadow.
+         * @param {number} [options.shadowRadius=0.2] - Visual radius of the shadow effect.
+         * @param {number} [options.opacity=0.5] - Opacity of the shadow.
+         * @param {number} [options.falloff=0.8] - Falloff of the shadow's edges.
+         * @param {number} [options.fadeDistance=5] - Distance over which the shadow fades with height.
+         * @param {number} [options.shadowPlaneSize=1.5] - Size of the shadow plane geometry.
+         * @returns {{target: THREE.Object3D, shadow: THREE.Mesh, update: Function, dispose: Function}} Shadow instance with update and dispose methods.
+         */
+        function createBlobShadow(targetObject, scene, options = {}) {
+            const {
+                color = 0x000000,
+                shadowRadius = 0.2, // Lowered default radius
+                opacity = 0.5,
+                falloff = 0.8,
+                fadeDistance = 5,
+                shadowPlaneSize = 1.5 // Renamed for clarity
+            } = options;
+
+            const shadowMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uColor: { value: new THREE.Color(color) },
+                    uRadius: { value: shadowRadius }, // Use the new shadowRadius
+                    uOpacity: { value: opacity },
+                    uFalloff: { value: falloff }
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    void main() {
+                        vUv = (uv - 0.5) * 2.0;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    varying vec2 vUv;
+                    uniform vec3 uColor;
+                    uniform float uRadius;
+                    uniform float uOpacity;
+                    uniform float uFalloff;
+                    void main() {
+                        float dist = length(vUv);
+                        float alpha = 1.0 - smoothstep(uRadius * uFalloff, uRadius, dist);
+                        gl_FragColor = vec4(uColor, alpha * uOpacity);
+                    }
+                `,
+                transparent: true,
+                depthWrite: false
+            });
+
+            const shadow = new THREE.Mesh(new THREE.PlaneGeometry(shadowPlaneSize, shadowPlaneSize), shadowMaterial);
+            shadow.rotation.x = -Math.PI / 2;
+            shadow.position.y = 0.01; // Slightly above the plane to avoid z-fighting
+            scene.add(shadow);
+
+            return {
+                target: targetObject,
+                shadow,
+                update() {
+                    const pos = new THREE.Vector3();
+                    this.target.getWorldPosition(pos);
+                    this.shadow.position.set(pos.x, 0.01, pos.z); // Keep shadow on the ground plane
+                    const height = pos.y; // Get the height of the object
+                    // Adjust scale and opacity based on height
+                    const dynamicScale = 1.0 + (height / fadeDistance) ** 2; // Use fadeDistance from closure
+                    this.shadow.scale.set(dynamicScale, dynamicScale, dynamicScale);
+                    const dynamicOpacity = 1.0 / (1.0 + (height / fadeDistance) ** 2);
+                    this.shadow.material.uniforms.uOpacity.value = Math.max(0.2, dynamicOpacity * opacity); // Use initial opacity from closure
+                },
+                dispose() {
+                    scene.remove(this.shadow);
+                    this.shadow.geometry.dispose();
+                    this.shadow.material.dispose();
+                }
+            };
+        }
+
+        // ==============================================
+        // CONSTANTS AND INITIALIZATION
+        // ==============================================
+
+        // Set up renderer, scene, camera, and controls
+        const canvas = document.getElementById('myCanvas');
+        // Ensure canvas is not null before proceeding
+        if (!canvas) {
+            console.error("Canvas element not found!");
+        }
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true
+        });
+
+        const scene = new THREE.Scene();
+
+        // Calculate FOV for 35mm focal length (assuming 24mm sensor height for 35mm equivalent)
+        const focalLength = 35; // mm
+        const sensorHeight = 24; // mm (common for 35mm equivalent)
+        const fov = 2 * Math.atan((sensorHeight / 2) / focalLength) * (180 / Math.PI);
+
+        const camera = new THREE.PerspectiveCamera(fov, canvas.width / canvas.height, 0.1, 1000);
+        // Set camera position (Blender coordinates X:6, Y:1, Z:5.5)
+        // Blender's Z-up is Three.js's Y-up. Blender's Y-forward is Three.js's Z-forward.
+        // So, Blender (X, Y, Z) -> Three.js (X, Z, -Y) for position.
+        // However, the request is for camera position and rotation, directly applying to Three.js camera.
+
+        // Set position
+        camera.position.set(8, 10.5, -1.5);
+
+        // Look toward target
+        camera.lookAt(5, 10.5, -1.5);
+
+
+        // Lighting setup
+        // The FFLShaderMaterial uses its own internal lighting,
+        // but general scene lights might still be useful for other objects or ambient scene lighting.
+        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(5, 10, 7.5);
+        scene.add(dirLight);
+        const pointLight = new THREE.PointLight(0xffffff, 15);
+        camera.add(pointLight);
+        scene.add(camera);
+
+        // Add a ground plane
+        const planeGeometry = new THREE.PlaneGeometry(20, 20);
+        const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc, side: THREE.DoubleSide });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -Math.PI / 2;
+        scene.add(plane);
+
+
+        // ==============================================
+        // ANIMATION PARAMETERS AND STATE
+        // ==============================================
+
+        const loadedModels = []; // Array of { id, model, textures, path, mixer, actions, shadow }
+        let mainFFLMaterial = null; // Reference to the FFLShaderMaterial of the main display model
+
+        let activeMixer = null;
+        let activeActions = [];
+        let currentLoopMode = THREE.LoopOnce; // Default loop mode: Play Once
+        const clock = new THREE.Clock();
+
+
+        // ==============================================
+        // MODEL MANAGEMENT FUNCTIONS
+        // ==============================================
+
+        /**
+         * Custom message box function to replace alert().
+         * @param {string} message - The message to display.
+         */
+        function showMessage(message) {
+            const messageBox = document.getElementById('messageBox');
+            const messageContent = document.getElementById('messageContent');
+            const closeMessageBoxButton = document.getElementById('closeMessageBox');
+
+            if (messageBox && messageContent && closeMessageBoxButton) {
+                messageContent.textContent = message;
+                messageBox.classList.remove('hidden');
+
+                const closeHandler = () => {
+                    messageBox.classList.add('hidden');
+                    closeMessageBoxButton.removeEventListener('click', closeHandler);
+                };
+                closeMessageBoxButton.addEventListener('click', closeHandler);
+            } else {
+                console.error("Message box elements not found. Falling back to console.log:", message);
+                console.log(message); // Fallback for environments where messageBox might not be available
+            }
+        }
+
+        /**
+         * Loads a GLB/GLTF model and optionally sets up a blob shadow and converts materials.
+         * @param {string} modelPath - Path to the GLB/GLTF model.
+         * @param {string} id - Unique ID for the model.
+         * @param {object} options - Options for loading and setup.
+         * @param {{x?: number, y?: number, z?: number}} [options.position] - Initial position.
+         * @param {number|{x?: number, y?: number, z?: number}} [options.scale] - Initial scale.
+         * @param {{x?: number, y?: number, z?: number}} [options.rotation] - Initial rotation.
+         * @param {object} [options.shadow] - Shadow options.
+         */
+        function loadModel(modelPath, id, options = {}) {
+            const loader = new GLTFLoader();
+            loader.load(modelPath, async (gltf) => {
+                const modelObject = gltf.scene;
+                const gltfTextures = await gltf.parser.getDependencies('texture');
+                console.log(`Loaded ${modelPath}`);
+
+                // Apply transformations from options
+                if (options.position) {
+                    modelObject.position.set(options.position.x || 0, options.position.y || 0, options.position.z || 0);
+                }
+                if (options.scale) {
+                    if (typeof options.scale === 'number') {
+                        modelObject.scale.set(options.scale, options.scale, options.scale);
+                    } else {
+                        modelObject.scale.set(options.scale.x || 1, options.scale.y || 1, options.scale.z || 1);
+                    }
+                }
+                if (options.rotation) {
+                    modelObject.rotation.set(options.rotation.x || 0, options.rotation.y || 0, options.rotation.z || 0);
+                }
+
+                // Check for existing model with same ID
+                const existingIndex = loadedModels.findIndex(item => item.id === id);
+                if (existingIndex !== -1) {
+                    // Remove existing model and shadow
+                    scene.remove(loadedModels[existingIndex].model);
+                    if (loadedModels[existingIndex].shadow) {
+                        loadedModels[existingIndex].shadow.dispose();
+                    }
+                    // Dispose of old mixer and actions
+                    if (loadedModels[existingIndex].mixer) {
+                        loadedModels[existingIndex].mixer.uncacheRoot(loadedModels[existingIndex].model);
+                    }
+                    loadedModels.splice(existingIndex, 1); // Remove from array
+                    console.log(`Replaced model with ID '${id}'`);
+                } else {
+                    console.log(`Added model with ID '${id}'`);
+                }
+
+                // Initialize AnimationMixer if the model has animations
+                let mixer = null;
+                let actions = [];
+                if (gltf.animations && gltf.animations.length) {
+                    mixer = new THREE.AnimationMixer(modelObject);
+                    gltf.animations.forEach((clip) => {
+                        const action = mixer.clipAction(clip);
+                        action.setLoop(currentLoopMode, currentLoopMode === THREE.LoopOnce ? 1 : Infinity); // Set initial loop mode
+                        action.clampWhenFinished = (currentLoopMode === THREE.LoopOnce); // Hold last frame for LoopOnce
+                        actions.push(action);
+                    });
+                    activeMixer = mixer;
+                    activeActions = actions;
+                    console.log(`Found ${gltf.animations.length} animations.`);
+                } else {
+                    activeMixer = null;
+                    activeActions = [];
+                    console.log("No animations found for this model.");
+                }
+
+                // Automatically convert materials to FFLShaderMaterial on load for 'display' model
+                if (id === 'display') {
+                    convertMaterials(modelObject, gltfTextures);
+                    // Find and store the FFLShaderMaterial instance
+                    modelObject.traverse((child) => {
+                        if (child.isMesh && child.material instanceof FFLShaderMaterial) {
+                            mainFFLMaterial = child.material;
+                        } else if (child.isMesh && Array.isArray(child.material)) {
+                            // If it's an array of materials, find the first FFLShaderMaterial
+                            const fflMat = child.material.find(mat => mat instanceof FFLShaderMaterial);
+                            if (fflMat) {
+                                mainFFLMaterial = fflMat;
+                            }
+                        }
+                    });
+                    if (!mainFFLMaterial) {
+                        console.warn("No FFLShaderMaterial found on the main model after conversion.");
+                    } else {
+                        // Set emblem scale to 2.0 as it's no longer a user-controlled input
+                        mainFFLMaterial.emblemScale = 2.0;
+                        console.log('Emblem scale set to fixed value of 2.0.');
+                        // Set brightness for the main FFLShaderMaterial (Flag_FlagColor equivalent)
+                        // This value is chosen to simulate a brightness reduction similar to Blender node settings.
+                        mainFFLMaterial.brightness = 0.7;
+                        console.log('Main FFLMaterial brightness set to 0.7.');
+
+                        // Ensure map2 is set to default emblem image by default
+                        mainFFLMaterial.map2 = new THREE.TextureLoader().load('/icons/default.png');
+                    }
+                } else {
+                    // For other models (like the plane), use standard materials
+                    modelObject.traverse((child) => {
+                        if (child.isMesh && child.material) {
+                            const oldMaterials = Array.isArray(child.material) ? child.material : [child.material];
+                            child.material = oldMaterials.map(mat => {
+                                // Create a new MeshStandardMaterial and copy properties
+                                const newMat = new THREE.MeshStandardMaterial({
+                                    color: mat.color,
+                                    map: mat.map,
+                                    transparent: mat.transparent,
+                                    opacity: mat.opacity,
+                                    side: mat.side
+                                });
+                                return newMat;
+                            });
+                            if (!Array.isArray(child.material)) {
+                                child.material = child.material[0];
+                            }
+                        }
+                    });
+                }
+
+                const newModelEntry = {
+                    id,
+                    model: modelObject,
+                    textures: gltfTextures,
+                    path: modelPath,
+                    mixer,
+                    actions
+                };
+                loadedModels.push(newModelEntry);
+
+                // Add to scene
+                scene.add(modelObject);
+
+                // Create shadow if requested
+                if (options.shadow) {
+                    setupBlobShadowForModel(modelObject, id, options.shadow);
+                }
+            }, undefined, (err) => {
+                console.error(`Failed to load ${modelPath}`, err);
+                // Display error message to user using custom message box
+                showMessage(`Failed to load model: ${err.message}. Please try another file.`);
+            });
+        }
+
+        /**
+         * Sets up a blob shadow for a given model.
+         * @param {THREE.Object3D} modelObject - The 3D model to cast a shadow.
+         * @param {string} id - The ID of the model.
+         * @param {object} shadowOptions - Options for the shadow.
+         */
+        function setupBlobShadowForModel(modelObject, id, shadowOptions = {}) {
+            if (!modelObject) return;
+            const modelEntry = loadedModels.find(entry => entry.id === id);
+            if (!modelEntry) return;
+
+            // Remove existing shadow if any
+            if (modelEntry.shadow) {
+                modelEntry.shadow.dispose();
+            }
+
+            // Calculate shadow dimensions based on model bounds
+            const box = new THREE.Box3().setFromObject(modelObject);
+            const size = box.getSize(new THREE.Vector3());
+            const modelBaseSize = Math.max(size.x, size.z);
+            const modelHeight = size.y;
+
+            // Determine effective shadow parameters
+            const effectiveShadowRadius = (shadowOptions.radius ?? 0.2) * modelBaseSize; // Default 0.2, scaled by model size
+            const effectiveShadowPlaneSize = (shadowOptions.shadowSize ?? 1.5) * modelBaseSize; // Default 1.5, scaled by model size
+            const effectiveFadeDistance = (shadowOptions.fadeDistance ?? 1) * modelHeight; // Default 1, scaled by model height
+
+
+            // Create shadow with calculated options
+            const shadowInstance = createBlobShadow(modelObject, scene, {
+                color: shadowOptions.color || 0x000000,
+                opacity: shadowOptions.opacity || 0.5,
+                shadowRadius: effectiveShadowRadius,
+                falloff: shadowOptions.falloff || 0.8,
+                fadeDistance: effectiveFadeDistance,
+                shadowPlaneSize: effectiveShadowPlaneSize
+            });
+
+            // Update model entry
+            modelEntry.shadow = shadowInstance;
+        }
+
+        // ==============================================
+        // MATERIAL AND SHADER FUNCTIONS
+        // ==============================================
+
+        /**
+         * Converts standard materials on a model to FFLShaderMaterial.
+         * @param {THREE.Object3D} model - The model whose materials are to be converted.
+         * @param {THREE.Texture[]} gltfTextures - Textures extracted from the GLTF model.
+         */
+        function convertMaterials(model, gltfTextures = []) {
+            if (!model) return;
+
+            let convertedCount = 0;
+            let textureIndex = 0;
+
+            model.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    const oldMaterials = Array.isArray(child.material) ? child.material : [child.material];
+                    const newMaterials = oldMaterials.map((oldMat) => {
+                        let usedTexture = oldMat.map || (gltfTextures.length > 0 ? gltfTextures[textureIndex % gltfTextures.length] : null);
+                        textureIndex++;
+
+                        // Ensure FFLShaderMaterial is defined
+                        if (typeof FFLShaderMaterial === 'undefined') {
+                            console.error("FFLShaderMaterial is not defined. Make sure FFLShaderMaterial.js is loaded correctly.");
+                            return oldMat; // Return original material if FFLShaderMaterial is not found
+                        }
+
+                        const shaderMat = new FFLShaderMaterial({
+                            map: usedTexture || null,
+                            color: new THREE.Color(0xAAAAAA), // Default color for FFLShaderMaterial
+                            opacity: oldMat.opacity ?? 1.0,
+                            lightEnable: true,
+                            modulateMode: usedTexture ? 1 : 0, // FFL_MODULATE_MODE_TEXTURE_DIRECT if texture, else FFL_MODULATE_MODE_CONSTANT
+                            transparent: oldMat.transparent || false,
+                            side: oldMat.side || THREE.FrontSide
+                        });
+
+                        // Apply default shader settings (no UI controls for these anymore)
+                        shaderMat.brightness = FFLShaderMaterial.defaultBrightness;
+                        shaderMat.gamma = FFLShaderMaterial.defaultGamma;
+                        shaderMat.ambientIntensity = FFLShaderMaterial.defaultAmbientIntensity;
+                        shaderMat.diffuseIntensity = FFLShaderMaterial.defaultDiffuseIntensity;
+                        // Specular power and mode are set by modulateType, but can be overridden if needed.
+                        // For now, they will rely on the materialParams table.
+                        shaderMat.uniforms.u_rim_power.value = FFLShaderMaterial.defaultRimPower;
+
+
+                        if (usedTexture) {
+                            shaderMat.map = usedTexture;
+                            shaderMat.map.needsUpdate = true;
+                            shaderMat.defines = shaderMat.defines || {};
+                            shaderMat.defines.USE_MAP = ''; // Enable texture mapping in shader
+                        }
+
+                        convertedCount++;
+                        return shaderMat;
+                    });
+                    child.material = Array.isArray(child.material) ? newMaterials : newMaterials[0];
+                }
+            });
+            console.log(`Converted ${convertedCount} materials to FFLShaderMaterial for model.`);
+        }
+
+        // ==============================================
+        // UI CONTROL HANDLERS
+        // ==============================================
+
+        /**
+         * Sets up event listeners for all UI controls.
+         */
+        function setupUIControls() {
+            // Define 24 preset colors
+            const presetColors = [
+                '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF', // Primary/Secondary
+                '#800000', '#008000', '#000080', '#808000', '#008080', '#800080', // Darker shades
+                '#FFA07A', '#ADD8E6', '#90EE90', '#FFD700', '#C0C0C0', '#DAA520', // Pastels/Gold/Silver
+                '#4B0082', '#00CED1', '#FF4500', '#20B2AA', '#7B68EE', '#F0E68C'  // Interesting shades
+            ];
+
+            const colorPickerCanvas = document.getElementById('colorPickerCanvas');
+            const ctx = colorPickerCanvas.getContext('2d');
+            const buttonSize = 40; // Size of each color button
+            const padding = 10; // Padding around the grid
+            const gap = 10; // Gap between buttons
+            const cols = 6; // Number of columns
+
+            // Function to draw a single squircle button
+            function drawSquircle(context, x, y, size, color) {
+                const radius = 15; // Controls the "squircleness"
+                context.fillStyle = color;
+                context.strokeStyle = '#666'; // Border color
+                context.lineWidth = 2;
+
+                context.beginPath();
+                // Top left corner
+                context.moveTo(x + radius, y);
+                // Top edge
+                context.lineTo(x + size - radius, y);
+                // Top right corner
+                context.arcTo(x + size, y, x + size, y + radius, radius);
+                // Right edge
+                context.lineTo(x + size, y + size - radius);
+                // Bottom right corner
+                context.arcTo(x + size, y + size, x + size - radius, y + size, radius);
+                // Bottom edge
+                context.lineTo(x + radius, y + size);
+                // Bottom left corner
+                context.arcTo(x, y + size, x, y + size - radius, radius);
+                // Left edge
+                context.lineTo(x, y + radius);
+                // Top left corner
+                context.arcTo(x, y, x + radius, y, radius);
+                context.closePath();
+                context.fill();
+                context.stroke();
+            }
+
+            // Function to draw all color buttons
+            function drawColorButtons() {
+                ctx.clearRect(0, 0, colorPickerCanvas.width, colorPickerCanvas.height); // Clear canvas
+                presetColors.forEach((color, index) => {
+                    const row = Math.floor(index / cols);
+                    const col = index % cols;
+                    const x = padding + col * (buttonSize + gap);
+                    const y = padding + row * (buttonSize + gap);
+                    drawSquircle(ctx, x, y, buttonSize, color);
+                });
+            }
+
+            // Initial draw
+            drawColorButtons();
+
+            // Handle clicks on the color picker canvas
+            colorPickerCanvas.addEventListener('click', async (event) => {
+                const rect = colorPickerCanvas.getBoundingClientRect();
+                const mouseX = event.clientX - rect.left;
+                const mouseY = event.clientY - rect.top;
+
+                for (let i = 0; i < presetColors.length; i++) {
+                    const row = Math.floor(i / cols);
+                    const col = i % cols;
+                    const x = padding + col * (buttonSize + gap);
+                    const y = padding + row * (buttonSize + gap);
+
+                    // Simple bounding box check for click detection
+                    if (mouseX >= x && mouseX <= x + buttonSize &&
+                        mouseY >= y && mouseY <= y + buttonSize) {
+                        const selectedColor = presetColors[i];
+                        if (mainFFLMaterial) {
+                            // Play animation 0
+                            await playAnimationAndWait(0);
+
+                            // Apply new color
+                            const newColor = new THREE.Color(selectedColor);
+                            mainFFLMaterial.color = newColor;
+                            console.log('Base color set to:', selectedColor);
+
+                            // Play animation 1
+                            await playAnimationAndWait(1);
+                        } else {
+                            showMessage('Load a model first to change base color.');
+                        }
+                        break; // Exit loop after finding clicked button
+                    }
+                }
+            });
+
+            // Load Second Texture (Emblem) Button
+            document.getElementById('loadSecondTextureButton').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.addEventListener('change', async (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const url = URL.createObjectURL(file);
+                        const textureLoader = new THREE.TextureLoader();
+                        textureLoader.load(url, async (texture) => {
+                            // Check if the uploaded texture is square
+                            if (texture.image.width !== texture.image.height) {
+                                showMessage('Warning: The uploaded image is not square. For best results, please upload a square image.');
+                            }
+
+                            if (mainFFLMaterial) {
+                                // Play animation 0
+                                await playAnimationAndWait(0);
+
+                                // Apply new emblem
+                                mainFFLMaterial.map2 = texture;
+                                texture.needsUpdate = true;
+                                console.log('Second texture (emblem) loaded and applied.');
+
+                                // Play animation 1
+                                await playAnimationAndWait(1);
+                            } else {
+                                showMessage('Load a model first to apply an emblem texture.');
+                            }
+                        }, undefined, (err) => {
+                            console.error('Error loading second texture:', err);
+                            showMessage('Failed to load second texture. Please try another image file.');
+                        });
+                    }
+                });
+                input.click();
+            });
+
+            // Tab functionality
+            const customizationTab = document.getElementById('customizationTab');
+            const animationTab = document.getElementById('animationTab');
+            const tabButtonCustomization = document.getElementById('tabButtonCustomization');
+            const tabButtonAnimation = document.getElementById('tabButtonAnimation');
+
+            function showTab(tabId) {
+                // Hide all tab pages
+                document.querySelectorAll('.tab-page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                // Deactivate all sidebar tab buttons
+                document.querySelectorAll('.tab-sidebar-button').forEach(button => {
+                    button.classList.remove('active');
+                });
+
+                // Show the selected tab page
+                const targetTab = document.getElementById(tabId);
+                if (targetTab) {
+                    targetTab.classList.add('active');
+                } else {
+                    console.warn(`Tab with ID '${tabId}' not found.`);
+                }
+
+                // Activate the corresponding sidebar tab button
+                const targetButton = document.getElementById('tabButton' + tabId.replace('Tab', ''));
+                if (targetButton) {
+                    targetButton.classList.add('active');
+                } else {
+                    console.warn(`Tab button for ID '${tabId}' not found.`);
+                }
+            }
+
+            tabButtonCustomization.addEventListener('click', () => showTab('customizationTab'));
+            tabButtonAnimation.addEventListener('click', () => showTab('animationTab'));
+
+            // Animation control buttons
+            document.getElementById('playAnimation0').addEventListener('click', () => playAnimationAndWait(0));
+            document.getElementById('playAnimation1').addEventListener('click', () => playAnimationAndWait(1));
+            document.getElementById('stopAnimations').addEventListener('click', () => {
+                if (activeMixer) {
+                    activeActions.forEach(action => action.stop());
+                    console.log('All animations stopped.');
+                } else {
+                    console.warn('No active mixer to stop animations.');
+                }
+            });
+        }
+
+        // ==============================================
+        // GLTF ANIMATION PLAYER FUNCTIONS
+        // ==============================================
+
+        /**
+         * Function to play a specific animation and wait for it to finish
+         * @param {number} index - The index of the animation to play.
+         * @returns {Promise<void>} A promise that resolves when the animation finishes.
+         */
+        async function playAnimationAndWait(index) {
+            return new Promise(resolve => {
+                if (!activeMixer || activeActions.length === 0) {
+                    console.warn('No animations available or mixer not active.');
+                    resolve(); // Resolve immediately if no animations
+                    return;
+                }
+                if (index >= activeActions.length || index < 0) {
+                    console.warn(`Animation at index ${index} does not exist.`);
+                    resolve(); // Resolve immediately if animation index is invalid
+                    return;
+                }
+
+                // Stop all animations before playing a specific one
+                activeActions.forEach(action => {
+                    action.stop();
+                    action.reset();
+                });
+
+                const targetAction = activeActions[index];
+                targetAction.setLoop(THREE.LoopOnce, 1); // Play once
+                targetAction.clampWhenFinished = true; // Hold last frame
+                targetAction.reset().play(); // Reset and play
+
+                const onFinish = (e) => {
+                    if (e.action === targetAction) {
+                        activeMixer.removeEventListener('finished', onFinish);
+                        resolve();
+                    }
+                };
+                activeMixer.addEventListener('finished', onFinish);
+            });
+        }
+
+
+        // ==============================================
+        // ANIMATION LOOP
+        // ==============================================
+
+        /**
+         * The main animation loop for the Three.js scene.
+         */
+        function animationLoop() {
+            const delta = clock.getDelta(); // Get delta time for mixer update
+            const elapsedTime = clock.getElapsedTime(); // Get total elapsed time for shader animation
+
+            // Update all loaded models
+            loadedModels.forEach(modelEntry => {
+                // Update shadow if exists
+                if (modelEntry.shadow) {
+                    modelEntry.shadow.update();
+                }
+            });
+
+            // Update animation mixer
+            if (activeMixer) {
+                activeMixer.update(delta);
+            }
+
+            // Update u_time uniform for FFLShaderMaterial for flag animation
+            if (mainFFLMaterial) {
+                mainFFLMaterial.time = elapsedTime;
+            }
+
+            renderer.render(scene, camera); // Render the scene
+        }
+
+        // ==============================================
+        // INITIALIZATION
+        // ==============================================
+
+        /**
+         * Initializes the application: sets up UI, loads initial models, and starts the animation loop.
+         */
+        function init() {
+            setupUIControls();
+
+            // Initial model loading (using AnimatedTriangle.glb as a common animated example)
+            // Note: FFLShaderMaterial is specialized and may not render all generic GLB models correctly
+            // if they lack specific vertex attributes like '_color' and 'tangent'.
+            loadModel('models/flag.glb', 'display', {
+                position: { x: 0, y: 0, z: 0 },
+                scale: 2.0, // Changed default scale to 2.0
+                shadow: {} // Add a shadow
+            });
+
+            // Set renderer size and camera aspect ratio based on fixed canvas dimensions
+            renderer.setSize(canvas.width, canvas.height, false);
+            camera.aspect = canvas.width / canvas.height;
+            camera.updateProjectionMatrix();
+
+            // Start animation loop
+            renderer.setAnimationLoop(animationLoop);
+        }
+
+        // Start the application when the window loads
+        window.onload = init;
+    </script>
+
+</body>
+</html>

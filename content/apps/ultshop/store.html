@@ -1,0 +1,2684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltStore</title>
+    <!-- Howler.js for audio playback -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    <!-- Luxon.js for date and time formatting (still included for general utility) -->
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.3/build/global/luxon.min.js"></script>
+    <!-- Tailwind CSS CDN for basic utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Root element for the UltStore App -->
+    <div class="ds-container" id="app-root"></div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
+
+
+
+        // Hardcoded product content for demonstration purposes.
+        const hardcodedProducts = [
+            {
+                id: "digital-art-pack-1",
+                name: "Fantasy Art Pack Vol. 1",
+                author: "Artful Creations",
+                price: "$29.99",
+                image: "https://placehold.co/400x240/ADD8E6/000000?text=Fantasy+Art+Pack",
+                tags: ["Digital Art", "Fantasy", "Assets"],
+                content: `
+Welcome to the **Fantasy Art Pack Vol. 1**!
+
+---
+
+This pack includes:
+* **50+ High-Resolution Illustrations:** Perfect for game development, book covers, or personal projects.
+* **Layered PSD Files:** For easy customization.
+* **Commercial License:** Use in your projects without worry.
+
+**Features:**
+* Diverse fantasy themes
+* Optimized for various uses
+* Regular updates with new content
+
+---
+
+**System Requirements:**
+* Any image editing software (e.g., Photoshop, GIMP)
+* Minimum 4GB RAM recommended
+
+**Purchase Information:**
+Click "Add to Cart" to get instant access to your digital download. All sales are final.
+
+For support, visit our website: [Support Page](https://example.com/support)
+Check out our YouTube tutorial: @[youtube](dQw4w9WgXcQ)
+`
+            },
+            {
+                id: "synthwave-music-pack",
+                name: "Synthwave Music Pack",
+                author: "Retro Beats",
+                price: "$19.99",
+                image: "https://placehold.co/400x240/8A2BE2/FFFFFF?text=Synthwave+Music",
+                tags: ["Music", "Synthwave", "Audio"],
+                content: `
+Dive into the **Synthwave Music Pack**!
+
+---
+
+This pack features:
+* **10 Original Tracks:** High-quality WAV and MP3 formats.
+* **Loopable Versions:** Perfect for background music in games or videos.
+* **Royalty-Free License:** Use in commercial and personal projects.
+
+**Themes:**
+* 80s Retro Vibes
+* Driving Beats
+* Atmospheric Pads
+
+---
+
+**Usage Tips:**
+* Ideal for indie games, YouTube videos, or personal listening.
+* Mix and match tracks to create your perfect soundtrack.
+
+**Get it now!**
+`
+            },
+            {
+                id: "sci-fi-3d-models",
+                name: "Sci-Fi 3D Model Kit",
+                author: "Future Forge",
+                price: "$49.99",
+                image: "https://placehold.co/400x240/4682B4/FFFFFF?text=Sci-Fi+3D+Models",
+                tags: ["3D Models", "Sci-Fi", "Assets"],
+                content: `
+Unleash your creativity with the **Sci-Fi 3D Model Kit**!
+
+---
+
+What's inside:
+* **25+ Modular 3D Assets:** Spaceships, weapons, props, and environment pieces.
+* **PBR Textures:** High-quality materials for realistic rendering.
+* **FBX & OBJ Formats:** Compatible with most 3D software.
+
+**Ideal for:**
+* Game Development
+* Architectural Visualization
+* Personal Art Projects
+
+---
+
+**Technical Details:**
+* Optimized poly-count for performance.
+* Clean topology for easy editing.
+
+**Start building your future today!**
+`
+            }
+        ];
+
+        // Language data for translations, supporting multiple locales.
+        const languageData = {
+            'en-US': `{
+    "exit": "Exit",
+    "store": "Store",
+    "unopened": "Unopened",
+    "unopenedMail": "Unopened Mail",
+    "searchPlaceholder": "Search...",
+    "close": "Close",
+    "byAuthor": "By {author}",
+    "sortAndFilter": "Sort & Filter",
+    "applyAndClose": "Apply & Close",
+    "sortBy": "Sort By",
+    "newestFirst": "Newest First",
+    "oldestFirst": "Oldest First",
+    "authorAZ": "Author (A-Z)",
+    "readStatus": "Read Status",
+    "all": "All",
+    "read": "Read",
+    "filterByTag": "Filter by Tag",
+    "footer": {
+      "exit": "Exit"
+    },
+    "acceptedView": {
+        "title": "Purchase Confirmed!",
+        "message": "Thank you for your purchase. Your download link has been sent to your email!"
+    },
+    "buyNow": "Buy Now",
+    "addToCart": "Add to Cart",
+    "viewCart": "View Cart ({count})",
+    "checkout": "Checkout",
+    "backToStore": "Back to Store",
+    "cartEmpty": "Your cart is empty.",
+    "cartTotal": "Total: {total}"
+  }`,
+            'es-ES': `{
+    "exit": "Salir",
+    "store": "Tienda",
+    "unopened": "Sin abrir",
+    "unopenedMail": "Correo sin abrir",
+    "searchPlaceholder": "Buscar...",
+    "close": "Cerrar",
+    "byAuthor": "Por {author}",
+    "sortAndFilter": "Ordenar y Filtrar",
+    "applyAndClose": "Aplicar y Cerrar",
+    "sortBy": "Ordenar por",
+    "newestFirst": "MÃ¡s nuevos primero",
+    "oldestFirst": "MÃ¡s antiguos primero",
+    "authorAZ": "Autor (A-Z)",
+    "readStatus": "Estado de lectura",
+    "all": "Todos",
+    "read": "LeÃ­do",
+    "filterByTag": "Filtrar por etiqueta",
+    "footer": {
+      "exit": "Salir"
+    },
+    "acceptedView": {
+        "title": "Â¡Compra Confirmada!",
+        "message": "Gracias por su compra. Â¡Su enlace de descarga ha sido enviado a su correo electrÃ³nico!"
+    },
+    "buyNow": "Comprar Ahora",
+    "addToCart": "AÃ±adir al Carrito",
+    "viewCart": "Ver Carrito ({count})",
+    "checkout": "Pagar",
+    "backToStore": "Volver a la Tienda",
+    "cartEmpty": "Tu carrito estÃ¡ vacÃ­o.",
+    "cartTotal": "Total: {total}"
+  }`,
+            'fr-FR': `{
+    "exit": "Quitter",
+    "store": "Boutique",
+    "unopened": "Non ouvert",
+    "unopenedMail": "Courrier non ouvert",
+    "searchPlaceholder": "Rechercher...",
+    "close": "Fermer",
+    "byAuthor": "Par {author}",
+    "sortAndFilter": "Trier et Filtrar",
+    "applyAndClose": "Appliquer et Fermer",
+    "sortBy": "Trier par",
+    "newestFirst": "Le plus rÃ©cent d'abord",
+    "oldestFirst": "Le plus ancien d'abord",
+    "authorAZ": "Auteur (A-Z)",
+    "readStatus": "Statut de lecture",
+    "all": "Tous",
+    "read": "Lu",
+    "filterByTag": "Filtrar por tag",
+    "footer": {
+      "exit": "Quitter"
+    },
+    "acceptedView": {
+        "title": "Achat ConfirmÃ© !",
+        "message": "Merci pour votre achat. Votre lien de tÃ©lÃ©chargement a Ã©tÃ© envoyÃ© Ã  votre e-mail !"
+    },
+    "buyNow": "Acheter Maintenant",
+    "addToCart": "Ajouter au Panier",
+    "viewCart": "Voir le Panier ({count})",
+    "checkout": "Payer",
+    "backToStore": "Retour Ã  la Boutique",
+    "cartEmpty": "Votre panier est vide.",
+    "cartTotal": "Total : {total}"
+  }`,
+            'de-DE': `{
+    "exit": "Beenden",
+    "store": "Shop",
+    "unopened": "UngeÃ¶ffnet",
+    "unopenedMail": "UngeÃ¶ffnete E-Mails",
+    "searchPlaceholder": "Suchen...",
+    "close": "ScherrÃŸen",
+    "byAuthor": "Von {author}",
+    "sortAndFilter": "Sortieren & Filtern",
+    "applyAndClose": "Anwenden & SchlieÃŸen",
+    "sortBy": "Sortieren nach",
+    "newestFirst": "Neueste zuerst",
+    "oldestFirst": "Ã„lteste zuerst",
+    "authorAZ": "Autor (A-Z)",
+    "readStatus": "Lesestatus",
+    "all": "Alle",
+    "read": "Gelesen",
+    "filterByTag": "Nach Tag filtern",
+    "footer": {
+      "exit": "Beenden"
+    },
+    "acceptedView": {
+        "title": "Kauf BestÃ¤tigt!",
+        "message": "Vielen Dank fÃ¼r Ihren Einkauf. Ihr Download-Link wurde an Ihre E-Mail gesendet!"
+    },
+    "buyNow": "Jetzt Kaufen",
+    "addToCart": "In den Warenkorb",
+    "viewCart": "Warenkorb anzeigen ({count})",
+    "checkout": "Zur Kasse",
+    "backToStore": "ZurÃ¼ck zum Shop",
+    "cartEmpty": "Ihr Warenkorb ist leer.",
+    "cartTotal": "Gesamt: {total}"
+  }`,
+            'ja-JP': `{
+    "exit": "çµ‚äº†",
+    "store": "ã‚¹ãƒˆã‚¢",
+    "unopened": "æœªé–‹å°",
+    "unopenedMail": "æœªé–‹å°ãƒ¡ãƒ¼ãƒ«",
+    "searchPlaceholder": "æ¤œç´¢...",
+    "close": "é–‰ã˜ã‚‹",
+    "byAuthor": "{author}ã‚ˆã‚Š",
+    "sortAndFilter": "ä¸¦ã¹æ›¿ãˆã¨ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼",
+    "applyAndClose": "é©ç”¨ã—ã¦é–‰ã˜ã‚‹",
+    "sortBy": "ä¸¦ã¹æ›¿ãˆ",
+    "newestFirst": "æ–°ã—ã„é †",
+    "oldestFirst": "å¤ã„é †",
+    "authorAZ": "è‘—è€…å (A-Z)",
+    "readStatus": "æ—¢èª­ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹",
+    "all": "ã™ã¹ã¦",
+    "read": "æ—¢èª­",
+    "filterByTag": "ã‚¿ã‚°ã§çµžã‚Šè¾¼ã‚€",
+    "footer": {
+      "exit": "çµ‚äº†"
+    },
+    "acceptedView": {
+        "title": "è³¼å…¥ç¢ºå®šï¼",
+        "message": "ã”è³¼å…¥ã‚ã‚ŠãŒã†ã”ã–ã„ã¾ã™ã€‚ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãƒªãƒ³ã‚¯ã¯ãƒ¡ãƒ¼ãƒ«ã§é€ä¿¡ã•ã‚Œã¾ã—ãŸï¼"
+    },
+    "buyNow": "ä»Šã™ãè³¼å…¥",
+    "addToCart": "ã‚«ãƒ¼ãƒˆã«è¿½åŠ ",
+    "viewCart": "ã‚«ãƒ¼ãƒˆã‚’è¦‹ã‚‹ ({count})",
+    "checkout": "ãƒã‚§ãƒƒã‚¯ã‚¢ã‚¦ãƒˆ",
+    "backToStore": "ã‚¹ãƒˆã‚¢ã«æˆ»ã‚‹",
+    "cartEmpty": "ã‚«ãƒ¼ãƒˆã¯ç©ºã§ã™ã€‚",
+    "cartTotal": "åˆè¨ˆï¼š{total}"
+  }`,
+            'ko-KR': `{
+    "exit": "ë‚˜ê°€ê¸°",
+    "store": "ìƒì ",
+    "unopened": "ì½ì§€ ì•ŠìŒ",
+    "unopenedMail": "ì½ì§€ ì•Šì€ ë©”ì¼",
+    "searchPlaceholder": "ê²€ìƒ‰...",
+    "close": "ë‹«ê¸°",
+    "byAuthor": "{author} ìž‘ì„±",
+    "sortAndFilter": "ì •ë ¬ ë° í•„í„°",
+    "applyAndClose": "ì ìš© ë° ë‹«ê¸°",
+    "sortBy": "ì •ë ¬ ê¸°ì¤€",
+    "newestFirst": "ìµœì‹ ìˆœ",
+    "oldestFirst": "ì˜¤ëž˜ëœìˆœ",
+    "authorAZ": "ìž‘ì„±ìž (A-Z)",
+    "readStatus": "ì½ìŒ ìƒíƒœ",
+    "all": "ëª¨ë‘",
+    "read": "ì½ìŒ",
+    "filterByTag": "íƒœê·¸ë¡œ í•„í„°ë§",
+    "footer": {
+      "exit": "ë‚˜ê°€ê¸°"
+    },
+    "acceptedView": {
+        "title": "êµ¬ë§¤ í™•ì¸ë¨!",
+        "message": "êµ¬ë§¤í•´ ì£¼ì…”ì„œ ê°ì‚¬í•©ë‹ˆë‹¤. ë‹¤ìš´ë¡œë“œ ë§í¬ê°€ ì´ë©”ì¼ë¡œ ì „ì†¡ë˜ì—ˆìŠµë‹ˆë‹¤!"
+    },
+    "buyNow": "ì§€ê¸ˆ êµ¬ë§¤",
+    "addToCart": "ìž¥ë°”êµ¬ë‹ˆì— ì¶”ê°€",
+    "viewCart": "ìž¥ë°”êµ¬ë‹ˆ ë³´ê¸° ({count})",
+    "checkout": "ê²°ì œ",
+    "backToStore": "ìƒì ìœ¼ë¡œ ëŒì•„ê°€ê¸°",
+    "cartEmpty": "ìž¥ë°”êµ¬ë‹ˆê°€ ë¹„ì–´ ìžˆìŠµë‹ˆë‹¤.",
+    "cartTotal": "ì´ì•¡: {total}"
+  }`,
+            'pi-RR': `{
+    "exit": "Walk the Plank",
+    "store": "The Market",
+    "unopened": "Unplundered",
+    "unplunderedMail": "Unplundered Mail",
+    "searchPlaceholder": "Search the Seas...",
+    "close": "Batten Down the Hatches",
+    "byAuthor": "By ol' {author}",
+    "sortAndFilter": "Sort yer Plunder",
+    "applyAndClose": "Aye, Apply & Stow",
+    "sortBy": "Sort By",
+    "newestFirst": "Newest Haul First",
+    "oldestRagsFirst": "Oldest Rags First",
+    "authorAZ": "Captain (A-Z)",
+    "readStatus": "Loot Status",
+    "all": "All Hands",
+    "read": "Plundered",
+    "filterByTag": "Filter by Mark",
+    "footer": {
+      "exit": "Set Sail!"
+    },
+    "acceptedView": {
+        "title": "Purchase Confirmed, Matey!",
+        "message": "Thank ye for yer purchase, arr! Yer download link be sent to yer email!"
+    },
+    "buyNow": "Claim Yer Booty",
+    "addToCart": "Add to Yer Booty",
+    "viewCart": "View Yer Booty ({count})",
+    "checkout": "Set Course for Checkout",
+    "backToStore": "Back to the Cove",
+    "cartEmpty": "Yer treasure chest be empty, arr!",
+    "cartTotal": "Total Plunder: {total}"
+  }`
+        };
+
+        /**
+         * A base class for creating UI components. Provides a helper for creating DOM elements.
+         */
+        class UIComponent {
+            constructor() {
+                this.element = null;
+            }
+
+            /**
+             * Creates a new DOM element with specified tag, class, and inner HTML.
+             * @param {string} tag - The HTML tag name (e.g., 'div', 'button').
+             * @param {string} className - The CSS class name(s) to apply.
+             * @param {string} [innerHTML=''] - The inner HTML content of the element.
+             * @returns {HTMLElement} The created DOM element.
+             */
+            createElement(tag, className, innerHTML = '') {
+                const el = document.createElement(tag);
+                if (className) el.className = className;
+                if (innerHTML) el.innerHTML = innerHTML;
+                return el;
+            }
+        }
+
+        /**
+         * Manages the top screen of the app, which displays the product image or the 3D scene.
+         */
+        class TopScreen extends UIComponent {
+            /**
+             * @param {UltStoreApp} appInstance - The main app instance.
+             */
+            constructor(appInstance) {
+                super();
+                this.app = appInstance;
+                this.element = this.createElement('div', 'top-screen');
+
+                this.productImageElement = this.createElement('img', 'product-image');
+                this.element.appendChild(this.productImageElement);
+
+                // Three.js canvas
+                this.threeDCanvas = this.createElement('canvas', 'three-d-canvas');
+                this.threeDCanvas.id = 'myCanvas'; // Match ID used in ThreeDSceneManager
+                this.threeDCanvas.width = 400;
+                this.threeDCanvas.height = 240;
+                this.element.appendChild(this.threeDCanvas);
+
+                // Canvases for product title and meta (moved here)
+                this.productNameCanvas = this.createElement('canvas', 'top-screen-product-name');
+                this.productNameCanvas.width = 300; // Adjusted width for top screen
+                this.productNameCanvas.height = 48;
+                this.element.appendChild(this.productNameCanvas);
+
+                this.productPriceCanvas = this.createElement('canvas', 'top-screen-product-price');
+                this.productPriceCanvas.width = 300; // Adjusted width for top screen
+                this.productPriceCanvas.height = 20;
+                this.element.appendChild(this.productPriceCanvas);
+
+                this.productMetaCanvas = this.createElement('canvas', 'top-screen-product-meta');
+                this.productMetaCanvas.width = 300; // Adjusted width for top screen
+                this.productMetaCanvas.height = 20;
+                this.element.appendChild(this.productMetaCanvas);
+
+                // Initially hide these canvases
+                this.productNameCanvas.style.display = 'none';
+                this.productPriceCanvas.style.display = 'none';
+                this.productMetaCanvas.style.display = 'none';
+            }
+
+            /**
+             * Displays the product image on the top screen.
+             * @param {string} imageUrl - The URL of the image to display.
+             */
+            showProductImage(imageUrl) {
+                this.productImageElement.src = imageUrl;
+                this.productImageElement.style.opacity = '1';
+                this.productImageElement.style.display = 'block';
+                this.threeDCanvas.style.display = 'none'; // Hide 3D canvas
+                this.productNameCanvas.style.display = 'none'; // Hide product name
+                this.productPriceCanvas.style.display = 'none'; // Hide product price
+                this.productMetaCanvas.style.display = 'none'; // Hide product meta
+            }
+
+            /**
+             * Shows the 3D scene on the top screen.
+             */
+            showThreeDScene() {
+                this.productImageElement.style.display = 'none'; // Hide product image
+                this.threeDCanvas.style.display = 'block'; // Show 3D canvas
+                this.productNameCanvas.style.display = 'none'; // Hide product name
+                this.productPriceCanvas.style.display = 'none'; // Hide product price
+                this.productMetaCanvas.style.display = 'none'; // Hide product meta
+            }
+
+            /**
+             * Draws product name on the top screen canvas.
+             * @param {string} name - The product name.
+             * @param {string} font - The font style.
+             * @param {string} color - The text color.
+             */
+            drawProductName(name, font, color) {
+                const ctx = this.productNameCanvas.getContext('2d');
+                ctx.clearRect(0, 0, this.productNameCanvas.width, this.productNameCanvas.height);
+                const maxNameWidth = this.productNameCanvas.width - 20; // Add some padding
+                let measuredNameHeight = this.app._estimateTextHeight(font, name, maxNameWidth, 1.2);
+                let textY = (this.productNameCanvas.height - measuredNameHeight) / 2;
+                this.app._drawTextOnCanvas(ctx, name, 10, textY, font, color, 'left', 'top', maxNameWidth, 1.2);
+                this.productNameCanvas.style.display = 'block';
+            }
+
+            /**
+             * Draws product price on the top screen canvas.
+             * @param {string} price - The product price.
+             * @param {string} font - The font style.
+             * @param {string} color - The text color.
+             */
+            drawProductPrice(price, font, color) {
+                const ctx = this.productPriceCanvas.getContext('2d');
+                ctx.clearRect(0, 0, this.productPriceCanvas.width, this.productPriceCanvas.height);
+                this.app._drawTextOnCanvas(ctx, price, 10, this.productPriceCanvas.height / 2, font, color, 'left', 'middle');
+                this.productPriceCanvas.style.display = 'block';
+            }
+
+            /**
+             * Draws product meta (author) on the top screen canvas.
+             * @param {string} metaText - The meta text.
+             * @param {string} font - The font style.
+             * @param {string} color - The text color.
+             */
+            drawProductMeta(metaText, font, color) {
+                const ctx = this.productMetaCanvas.getContext('2d');
+                ctx.clearRect(0, 0, this.productMetaCanvas.width, this.productMetaCanvas.height);
+                this.app._drawTextOnCanvas(ctx, metaText, 10, this.productMetaCanvas.height / 2, font, color, 'left', 'middle');
+                this.productMetaCanvas.style.display = 'block';
+            }
+        }
+
+        /**
+         * Implements a custom scrollbar for a given scrollable container.
+         * Renders the scrollbar visually on a canvas and handles drag interactions.
+         */
+        class Scrollbar extends UIComponent {
+            /**
+             * @param {HTMLElement} scrollableContainer - The DOM element to attach the scrollbar to.
+             * @param {UltStoreApp} appInstance - The main app instance for sound playback.
+             */
+            constructor(scrollableContainer, appInstance) {
+                super();
+                this.container = scrollableContainer;
+                this.app = appInstance;
+                this.element = document.createElement('canvas');
+                this.element.className = 'custom-scrollbar';
+                this.ctx = this.element.getContext('2d');
+                this.ctx.imageSmoothingEnabled = false; // For crisp lines
+                this.isDragging = false;
+                this.startY = 0;
+                this.startScrollTop = 0;
+                this.lastScrollTop = this.container.scrollTop; // Track last scroll position for sound
+                this.scrollSoundTimeout = null; // Debounce for scroll sound
+
+                // Mouse event listeners for desktop dragging
+                this.element.addEventListener('mousedown', this.onThumbMouseDown.bind(this));
+                document.addEventListener('mousemove', this.onThumbMouseMove.bind(this));
+                document.addEventListener('mouseup', this.onThumbMouseUp.bind(this));
+
+                // Touch event listeners for mobile dragging
+                this.element.addEventListener('touchstart', this.onThumbTouchStart.bind(this), { passive: false });
+                document.addEventListener('touchmove', this.onThumbTouchMove.bind(this), { passive: false });
+                document.addEventListener('touchend', this.onThumbTouchEnd.bind(this));
+
+                // Listen for container's scroll events to update scrollbar position
+                this.container.addEventListener('scroll', () => this.update());
+                // Listen for window resize to adjust scrollbar dimensions
+                window.addEventListener('resize', () => this.update());
+
+                // Observe changes in the container's children or attributes to update scrollbar
+                const observer = new MutationObserver(() => this.update());
+                observer.observe(this.container, { childList: true, subtree: true, characterData: true, attributes: true });
+
+                this.update(); // Initial update to draw the scrollbar
+            }
+
+            /**
+             * Handles mouse down event on the scrollbar thumb.
+             * Initiates dragging.
+             * @param {MouseEvent} e - The mouse event.
+             */
+            onThumbMouseDown(e) {
+                this.isDragging = true;
+                this.startY = e.clientY;
+                this.startScrollTop = this.container.scrollTop;
+                this.element.style.cursor = 'grabbing';
+            }
+
+            /**
+             * Handles mouse move event while dragging the scrollbar thumb.
+             * Updates the container's scroll position.
+             * @param {MouseEvent} e - The mouse event.
+             */
+            onThumbMouseMove(e) {
+                if (!this.isDragging) return;
+                e.preventDefault(); // Prevent default browser scrolling
+                const dy = e.clientY - this.startY;
+                const scrollRatio = this.container.scrollHeight / this.container.clientHeight;
+                this.container.scrollTop = this.startScrollTop + (dy * scrollRatio);
+            }
+
+            /**
+             * Handles mouse up event, ending the scrollbar dragging.
+             */
+            onThumbMouseUp() {
+                this.isDragging = false;
+                this.element.style.cursor = 'grab';
+            }
+
+            /**
+             * Handles touch start event on the scrollbar thumb.
+             * Initiates dragging for touch devices.
+             * @param {TouchEvent} e - The touch event.
+             * @returns {void}
+             */
+            onThumbTouchStart(e) {
+                this.isDragging = true;
+                this.startY = e.touches[0].clientY;
+                this.startScrollTop = this.container.scrollTop;
+                this.element.style.cursor = 'grabbing';
+                e.preventDefault(); // Prevent default browser scrolling
+            }
+
+            /**
+             * Handles touch move event while dragging the scrollbar thumb on touch devices.
+             * Updates the container's scroll position.
+             * @param {TouchEvent} e - The touch event.
+             * @returns {void}
+             */
+            onThumbTouchMove(e) {
+                if (!this.isDragging) return;
+                e.preventDefault(); // Prevent default browser scrolling
+                const dy = e.touches[0].clientY - this.startY;
+                const scrollRatio = this.container.scrollHeight / this.container.clientHeight;
+                this.container.scrollTop = this.startScrollTop + (dy * scrollRatio);
+            }
+
+            /**
+             * Handles touch end event, ending the scrollbar dragging for touch devices.
+             */
+            onThumbTouchEnd() {
+                this.isDragging = false;
+                this.element.style.cursor = 'grab';
+            }
+
+            /**
+             * Draws the scrollbar track and thumb on the canvas.
+             * @param {number} viewHeight - The visible height of the scrollable area.
+             * @param {number} contentHeight - The total scrollable height of the content.
+             * @param {number} thumbHeight - The calculated height of the scrollbar thumb.
+             * @param {number} thumbY - The Y position of the scrollbar thumb.
+             */
+            drawScrollbar(viewHeight, contentHeight, thumbHeight, thumbY) {
+                const canvas = this.element;
+                const ctx = this.ctx;
+                const trackWidth = 8; // Width of the scrollbar track
+                const thumbWidth = 6; // Width of the scrollbar thumb
+                const borderRadius = 3; // Border radius for the thumb
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw scrollbar track
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(canvas.width - trackWidth, 0, trackWidth, canvas.height);
+
+                // Draw scrollbar thumb
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                const thumbX = canvas.width - trackWidth + (trackWidth - thumbWidth) / 2;
+
+                // Draw rounded rectangle for the thumb using arcTo for smooth corners
+                ctx.moveTo(thumbX + borderRadius, thumbY);
+                ctx.lineTo(thumbX + thumbWidth - borderRadius, thumbY);
+                ctx.arcTo(thumbX + thumbWidth, thumbY, thumbX + thumbWidth, thumbY + borderRadius, borderRadius);
+                ctx.lineTo(thumbX + thumbWidth, thumbY + thumbHeight - borderRadius);
+                ctx.arcTo(thumbX + thumbWidth, thumbY + thumbHeight, thumbX + thumbWidth - borderRadius, thumbY + thumbHeight, borderRadius);
+                ctx.lineTo(thumbX + borderRadius, thumbY + thumbHeight);
+                ctx.arcTo(thumbX, thumbY + thumbHeight, thumbX, thumbY + thumbHeight - borderRadius, borderRadius);
+                ctx.lineTo(thumbX, thumbY + borderRadius);
+                ctx.arcTo(thumbX, thumbY, thumbX + borderRadius, thumbY, borderRadius);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            /**
+             * Updates the scrollbar's position and visibility based on the container's scroll state.
+             * Plays a scroll sound with debouncing.
+             */
+            update() {
+                requestAnimationFrame(() => {
+                    const viewHeight = this.container.clientHeight;
+                    const contentHeight = this.container.scrollHeight;
+                    this.element.height = viewHeight;
+                    this.element.width = 14; // Fixed width for the scrollbar canvas
+                    // Hide scrollbar if content is not scrollable
+                    this.element.style.visibility = contentHeight > viewHeight ? 'visible' : 'hidden';
+
+                    // Position the scrollbar canvas correctly within its parent
+                    this.element.style.position = 'absolute';
+                    this.element.style.top = '0px';
+                    this.element.style.bottom = '0px';
+                    this.element.style.right = '0px';
+
+                    // Calculate thumb height and position
+                    const thumbHeight = Math.max(20, viewHeight * (viewHeight / contentHeight));
+                    const scrollPercentage = contentHeight > viewHeight ? this.container.scrollTop / (contentHeight - viewHeight) : 0;
+                    const thumbY = scrollPercentage * (viewHeight - thumbHeight);
+
+                    // Play scroll sound if scrolling and not currently debounced
+                    const newScrollTop = this.container.scrollTop;
+                    if (this.app && this.app.sounds.scroll && this.lastScrollTop !== undefined && newScrollTop !== this.lastScrollTop) {
+                        if (!this.scrollSoundTimeout) {
+                            // this.app.sounds.scroll.play(); // Commented out as the sound asset is missing
+                            this.scrollSoundTimeout = setTimeout(() => {
+                                this.scrollSoundTimeout = null;
+                            }, 100); // Debounce for 100ms
+                        }
+                    }
+                    this.lastScrollTop = newScrollTop;
+
+                    this.drawScrollbar(viewHeight, contentHeight, thumbHeight, thumbY);
+                });
+            }
+        }
+
+        /**
+         * Helper class to measure text width and height on a temporary canvas context.
+         */
+        class TextCanvasMeasurer {
+            constructor() {
+                if (!TextCanvasMeasurer.instance) {
+                    this._canvas = document.createElement('canvas');
+                    this._ctx = this._canvas.getContext('2d');
+                    this._ctx.imageSmoothingEnabled = false; // Disable anti-aliasing for accurate pixel measurements
+                    TextCanvasMeasurer.instance = this;
+                }
+                return TextCanvasMeasurer.instance;
+            }
+
+            /**
+             * Measures the width of a given text with a specific font.
+             * @param {string} text - The text to measure.
+             * @param {string} font - The font style string (e.g., '14px "Rodin", sans-serif').
+             * @returns {TextMetrics} The TextMetrics object.
+             */
+            measureText(text, font) {
+                this._ctx.font = font;
+                return this._ctx.measureText(text);
+            }
+
+            /**
+             * Estimates the total height required to wrap text within a given maximum width.
+             * @param {string} text - The text to measure.
+             * @param {string} font - The font style string.
+             * @param {number} maxWidth - The maximum width for text wrapping. Use Infinity for no wrapping.
+             * @param {number} [lineSpacingFactor=1.0] - Multiplier for line height.
+             * @returns {number} The estimated total height in pixels.
+             */
+            estimateWrappedTextHeight(text, font, maxWidth, lineSpacingFactor = 1.0) {
+                this._ctx.font = font;
+                const tempMetrics = this._ctx.measureText('M'); // Measure a single character to get approximate line height
+                const actualLineHeight = (tempMetrics.actualBoundingBoxAscent || 0) + (tempMetrics.actualBoundingBoxDescent || 0);
+
+                if (maxWidth === Infinity) {
+                    return actualLineHeight * lineSpacingFactor;
+                }
+
+                const words = text.split(' ');
+                let line = '';
+                let totalHeight = 0;
+                for (let n = 0; n < words.length; n++) {
+                    let testLine = line + (n > 0 ? ' ' : '') + words[n];
+                    let metrics = this._ctx.measureText(testLine);
+                    let testWidth = metrics.width;
+
+                    if (testWidth > maxWidth && line.length > 0) {
+                        totalHeight += actualLineHeight * lineSpacingFactor;
+                        line = words[n];
+                    } else {
+                        line = testLine;
+                    }
+                }
+                totalHeight += actualLineHeight * lineSpacingFactor; // Add height for the last line
+                return totalHeight;
+            }
+        }
+
+        /**
+         * Manages loading and caching of images to prevent redundant fetches.
+         */
+        class ImageManager {
+            constructor() {
+                this.cache = new Map(); // Cache to store loaded images
+            }
+
+            /**
+             * Loads an image and caches it. Returns a Promise that resolves with the Image object.
+             * @param {string} url - The URL of the image.
+             * @returns {Promise<HTMLImageElement|null>} A promise that resolves with the Image object or null if loading fails.
+             */
+            loadImage(url) {
+                if (this.cache.has(url)) {
+                    return Promise.resolve(this.cache.get(url));
+                }
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous"; // Required for loading images from other origins onto canvas
+                    img.onload = () => {
+                        this.cache.set(url, img);
+                        resolve(img);
+                    };
+                    img.onerror = () => {
+                        console.error(`Failed to load image: ${url}`);
+                        this.cache.set(url, null); // Cache null to avoid retrying failed images
+                        resolve(null);
+                    };
+                    img.src = url;
+                });
+            }
+
+            /**
+             * Retrieves a cached image.
+             * @param {string} url - The URL of the image.
+             * @returns {HTMLImageElement|null} The cached Image object or null if not found.
+             */
+            getImage(url) {
+                return this.cache.get(url) || null;
+            }
+
+            /**
+             * Loads all images referenced within a list of content blocks.
+             * @param {Array<object>} blocks - An array of parsed content blocks.
+             * @returns {Promise<void>} A promise that resolves when all images are attempted to be loaded.
+             */
+            async loadImagesFromBlocks(blocks) {
+                const mediaUrls = new Set();
+                blocks.forEach(block => {
+                    if (block.type === 'image') {
+                        mediaUrls.add(block.url);
+                    } else if (block.type === 'embed' && block.service === 'youtube') {
+                        // Use YouTube thumbnail for embeds
+                        mediaUrls.add(`https://img.youtube.com/vi/${block.id}/0.jpg`);
+                    }
+                });
+                const promises = Array.from(mediaUrls).map(url => this.loadImage(url));
+                await Promise.all(promises); // Wait for all images to attempt loading
+            }
+        }
+
+        /**
+         * Manages the display and switching of different pages/views in the application.
+         */
+        class PageViewManager extends UIComponent {
+            /**
+             * @param {HTMLElement} rootElement - The main container for all pages.
+             * @param {TopScreen} topScreen - The top screen instance to control its visibility.
+             */
+            constructor(rootElement, topScreen) {
+                super();
+                this.root = rootElement;
+                this.topScreen = topScreen;
+                this.pages = new Map();
+                this.currentPage = null;
+
+                // Create a container for the pages within the root, below the top screen
+                this.pagesContainer = this.createElement('div', 'pages-container');
+                this.root.appendChild(this.pagesContainer);
+            }
+
+            /**
+             * Registers a page component with the manager.
+             * @param {string} id - A unique ID for the page.
+             * @param {UIComponent} pageInstance - The instance of the page component.
+             */
+            registerPage(id, pageInstance) {
+                this.pages.set(id, pageInstance);
+                // All pages are initially hidden
+                pageInstance.element.classList.add('view');
+                this.pagesContainer.appendChild(pageInstance.element);
+            }
+
+            /**
+             * Shows a specific page by its ID and hides the currently active page.
+             * @param {string} id - The ID of the page to show.
+             * @param {object} [data={}] - Data to pass to the page's render method.
+             */
+            showPage(id, data = {}) {
+                const nextPage = this.pages.get(id);
+                if (!nextPage) {
+                    console.error(`Page with ID '${id}' not found.`);
+                    return;
+                }
+
+                if (this.currentPage && this.currentPage !== nextPage) {
+                    this.currentPage.element.classList.remove('active');
+                }
+
+                this.currentPage = nextPage;
+                this.currentPage.element.classList.add('active');
+
+                // Render the page with the provided data
+                if (typeof this.currentPage.render === 'function') {
+                    this.currentPage.render(data);
+                }
+
+                // Control TopScreen visibility based on the active page
+                if (id === 'product-detail') {
+                    this.topScreen.showProductImage(data.product?.image || 'https://placehold.co/400x240/ADD8E6/000000?text=Default+Image');
+                    this.topScreen.drawProductName(data.product?.name || '', 'bold 20px "Rodin", sans-serif', 'black');
+                    this.topScreen.drawProductPrice(data.product?.price || '', 'bold 16px "Rodin", sans-serif', this.app.cssVars['--ds-accent-blue']);
+                    this.topScreen.drawProductMeta(this.app.t('byAuthor', { author: data.product?.author || '' }), '12px "Rodin", sans-serif', this.app.cssVars['--ds-text-subtle']);
+                } else if (id === 'purchase-confirmation') {
+                    this.topScreen.showThreeDScene();
+                } else if (id === 'storefront' || id === 'cart') {
+                    // For storefront and cart, show 3D scene
+                    this.topScreen.showThreeDScene();
+                    // Hide product name/price/meta canvases when not on product detail page
+                    this.topScreen.productNameCanvas.style.display = 'none';
+                    this.topScreen.productPriceCanvas.style.display = 'none';
+                    this.topScreen.productMetaCanvas.style.display = 'none';
+                }
+            }
+        }
+
+        /**
+         * Represents the Storefront display page, showing a grid of products.
+         */
+        class StorefrontPage extends UIComponent {
+            /**
+             * @param {object} options - Options for the StorefrontPage.
+             * @param {UltStoreApp} options.appInstance - The main app instance.
+             * @param {function} options.onViewProduct - Callback when a product card is clicked.
+             * @param {function} options.onViewCart - Callback when the View Cart button is clicked.
+             * @param {function} options.onExitApp - Callback when the Exit button is clicked.
+             */
+            constructor({ appInstance, onViewProduct, onViewCart, onExitApp }) {
+                super();
+                this.app = appInstance;
+                this.onViewProduct = onViewProduct;
+                this.onViewCart = onViewCart;
+                this.onExitApp = onExitApp;
+
+                this.element = this.createElement('div', 'storefront-page view');
+                this.init();
+            }
+
+            /**
+             * Initializes the DOM structure of the storefront page.
+             */
+            init() {
+                const header = this.createElement('div', 'storefront-header');
+                const headerCanvas = this.createElement('canvas', 'storefront-header-canvas');
+                headerCanvas.width = this.app.dsContainerWidth;
+                headerCanvas.height = 40;
+                header.appendChild(headerCanvas);
+
+                this.cartButton = this.app._createCanvasButton({
+                    text: this.app.t('viewCart', { count: 0 }),
+                    sprite: null, // No sprite for cart button by default
+                    width: 100, height: 30, textColor: 'black', font: 'bold 14px "Rodin", sans-serif',
+                    onClick: () => this.onViewCart(),
+                    className: 'cart-button',
+                    backgroundColor: '#FFEB3B', activeBackgroundColor: '#FDD835',
+                    borderRadius: 6,
+                    shadowOffset: { x: 0, y: 2, blur: 4, color: 'rgba(0,0,0,0.2)' }
+                });
+                header.appendChild(this.cartButton);
+
+                this.exitButton = this.app._createCanvasButton({
+                    text: this.app.t('exit'),
+                    sprite: null, // No sprite for exit button
+                    width: 60, height: 30, textColor: 'white', font: 'bold 14px "Rodin", sans-serif',
+                    onClick: () => this.onExitApp(),
+                    className: 'exit-button',
+                    backgroundColor: '#DC3545', activeBackgroundColor: '#A72B38',
+                    borderRadius: 6,
+                    shadowOffset: { x: 0, y: 2, blur: 4, color: 'rgba(0,0,0,0.2)' }
+                });
+                header.appendChild(this.exitButton);
+
+                this.element.appendChild(header);
+
+                this.productsGrid = this.createElement('div', 'products-grid');
+                this.element.appendChild(this.productsGrid);
+
+                this.storefrontScrollbar = new Scrollbar(this.productsGrid, this.app);
+                this.productsGrid.appendChild(this.storefrontScrollbar.element);
+            }
+
+            /**
+             * Renders the storefront with product cards.
+             * @param {object} data - Contains the list of products.
+             */
+            render(data) {
+                this.productsGrid.innerHTML = ''; // Clear previous products
+                const products = data.products || [];
+
+                // Re-append scrollbar element as innerHTML clears it
+                this.productsGrid.appendChild(this.storefrontScrollbar.element);
+
+                // Update cart button text
+                this.cartButton.updateText(this.app.t('viewCart', { count: this.app.cart.length }));
+
+                // Draw header text
+                const headerCanvas = this.element.querySelector('.storefront-header-canvas');
+                const headerCtx = headerCanvas.getContext('2d');
+                headerCtx.clearRect(0, 0, headerCanvas.width, headerCanvas.height);
+                this.app._drawTextOnCanvas(headerCtx, this.app.appLabel, headerCanvas.width / 2, headerCanvas.height / 2, 'bold 18px "Rodin", sans-serif', 'black', 'center', 'middle');
+
+
+                if (products.length === 0) {
+                    const noProductsMessage = this.createElement('p', 'text-center text-gray-500 mt-8', 'No products available.');
+                    this.productsGrid.appendChild(noProductsMessage);
+                    return;
+                }
+
+                products.forEach(product => {
+                    const productCard = this.app._createCanvasButton({
+                        text: `${product.name}\n${product.price}`, // Multi-line text
+                        sprite: null, // Image will be drawn separately
+                        width: 140, height: 160, textColor: 'black', font: '14px "Rodin", sans-serif',
+                        textAlign: 'center', textBaseline: 'bottom',
+                        onClick: () => this.onViewProduct(product),
+                        className: 'product-card',
+                        backgroundColor: '#FFFFFF', activeBackgroundColor: '#F0F0F0',
+                        borderRadius: 8,
+                        shadowOffset: { x: 0, y: 4, blur: 8, color: 'rgba(0,0,0,0.15)' }
+                    });
+
+                    // Custom drawing for product card to include image
+                    const cardCanvas = productCard.querySelector('canvas');
+                    const cardCtx = cardCanvas.getContext('2d');
+                    cardCtx.imageSmoothingEnabled = false;
+
+                    const drawProductCardContent = async () => {
+                        cardCtx.clearRect(0, 0, cardCtx.canvas.width, cardCtx.canvas.height);
+                        // Draw background and shadow (handled by _createCanvasButton)
+
+                        // Draw product image
+                        const img = await this.app.imageManager.loadImage(product.image);
+                        if (img && img.complete) {
+                            const imgWidth = cardCtx.canvas.width - 20; // 10px padding on each side
+                            const imgHeight = imgWidth * (img.height / img.width);
+                            cardCtx.drawImage(img, 10, 10, imgWidth, imgHeight);
+                        } else {
+                            // Fallback if image fails to load
+                            cardCtx.fillStyle = '#E0E0E0';
+                            cardCtx.fillRect(10, 10, cardCtx.canvas.width - 20, cardCtx.canvas.width * (3/4) - 20); // Placeholder box
+                            this.app._drawTextOnCanvas(cardCtx, 'Image N/A', cardCtx.canvas.width / 2, cardCtx.canvas.height / 2 - 20, '12px "Rodin", sans-serif', '#888888', 'center', 'middle');
+                        }
+
+                        // Draw product name and price
+                        this.app._drawTextOnCanvas(cardCtx, product.name, cardCtx.canvas.width / 2, cardCtx.canvas.height - 40, 'bold 14px "Rodin", sans-serif', 'black', 'center', 'bottom', cardCtx.canvas.width - 20, 1.2);
+                        this.app._drawTextOnCanvas(cardCtx, product.price, cardCtx.canvas.width / 2, cardCtx.canvas.height - 15, 'bold 16px "Rodin", sans-serif', this.app.cssVars['--ds-accent-blue'], 'center', 'bottom');
+                    };
+
+                    drawProductCardContent();
+                    productCard.addEventListener('mouseenter', drawProductCardContent); // Redraw on hover to ensure image is there
+                    productCard.addEventListener('mouseleave', drawProductCardContent); // Redraw on hover to ensure image is there
+
+                    this.productsGrid.appendChild(productCard);
+                });
+                this.storefrontScrollbar.update(); // Update scrollbar after content is rendered
+            }
+        }
+
+        /**
+         * Represents the product detail display page.
+         */
+        class ProductDetailPage extends UIComponent {
+            /**
+             * @param {object} options - Options for the ProductDetailPage.
+             * @param {UltStoreApp} options.appInstance - The main app instance.
+             * @param {function} options.onShare - Callback for share button.
+             * @param {function} options.onBackToStore - Callback for back to store button.
+             * @param {function} options.onAddToCart - Callback for add to cart button.
+             */
+            constructor({ appInstance, onShare, onBackToStore, onAddToCart }) {
+                super();
+                this.app = appInstance;
+                this.onShare = onShare;
+                this.onBackToStore = onBackToStore;
+                this.onAddToCart = onAddToCart;
+
+                this.element = this.createElement('div', 'product-detail-page view');
+
+                // Inner elements will be created in init()
+                this.productContentCanvas = null;
+                this.scrollableCanvasWrapper = null;
+                this.htmlOverlay = null;
+                this.productScrollbar = null;
+                this.shareButton = null;
+                this.backButton = null;
+                this.addToCartButton = null;
+
+                this.init(); // Initialize DOM structure
+            }
+
+            /**
+             * Initializes the DOM structure of the product detail page.
+             */
+            init() {
+                // Header (now mostly for background and share button)
+                const header = this.createElement('div', 'product-header-content');
+                const headerBackgroundCanvas = this.createElement('canvas', 'header-background-canvas');
+                headerBackgroundCanvas.width = this.app.dsContainerWidth;
+                headerBackgroundCanvas.height = 90;
+                const headerBackgroundCtx = headerBackgroundCanvas.getContext('2d');
+                headerBackgroundCtx.imageSmoothingEnabled = false;
+                header.prepend(headerBackgroundCanvas);
+
+                const buttonWrapper = this.createElement('div', 'product-header-buttons');
+                this.shareButton = this.app._createCanvasButton({ // Use app's method
+                    text: '',
+                    sprite: this.app.sprites.share,
+                    width: 24, height: 24, textColor: 'black', font: '16px "Rodin", sans-serif',
+                    onClick: () => this.onShare(), className: 'share-button',
+                    backgroundColor: 'transparent', activeBackgroundColor: 'transparent', // Transparent background
+                    pulseColor: this.app.cssVars['--ds-accent-blue'], borderRadius: 6,
+                    shadowOffset: { x: 0, y: 0, blur: 0, color: 'transparent' }
+                });
+                buttonWrapper.appendChild(this.shareButton);
+                header.appendChild(buttonWrapper);
+                this.element.appendChild(header); // Append header to the page element
+
+                // Body (scrollable content)
+                const bodyWrapper = this.createElement('div', 'product-body-wrapper');
+                this.scrollableCanvasWrapper = this.createElement('div', 'scrollable-canvas-wrapper');
+                this.htmlOverlay = this.createElement('div', 'product-html-overlay');
+                this.scrollableCanvasWrapper.appendChild(this.htmlOverlay);
+                this.productContentCanvas = this.createElement('canvas', 'product-content-canvas');
+                this.scrollableCanvasWrapper.insertBefore(this.productContentCanvas, this.htmlOverlay);
+                bodyWrapper.appendChild(this.scrollableCanvasWrapper);
+
+                this.productScrollbar = new Scrollbar(this.scrollableCanvasWrapper, this.app);
+                bodyWrapper.appendChild(this.productScrollbar.element);
+
+                // Footer (buttons)
+                const productFooter = this.createElement('div', 'product-footer');
+                const footerWidth = this.app.dsContainerWidth;
+                const buttonWidth = footerWidth / 2;
+
+                this.backButton = this.app._createCanvasButton({ // Use app's method
+                    text: this.app.t('backToStore'), // New text for back button
+                    sprite: this.app.sprites.backArrow,
+                    width: buttonWidth, height: 40, textColor: 'white', font: 'bold 16px "Rodin", sans-serif',
+                    onClick: () => this.onBackToStore(),
+                    className: 'back-button',
+                    backgroundColor: this.app.cssVars['--ds-accent-red'], activeBackgroundColor: this.app.cssVars['--ds-accent-red-dark'],
+                    borderRadius: [6, 6, 0, 0],
+                    shadowOffset: { x: 0, y: -2, blur: 4, color: 'rgba(0,0,0,0.2)' }
+                });
+                productFooter.appendChild(this.backButton);
+
+                this.addToCartButton = this.app._createCanvasButton({ // Use app's method
+                    text: this.app.t('addToCart'), // New text for add to cart button
+                    sprite: this.app.sprites.cart, // Assuming a cart sprite is loaded
+                    width: buttonWidth, height: 40, textColor: 'white', font: 'bold 16px "Rodin", sans-serif',
+                    onClick: () => this.onAddToCart(this.currentProduct), // Pass current product to handler
+                    className: 'add-to-cart-button',
+                    backgroundColor: this.app.cssVars['--ds-accent-blue'], activeBackgroundColor: this.app.cssVars['--ds-accent-blue-dark'],
+                    borderRadius: [6, 6, 0, 0],
+                    shadowOffset: { x: 0, y: -2, blur: 4, color: 'rgba(0,0,0,0.2)' }
+                });
+                productFooter.appendChild(this.addToCartButton);
+
+                // Append all sections to the page element
+                this.element.appendChild(bodyWrapper);
+                this.element.appendChild(productFooter);
+            }
+
+            /**
+             * Renders the product content onto the canvas and updates UI elements.
+             * @param {object} data - Contains the product object.
+             */
+            async render(data) {
+                const product = data.product;
+                if (!product) return;
+                this.currentProduct = product; // Store current product for add to cart button
+
+                // Clear any previous HTML elements from the overlay
+                this.htmlOverlay.innerHTML = '';
+                this.app.hyperlinks = []; // Clear old links
+                this.app.checkboxes = []; // Clear old checkboxes
+
+                // Remove previous click listener to prevent multiple bindings
+                if (this._productClickListener) {
+                    this.productContentCanvas.removeEventListener('click', this._productClickListener);
+                }
+                // Add a new click listener for interactive elements on the canvas
+                this._productClickListener = this.handleProductCanvasClick.bind(this); // Ensure 'this' context is correct
+                this.productContentCanvas.addEventListener('click', this._productClickListener);
+
+                // Draw header background (still needed for visual separation)
+                const headerBackgroundCanvas = this.element.querySelector('.header-background-canvas');
+                const headerBackgroundCtx = headerBackgroundCanvas.getContext('2d');
+                headerBackgroundCtx.clearRect(0, 0, headerBackgroundCanvas.width, headerBackgroundCanvas.height);
+                headerBackgroundCtx.fillStyle = '#E8D8C0'; // Solid color
+                headerBackgroundCtx.save();
+                headerBackgroundCtx.shadowColor = 'rgba(0,0,0,0.1)';
+                headerBackgroundCtx.shadowBlur = 5;
+                headerBackgroundCtx.shadowOffsetX = 0;
+                headerBackgroundCtx.shadowOffsetY = 2;
+                headerBackgroundCtx.beginPath();
+                headerBackgroundCtx.roundRect(0, 0, headerBackgroundCanvas.width, headerBackgroundCanvas.height, {
+                    topLeft: 0, topRight: 0, bottomRight: 6, bottomLeft: 6
+                });
+                headerBackgroundCtx.fill();
+                headerBackgroundCtx.restore();
+                headerBackgroundCtx.strokeStyle = '#cccccc';
+                headerBackgroundCtx.lineWidth = 1;
+                headerBackgroundCtx.beginPath();
+                headerBackgroundCtx.moveTo(0, headerBackgroundCanvas.height - 0.5);
+                headerBackgroundCtx.lineTo(headerBackgroundCanvas.width, headerBackgroundCanvas.height - 0.5);
+                headerBackgroundCtx.stroke();
+
+                // Product name and meta are now drawn on TopScreen, not here.
+                // This section is removed from ProductDetailPage render.
+
+                // Draw product content
+                await this.drawProductContent(product.content);
+            }
+
+            /**
+             * Draws the product content onto the canvas, applying all formatting.
+             * @param {string} text - The raw markdown-like text content of the product description.
+             */
+            async drawProductContent(text) {
+                this.app.hyperlinks = []; // Clear existing hyperlinks and checkboxes before redrawing
+                this.app.checkboxes = [];
+
+                // Clear existing HTML overlay content
+                this.htmlOverlay.innerHTML = '';
+
+                // Parse the product content into structured blocks
+                const contentBlocks = this.app._parseProductContent(text || "");
+                // Preload all images found in the content blocks
+                await this.app.imageManager.loadImagesFromBlocks(contentBlocks);
+
+                const ctx = this.productContentCanvas.getContext('2d');
+                const containerRect = this.scrollableCanvasWrapper.getBoundingClientRect();
+                const horizontalPadding = 10; // Padding for the product content
+                const verticalPadding = 10; // Padding for the product content
+                const drawAreaWidth = this.app.productContentTextWidth - (horizontalPadding * 2); // Adjust draw area for padding
+
+                // Calculate total height needed for the content
+                let totalMeasuredHeight = verticalPadding; // Start with top padding
+                for (const block of contentBlocks) {
+                    totalMeasuredHeight += this.app._measureBlockHeight(ctx, block, drawAreaWidth) + (this.app.cssVars.blockSpacing || 10);
+                }
+                totalMeasuredHeight += verticalPadding; // Add bottom padding
+
+                // Set canvas dimensions
+                this.productContentCanvas.width = containerRect.width;
+                this.productContentCanvas.height = Math.max(this.scrollableCanvasWrapper.clientHeight, totalMeasuredHeight);
+                this.productContentCanvas.style.height = `${this.productContentCanvas.height}px`; // Apply height to CSS for scrolling
+
+                // Clear the canvas
+                ctx.clearRect(0, 0, this.productContentCanvas.width, this.productContentCanvas.height);
+
+                // Draw the smooth background on the canvas
+                ctx.fillStyle = '#FDFDFD'; // Solid white background
+                ctx.fillRect(0, 0, this.productContentCanvas.width, this.productContentCanvas.height);
+
+                // Draw each content block
+                let currentY = verticalPadding; // Start drawing content after top padding
+                ctx.textBaseline = 'top'; // Ensure text baseline is consistent
+                for (const block of contentBlocks) {
+                    const blockHeight = this.app._drawFormattedBlock(ctx, this.htmlOverlay, block, horizontalPadding, currentY, drawAreaWidth);
+                    currentY += blockHeight + (this.app.cssVars.blockSpacing || 10);
+                }
+
+                // Update the custom scrollbar
+                this.productScrollbar.update();
+            }
+
+            /**
+             * Handles clicks on the product content canvas, specifically for hyperlinks.
+             * @param {MouseEvent} e - The click event.
+             */
+            handleProductCanvasClick(e) {
+                const canvas = this.productContentCanvas;
+                const rect = canvas.getBoundingClientRect();
+                const scrollOffset = this.scrollableCanvasWrapper.scrollTop;
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top + scrollOffset;
+
+                // Find if a link was clicked
+                const clickedLink = this.app.hyperlinks.find(link => {
+                    return x >= link.rect.x && x <= link.rect.x + link.rect.width && y >= link.rect.y && y <= link.rect.y + link.rect.height;
+                });
+
+                if (clickedLink) {
+                    const url = clickedLink.url;
+                    // Handle YouTube video links by opening them in a new window
+                    if (url.startsWith('youtube:')) {
+                        const videoId = url.substring(8);
+                        window.parent.postMessage({ type: 'open-url', url: `https://www.youtube.com/watch?v=${videoId}` }, '*');
+                    } else {
+                        // For other links, open the URL in a new window
+                        window.parent.postMessage({ type: 'open-url', url: url }, '*');
+                    }
+                }
+            }
+        }
+
+        /**
+         * Represents the Cart display page.
+         */
+        class CartPage extends UIComponent {
+            /**
+             * @param {object} options - Options for the CartPage.
+             * @param {UltStoreApp} options.appInstance - The main app instance.
+             * @param {function} options.onBackToStore - Callback for back to store button.
+             * @param {function} options.onCheckout - Callback for checkout button.
+             */
+            constructor({ appInstance, onBackToStore, onCheckout }) {
+                super();
+                this.app = appInstance;
+                this.onBackToStore = onBackToStore;
+                this.onCheckout = onCheckout;
+
+                this.element = this.createElement('div', 'cart-page view');
+                this.init();
+            }
+
+            /**
+             * Initializes the DOM structure of the cart page.
+             */
+            init() {
+                const header = this.createElement('div', 'cart-header');
+                const headerCanvas = this.createElement('canvas', 'cart-header-canvas');
+                headerCanvas.width = this.app.dsContainerWidth;
+                headerCanvas.height = 40;
+                header.appendChild(headerCanvas);
+                this.element.appendChild(header);
+
+                this.cartItemsContainer = this.createElement('div', 'cart-items-container');
+                this.element.appendChild(this.cartItemsContainer);
+
+                const footer = this.createElement('div', 'cart-footer');
+                const totalCanvas = this.createElement('canvas', 'cart-total-canvas');
+                totalCanvas.width = this.app.dsContainerWidth - 20;
+                totalCanvas.height = 30;
+                footer.appendChild(totalCanvas);
+
+                const buttonWrapper = this.createElement('div', 'cart-buttons-wrapper');
+                this.backToStoreButton = this.app._createCanvasButton({
+                    text: this.app.t('backToStore'),
+                    sprite: this.app.sprites.backArrow,
+                    width: (this.app.dsContainerWidth / 2) - 10, height: 40, textColor: 'white', font: 'bold 16px "Rodin", sans-serif',
+                    onClick: () => this.onBackToStore(),
+                    className: 'back-button',
+                    backgroundColor: this.app.cssVars['--ds-accent-red'], activeBackgroundColor: this.app.cssVars['--ds-accent-red-dark'],
+                    borderRadius: [6, 6, 0, 0],
+                    shadowOffset: { x: 0, y: -2, blur: 4, color: 'rgba(0,0,0,0.2)' }
+                });
+                buttonWrapper.appendChild(this.backToStoreButton);
+
+                this.checkoutButton = this.app._createCanvasButton({
+                    text: this.app.t('checkout'),
+                    sprite: this.app.sprites.checkmark,
+                    width: (this.app.dsContainerWidth / 2) - 10, height: 40, textColor: 'white', font: 'bold 16px "Rodin", sans-serif',
+                    onClick: () => this.onCheckout(),
+                    className: 'checkout-button',
+                    backgroundColor: this.app.cssVars['--ds-accent-blue'], activeBackgroundColor: this.app.cssVars['--ds-accent-blue-dark'],
+                    borderRadius: [6, 6, 0, 0],
+                    shadowOffset: { x: 0, y: -2, blur: 4, color: 'rgba(0,0,0,0.2)' }
+                });
+                buttonWrapper.appendChild(this.checkoutButton);
+                footer.appendChild(buttonWrapper);
+                this.element.appendChild(footer);
+            }
+
+            /**
+             * Renders the cart contents.
+             */
+            render() {
+                const cart = this.app.cart;
+                this.cartItemsContainer.innerHTML = ''; // Clear previous items
+
+                // Draw header
+                const headerCanvas = this.element.querySelector('.cart-header-canvas');
+                const headerCtx = headerCanvas.getContext('2d');
+                headerCtx.clearRect(0, 0, headerCanvas.width, headerCanvas.height);
+                this.app._drawTextOnCanvas(headerCtx, 'Your Cart', headerCanvas.width / 2, headerCanvas.height / 2, 'bold 18px "Rodin", sans-serif', 'black', 'center', 'middle');
+
+                if (cart.length === 0) {
+                    const emptyMessage = this.createElement('p', 'text-center text-gray-500 mt-8', this.app.t('cartEmpty'));
+                    this.cartItemsContainer.appendChild(emptyMessage);
+                    this.checkoutButton.disabled = true;
+                } else {
+                    let total = 0;
+                    cart.forEach(item => {
+                        const itemElement = this.createElement('div', 'cart-item flex justify-between items-center p-2 border-b border-gray-200');
+                        const itemText = this.createElement('span', 'text-sm', `${item.name} - ${item.price}`);
+                        itemElement.appendChild(itemText);
+                        this.cartItemsContainer.appendChild(itemElement);
+
+                        const priceValue = parseFloat(item.price.replace(/[^0-9.-]+/g, ""));
+                        if (!isNaN(priceValue)) {
+                            total += priceValue;
+                        }
+                    });
+                    this.checkoutButton.disabled = false;
+
+                    // Draw total
+                    const totalCanvas = this.element.querySelector('.cart-total-canvas');
+                    const totalCtx = totalCanvas.getContext('2d');
+                    totalCtx.clearRect(0, 0, totalCanvas.width, totalCanvas.height);
+                    this.app._drawTextOnCanvas(totalCtx, this.app.t('cartTotal', { total: `$${total.toFixed(2)}` }), totalCanvas.width / 2, totalCanvas.height / 2, 'bold 16px "Rodin", sans-serif', 'black', 'center', 'middle');
+                }
+            }
+        }
+
+        /**
+         * Represents the "Purchase Confirmed" display page.
+         */
+        class PurchaseConfirmationPage extends UIComponent {
+            /**
+             * @param {object} options - Options for the PurchaseConfirmationPage.
+             * @param {UltStoreApp} options.appInstance - The main app instance.
+             * @param {function} options.onBackToStore - Callback for back to store button.
+             */
+            constructor({ appInstance, onBackToStore }) {
+                super();
+                this.app = appInstance;
+                this.onBackToStore = onBackToStore;
+
+                this.element = this.createElement('div', 'purchase-confirmation-page view');
+                this.init(); // Initialize DOM structure
+            }
+
+            /**
+             * Initializes the DOM structure of the accepted page.
+             */
+            init() {
+                const messageContainer = this.createElement('div', 'flex flex-col items-center justify-center h-full text-center p-4');
+
+                const titleCanvas = this.createElement('canvas', 'accepted-title-canvas');
+                titleCanvas.width = 300;
+                titleCanvas.height = 40;
+                messageContainer.appendChild(titleCanvas);
+
+                const messageCanvas = this.createElement('canvas', 'accepted-message-canvas');
+                messageCanvas.width = 300;
+                messageCanvas.height = 60;
+                messageContainer.appendChild(messageCanvas);
+
+                const backToStoreButton = this.app._createCanvasButton({ // Use app's method
+                    text: this.app.t('backToStore'), // Use 'backToStore' translation key
+                    sprite: this.app.sprites.backArrow,
+                    width: 150, height: 40, textColor: 'white', font: 'bold 16px "Rodin", sans-serif',
+                    onClick: () => this.onBackToStore(),
+                    className: 'back-to-store-button mt-8',
+                    backgroundColor: this.app.cssVars['--ds-accent-blue'], activeBackgroundColor: this.app.cssVars['--ds-accent-blue-dark'],
+                    borderRadius: 6,
+                    shadowOffset: { x: 0, y: 2, blur: 4, color: 'rgba(0,0,0,0.2)' }
+                });
+                messageContainer.appendChild(backToStoreButton);
+
+                this.element.appendChild(messageContainer);
+            }
+
+            /**
+             * Renders the "Purchase Confirmed" view.
+             */
+            render() {
+                // Draw title
+                const titleCanvas = this.element.querySelector('.accepted-title-canvas');
+                const titleCtx = titleCanvas.getContext('2d');
+                titleCtx.clearRect(0, 0, titleCanvas.width, titleCanvas.height);
+                this.app._drawTextOnCanvas(titleCtx, this.app.t('acceptedView.title'), titleCanvas.width / 2, titleCanvas.height / 2, 'bold 24px "Rodin", sans-serif', 'black', 'center', 'middle');
+
+                // Draw message
+                const messageCanvas = this.element.querySelector('.accepted-message-canvas');
+                const messageCtx = messageCanvas.getContext('2d');
+                messageCtx.clearRect(0, 0, messageCanvas.width, messageCanvas.height);
+                this.app._drawTextOnCanvas(messageCtx, this.app.t('acceptedView.message'), messageCanvas.width / 2, messageCanvas.height / 2, '16px "Rodin", sans-serif', 'black', 'center', 'middle');
+
+                // Show 3D scene when accepted view is active
+                this.app.topScreen.showThreeDScene();
+
+                // Play background music with fade-in after confirming purchase
+                if (this.app.audioSettings.backgroundAudio && this.app.sounds.music) {
+                    if (!this.app.sounds.music.playing()) {
+                        this.app.sounds.music.play();
+                        this.app.sounds.music.fade(0, 0.2 * this.app.audioSettings.volumeMultiplier.music, 3000);
+                    }
+                }
+            }
+        }
+
+        /**
+         * The main application class for the UltStore.
+         * Manages overall state, views, translations, audio, and content rendering.
+         */
+        class UltStoreApp extends UIComponent {
+            /**
+             * @param {string} rootId - The ID of the root HTML element for the app.
+             */
+            constructor(rootId) {
+                super();
+                this.root = document.getElementById(rootId);
+                this.appId = 'ultstore-app'; // Renamed app ID
+                this.appLabel = 'UltStore'; // Renamed app label
+                this.products = hardcodedProducts; // All available products
+                this.selectedProduct = null; // Currently viewed product
+                this.cart = []; // Items in the shopping cart
+                this.hyperlinks = []; // Stores clickable link regions on canvas
+                this.checkboxes = []; // Stores checkbox regions on canvas
+                this.imageManager = new ImageManager();
+                this.sprites = {}; // Stores loaded image sprites for UI elements
+                this.userTimeZone = null; // User's timezone for date formatting
+                this.language = localStorage.getItem('userLanguage') || 'en-US'; // User's preferred language
+                this.translations = {}; // Loaded translation data
+                this.audioSettings = {
+                    volumeMultiplier: { sfx: 1.0, music: 1.0 },
+                    backgroundAudio: true,
+                    mute: false
+                };
+                this.sounds = {}; // Howler.js sound instances
+                // CSS variables for consistent styling across canvas and DOM elements
+                this.cssVars = {
+                    '--ds-bg': '#E0F2F7', // Light blue background (Tropical)
+                    '--ds-bg-grad': 'linear-gradient(180deg, #B2EBF2 0%, #80DEEA 100%)', // Aqua gradient (Tropical)
+                    '--ds-bg-grad-start-color': '#B2EBF2', // Light Aqua
+                    '--ds-bg-grad-end-color': '#80DEEA', // Medium Aqua
+                    '--ds-text': '#000000', // Black text
+                    '--ds-text-subtle': '#004D40', // Dark teal for subtle text
+                    '--ds-accent-blue': '#00BCD4', // Cyan for accent
+                    '--ds-accent-blue-dark': '#00838F', // Darker Cyan
+                    '--ds-accent-red': '#D32F2F', // Deep Red for danger/exit
+                    '--ds-interactive-bg': 'rgba(0,188,212,0.1)', // Light cyan interactive background
+                    '--ds-interactive-hover': 'rgba(0,188,212,0.2)', // Slightly darker cyan on hover
+                    '--ds-list-bg': '#E0F7FA', // Very light blue for list backgrounds
+                    'blockSpacing': 10, // Vertical spacing between content blocks
+                    'productContentHorizontalPadding': 0, // Horizontal padding for product content
+                    'productContentVerticalPadding': 15 // Vertical padding for product content
+                };
+                // Message Box (canvas-rendered)
+                this.messageCanvas = this.createElement('canvas', 'message-canvas');
+                this.messageCtx = this.messageCanvas.getContext('2d');
+                this.messageCanvas.width = 300;
+                this.messageCanvas.height = 80;
+                this.messageCanvas.style.display = 'none'; // Initially hidden
+                
+                // Initialize topScreen *before* attempting to append messageCanvas to it
+                this.topScreen = new TopScreen(this);
+                this.topScreen.element.appendChild(this.messageCanvas);
+
+
+                this.firstShareDone = false; // Flag to trigger sparkle effect only once
+                this.productContentTextWidth = 256; // Max width for product content text
+                this.lineSpacingFactor = 1.5; // Line spacing for general product text
+                this.productNameLineSpacingFactor = 1.2; // Line spacing for product name
+                this.productNameTextWidth = 256; // Max width for product name text
+
+                this.threeDSceneManager = null;
+                this.dsContainerWidth = 320; // Fixed width of the bottom screen
+                this.dsContainerHeight = 240; // Fixed height of the bottom screen
+
+                // No explicit .bind(this) calls needed here for methods defined directly in the class,
+                // as they are automatically bound to the instance when called via `this.methodName()`.
+                // Only bind if passing as a callback where `this` context might be lost.
+            }
+            _drawTextOnCanvas(ctx, text, x, y, font, color, textAlign = 'left', textBaseline = 'alphabetic', maxWidth = Infinity, lineSpacingFactorToUse = this.lineSpacingFactor) {
+                // Add null check for ctx
+                if (!ctx) {
+                    console.error("Canvas rendering context is null. Cannot draw text.");
+                    return 0; // Return 0 height if context is unavailable
+                }
+                ctx.save();
+                ctx.font = font;
+                // Defensive check for color before setting fillStyle
+                ctx.fillStyle = color !== undefined && color !== null ? color : 'black';
+                ctx.textAlign = textAlign;
+                ctx.textBaseline = textBaseline;
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.font = font;
+                const tempMetrics = tempCtx.measureText('M');
+                const actualLineHeight = (tempMetrics.actualBoundingBoxAscent || 0) + (tempMetrics.actualBoundingBoxDescent || 0);
+                if (maxWidth === Infinity) {
+                    ctx.fillText(text, x, y);
+                    ctx.restore();
+                    return actualLineHeight * lineSpacingFactorToUse;
+                } else {
+                    const words = text.split(' ');
+                    let line = '';
+                    let currentY = y;
+                    let totalHeightUsed = 0;
+                    for (let n = 0; n < words.length; n++) {
+                        let testLine = line + (n > 0 ? ' ' : '') + words[n];
+                        let metrics = ctx.measureText(testLine);
+                        let testWidth = metrics.width;
+                        if (testWidth > maxWidth && line.length > 0) {
+                            ctx.fillText(line, x, currentY);
+                            totalHeightUsed += actualLineHeight * lineSpacingFactorToUse;
+                            currentY += actualLineHeight * lineSpacingFactorToUse;
+                            line = words[n];
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    ctx.fillText(line, x, currentY);
+                    totalHeightUsed += actualLineHeight * lineSpacingFactorToUse;
+                    ctx.restore();
+                    return totalHeightUsed;
+                }
+            }
+ 
+            /**
+             * Creates a canvas-rendered button with custom styling and effects.
+             * Moved to UltStoreApp for reusability.
+             * @param {object} options - Button creation options.
+             * @param {string} [options.text] - Text to display on the button.
+             * @param {HTMLImageElement} [options.sprite] - Image sprite to display on the button.
+             * @param {number} options.width - Width of the button canvas.
+             * @param {number} options.height - Height of the button canvas.
+             * @param {string} [options.textColor='black'] - Color of the button text.
+             * @param {CanvasTextBaseline} [options.textBaseline='middle'] - Text baseline for rendering.
+             * @param {CanvasTextAlign} [options.textAlign='center'] - Text alignment for rendering.
+             * @param {string} [options.font='16px "Rodin', sans-serif'] - Font style for the text.
+             * @param {function} [options.onClick] - Click event handler.
+             * @param {string} [options.className='canvas-button'] - CSS class for the button element.
+             * @param {string} [options.backgroundColor] - Base background color.
+             * @param {string} [options.activeBackgroundColor] - Background color when active/pressed.
+             * @param {number|number[]} [options.borderRadius=6] - Border radius (can be single value or array for each corner).
+             * @param {string} [options.pulseColor=null] - Color for the pulse effect on click.
+             * @param {object} [options.shadowOffset] - Shadow properties.
+             * @returns {HTMLButtonElement} The created button element.
+             */
+            _createCanvasButton({
+                text, sprite, width, height, textColor = 'black', textBaseline = 'middle',
+                textAlign = 'center', font = '16px "Rodin", sans-serif', onClick, className = 'canvas-button',
+                backgroundColor, activeBackgroundColor, borderRadius = 6, pulseColor = null,
+                shadowOffset = { x: 0, y: 2, blur: 4, color: 'rgba(0,0,0,0.2)' }
+            }) {
+                const button = this.createElement('button', className);
+                const canvas = this.createElement('canvas');
+                button.appendChild(canvas);
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false; // Disable anti-aliasing for pixel-perfect rendering
+
+                const appInstanceRef = this; // Capture 'this' (UltStoreApp instance) for use in nested functions
+
+                let pulseStartTime = 0;
+                let isPulsing = false;
+                let animationFrameId = null;
+                let isHovered = false;
+                let isPressed = false; // State for pressed effect
+
+                const finalTextColor = textColor;
+
+                // Method to update button text dynamically
+                button.updateText = (newText) => {
+                    text = newText;
+                    draw();
+                };
+
+                // Starts the pulse animation
+                const startPulse = () => {
+                    isPulsing = true;
+                    pulseStartTime = performance.now();
+                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                    animationFrameId = requestAnimationFrame(animatePulse);
+                };
+
+                // Animation loop for the pulse effect
+                const animatePulse = (currentTime) => {
+                    if (!isPulsing) return;
+                    const elapsed = currentTime - pulseStartTime;
+                    const duration = 500; // Pulse animation duration
+                    const progress = elapsed / duration;
+                    if (progress < 1) {
+                        draw(progress); // Redraw with current pulse progress
+                        animationFrameId = requestAnimationFrame(animatePulse);
+                    } else {
+                        isPulsing = false;
+                        animationFrameId = null;
+                        draw(); // Final redraw without pulse
+                    }
+                };
+
+                // Main drawing function for the button canvas
+                const draw = (pulseProgress = 0) => {
+                    ctx.clearRect(0, 0, width, height);
+                    const isActive = button.classList.contains('active');
+                    const isDisabled = button.disabled;
+
+                    let currentBgColor;
+                    let currentShadowOffset = { ...shadowOffset };
+
+                    // Determine background color based on button state
+                    if (isDisabled) {
+                        currentBgColor = '#d1d5db'; // Tailwind gray-300
+                        currentShadowOffset = { x: 0, y: 0, blur: 0, color: 'transparent' }; // No shadow when disabled
+                    } else if (isPressed) {
+                        currentBgColor = activeBackgroundColor || appInstanceRef.cssVars['--ds-accent-blue-dark']; // Darker for pressed
+                        currentShadowOffset = { x: 0, y: 0, blur: 0, color: 'transparent' }; // No shadow when pressed
+                    } else if (isActive) {
+                        currentBgColor = activeBackgroundColor || appInstanceRef.cssVars['--ds-accent-blue'];
+                    } else if (isHovered && !className.includes('share-button') && !className.includes('exit-button') && !className.includes('back-to-store-button') && !className.includes('add-to-cart-button') && !className.includes('checkout-button')) { // Exclude specific buttons from default hover
+                        currentBgColor = appInstanceRef.cssVars['--ds-interactive-hover']; // Hover color for general buttons
+                    } else {
+                        // Default background colors
+                        currentBgColor = backgroundColor || appInstanceRef.cssVars['--ds-interactive-bg'];
+                    }
+
+                    // Apply specific background colors for back and add-to-cart/checkout buttons
+                    if (className.includes('back-button')) {
+                        if (isDisabled) currentBgColor = 'rgba(128, 128, 128, 0.5)';
+                        else currentBgColor = isPressed ? appInstanceRef.cssVars['--ds-accent-red'] : (isActive ? appInstanceRef.cssVars['--ds-accent-red'] : appInstanceRef.cssVars['--ds-accent-red']); // Red tones
+                    } else if (className.includes('add-to-cart-button') || className.includes('checkout-button') || className.includes('back-to-store-button')) {
+                        if (isDisabled) currentBgColor = 'rgba(128, 128, 128, 0.5)';
+                        else currentBgColor = isPressed ? appInstanceRef.cssVars['--ds-accent-blue-dark'] : (isActive ? appInstanceRef.cssVars['--ds-accent-blue'] : appInstanceRef.cssVars['--ds-accent-blue']); // Green tones
+                    } else if (className.includes('cart-button')) {
+                        if (isDisabled) currentBgColor = 'rgba(128, 128, 128, 0.5)';
+                        else currentBgColor = isPressed ? '#FDD835' : (isActive ? '#FDD835' : '#FFEB3B'); // Yellow tones
+                    } else if (className.includes('exit-button')) {
+                        if (isDisabled) currentBgColor = 'rgba(128, 128, 128, 0.5)';
+                        else currentBgColor = isPressed ? appInstanceRef.cssVars['--ds-accent-red'] : (isActive ? appInstanceRef.cssVars['--ds-accent-red'] : appInstanceRef.cssVars['--ds-accent-red']); // Red tones for exit
+                    } else if (className.includes('share-button')) { // Ensure share button is transparent
+                        currentBgColor = 'transparent';
+                    }
+
+
+                    // Draw button background with shadow
+                    ctx.save();
+                    ctx.shadowColor = currentShadowOffset.color;
+                    ctx.shadowBlur = currentShadowOffset.blur;
+                    ctx.shadowOffsetX = currentShadowOffset.x;
+                    ctx.shadowOffsetY = currentShadowOffset.y;
+
+                    if (!(currentBgColor.startsWith('rgba') && currentBgColor.endsWith(',0)'))) {
+                        ctx.fillStyle = currentBgColor;
+                        ctx.beginPath();
+                        // Handle borderRadius array for ctx.roundRect (top-left, top-right, bottom-right, bottom-left)
+                        const radii = Array.isArray(borderRadius) ? {
+                            topLeft: borderRadius[0], topRight: borderRadius[1],
+                            bottomRight: borderRadius[2], bottomLeft: borderRadius[3]
+                        } : borderRadius;
+                        ctx.roundRect(0, 0, width, height, radii);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+
+                    // Draw highlight gradient
+                    ctx.save();
+                    ctx.beginPath();
+                    const highlightRadii = Array.isArray(borderRadius) ? {
+                        topLeft: borderRadius[0], topRight: borderRadius[1],
+                        bottomRight: borderRadius[2], bottomLeft: borderRadius[3]
+                    } : borderRadius;
+                    ctx.roundRect(0, 0, width, height, highlightRadii);
+                    ctx.clip(); // Clip to the rounded rectangle shape
+                    const highlightGradient = ctx.createLinearGradient(0, 0, 0, height);
+                    highlightGradient.addColorStop(0, `rgba(255, 255, 255, 0.15)`);
+                    highlightGradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+                    ctx.fillStyle = highlightGradient;
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.restore();
+
+                    // Draw subtle inner shadow gradient
+                    ctx.save();
+                    ctx.beginPath();
+                    const shadowRadii = Array.isArray(borderRadius) ? {
+                        topLeft: borderRadius[0], topRight: borderRadius[1],
+                        bottomRight: borderRadius[2], bottomLeft: borderRadius[3]
+                    } : borderRadius;
+                    ctx.roundRect(0, 0, width, height, shadowRadii);
+                    ctx.clip();
+                    const shadowGradient = ctx.createLinearGradient(0, 0, 0, height);
+                    shadowGradient.addColorStop(0, `rgba(0, 0, 0, 0)`);
+                    shadowGradient.addColorStop(1, `rgba(0, 0, 0, 0.1)`);
+                    ctx.fillStyle = shadowGradient;
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.restore();
+
+                    // Apply glow effect for share button on hover
+                    if (className.includes('share-button') && isHovered && !isDisabled) {
+                        ctx.shadowColor = 'rgba(13, 110, 253, 0.8)';
+                        ctx.shadowBlur = 15;
+                    } else {
+                        ctx.shadowColor = 'transparent';
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetX = 0;
+                        ctx.shadowOffsetY = 0;
+                    }
+
+                    // Draw pulse effect
+                    if (isPulsing && pulseColor && !isDisabled) {
+                        const radius = pulseProgress * (Math.min(width, height) / 2 * 1.5);
+                        const opacity = 0.5 * (1 - pulseProgress);
+                        const r = parseInt(pulseColor.slice(1, 3), 16);
+                        const g = parseInt(pulseColor.slice(3, 5), 16);
+                        const b = parseInt(pulseColor.slice(5, 7), 16);
+                        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+                        ctx.beginPath();
+                        ctx.arc(width / 2, height / 2, radius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // Draw sprite (icon)
+                    if (sprite) {
+                        const spriteSize = 20; // Fixed size for sprite
+                        // Only draw if the sprite is loaded and not in a broken state
+                        if (sprite.complete && sprite.naturalWidth !== 0) {
+                            ctx.drawImage(sprite, (width - spriteSize) / 2, (height - spriteSize) / 2, spriteSize, spriteSize);
+                        } else {
+                            console.warn(`Sprite for button is not loaded or broken: ${sprite.src}`);
+                        }
+                    }
+                    // Draw text
+                    if (text) {
+                        // Handle multi-line text for product cards
+                        const lines = text.split('\n');
+                        const lineHeight = parseInt(font) * 1.2; // Approximate line height
+                        let currentTextY = (height / 2) - (lines.length - 1) * lineHeight / 2; // Adjust starting Y for centering multi-line
+
+                        lines.forEach(line => {
+                            // Use the captured appInstanceRef
+                            appInstanceRef._drawTextOnCanvas(ctx, line, width / 2, currentTextY, font, finalTextColor, textAlign, textBaseline);
+                            currentTextY += lineHeight;
+                        });
+                    }
+                    // Reset shadow properties after drawing button content
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                };
+
+                // Observe changes in button class or disabled attribute to trigger redraw
+                const observer = new MutationObserver((mutationsList) => {
+                    for (const mutation of mutationsList) {
+                        if (mutation.type === 'attributes' && (mutation.attributeName === 'class' || mutation.attributeName === 'disabled')) {
+                            draw();
+                        }
+                    }
+                });
+                observer.observe(button, { attributes: true });
+
+                // Event listeners for hover and press effects
+                button.addEventListener('mouseenter', () => {
+                    if (button.disabled) return;
+                    isHovered = true;
+                    this.app.sounds.hover.play(); // Play hover sound
+                    draw();
+                });
+                button.addEventListener('mouseleave', () => {
+                    isHovered = false;
+                    isPressed = false; // Ensure pressed state is reset if mouse leaves while pressed
+                    draw();
+                });
+                button.addEventListener('mousedown', () => {
+                    if (button.disabled) return;
+                    isPressed = true;
+                    this.app.sounds.appLaunch.play(); // Play click sound on mousedown
+                    draw();
+                });
+                button.addEventListener('mouseup', () => {
+                    if (button.disabled) return;
+                    isPressed = false;
+                    draw();
+                });
+
+                // Click event listener
+                if (onClick) {
+                    button.addEventListener('click', (e) => {
+                        if (button.disabled) return;
+                        if (pulseColor) startPulse(); // Start pulse animation if defined
+                        onClick(e);
+                    });
+                }
+                // Redraw button once sprite is loaded or immediately if already loaded
+                if (sprite && !sprite.complete) sprite.onload = draw;
+                else draw();
+                return button;
+            }
+
+            /**
+             * Translates a given key using the loaded translation data.
+             * Supports nested keys (e.g., 'footer.exit') and replacements.
+             * @param {string} key - The translation key.
+             * @param {object} [replacements={}] - An object of placeholders and their values.
+             * @returns {string} The translated string.
+             */
+            t(key, replacements = {}) {
+                const keys = key.split('.');
+                let value = this.translations;
+                for (const k of keys) value = value ? value[k] : undefined;
+                let str = value || key; // Fallback to key if translation not found
+                for (const placeholder in replacements) str = str.replace(`{${placeholder}}`, replacements[placeholder]);
+                return str;
+            }
+
+            /**
+             * Loads translation data based on the current language setting.
+             * Defaults to 'en-US' if the specified language data is not found or parsing fails.
+             */
+            loadTranslations() {
+                try {
+                    const langData = languageData[this.language] || languageData['en-US'];
+                    this.translations = JSON.parse(langData);
+                } catch (e) {
+                    console.error("Failed to load or parse translations:", e);
+                    // Fallback to English if parsing fails
+                    this.translations = JSON.parse(languageData['en-US']);
+                }
+            }
+
+            /**
+             * Loads audio settings from localStorage.
+             */
+            loadAudioSettings() {
+                try {
+                    const storedSettings = localStorage.getItem('audioSettings');
+                    if (storedSettings) {
+                        const parsedSettings = JSON.parse(storedSettings);
+                        this.audioSettings = { ...this.audioSettings, ...parsedSettings };
+                    }
+                } catch (e) {
+                    console.error('Failed to load audio settings from localStorage:', e);
+                }
+            }
+
+            /**
+             * Saves current audio settings to localStorage.
+             */
+            saveAudioSettings() {
+                try {
+                    localStorage.setItem('audioSettings', JSON.stringify(this.audioSettings));
+                } catch (e) {
+                    console.error('Failed to save audio settings to localStorage:', e);
+                }
+            }
+
+            /**
+             * Initializes Howler.js sound instances.
+             */
+            _initializeSounds() {
+                const sfxVolume = 1.0 * this.audioSettings.volumeMultiplier.sfx;
+                const musicVolume = 0.2 * this.audioSettings.volumeMultiplier.music;
+                this.sounds = {
+                    hover: new Howl({ src: ['assets/sfx/Hover_1.wav'], volume: 1.0 * sfxVolume }),
+                    shareConfirm: new Howl({ src: ['assets/sfx/Start_2.wav'], volume: 0.8 * sfxVolume }),
+                    appLaunch: new Howl({ src: ['assets/sfx/Change_Tab_Open.wav'], volume: 0.7 * sfxVolume }),
+                    appExit: new Howl({ src: ['assets/sfx/Change_Tab_Close.wav'], volume: 0.7 * sfxVolume }),
+                    typing: new Howl({
+                        src: ['assets/sfx/tap1.wav', 'assets/sfx/tap2.wav', 'assets/sfx/tap3.wav'],
+                        sprite: { s1: [0, 100], s2: [100, 100], s3: [200, 100] },
+                        volume: 0.5 * sfxVolume
+                    }),
+                    inputFocus: new Howl({ src: ['assets/sfx/focus.wav'], volume: 0.7 * sfxVolume }),
+                    inputBlur: new Howl({ src: ['assets/sfx/blur.wav'], volume: 0.7 * sfxVolume }),
+                    music: new Howl({ src: ['assets/music/background_music.mp3'], loop: true, volume: 0 })
+                };
+            }
+
+            /**
+             * Applies the current audio settings (volume, mute, background music playback)
+             * to the Howler.js sound instances.
+             */
+            _applyAudioSettings() {
+                Howler.mute(this.audioSettings.mute);
+                const sfxVolume = 1.0 * this.audioSettings.volumeMultiplier.sfx;
+                const musicVolume = 0.2 * this.audioSettings.volumeMultiplier.music;
+
+                // Update volume for each sound if it exists
+                if (this.sounds.hover) this.sounds.hover.volume(1.0 * sfxVolume);
+                if (this.sounds.shareConfirm) this.sounds.shareConfirm.volume(0.8 * sfxVolume);
+                if (this.sounds.appLaunch) this.sounds.appLaunch.volume(0.7 * sfxVolume);
+                if (this.sounds.appExit) this.sounds.appExit.volume(0.7 * sfxVolume);
+                if (this.sounds.typing) this.sounds.typing.volume(0.5 * sfxVolume);
+                if (this.sounds.inputFocus) this.sounds.inputFocus.volume(0.7 * sfxVolume);
+                if (this.sounds.inputBlur) this.sounds.inputBlur.volume(0.7 * sfxVolume);
+
+                // Manage background music playback - initial play is now triggered by accepting rules
+                if (this.sounds.music) this.sounds.music.volume(musicVolume);
+            }
+
+            /**
+             * Parses a text string for inline formatting (bold, italic, links, images, etc.)
+             * and returns an array of token objects, each with text content and style properties.
+             * @param {string} text - The input text string.
+             * @returns {Array<object>} An array of parsed tokens.
+             */
+            _parseProductContent(content) {
+                const blocks = [];
+                const lines = content.split('\n');
+                let inList = false;
+                let currentListType = null; // 'unordered' or 'ordered'
+                let currentListIndent = 0;
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trimEnd(); // Trim end to remove trailing spaces but keep leading for indent
+
+                    // Heading (simple check, can be extended for #, ##, etc.)
+                    if (line.startsWith('# ')) {
+                        blocks.push({ type: 'heading', level: 1, text: line.substring(2).trim() });
+                        inList = false;
+                        continue;
+                    }
+                    // Horizontal Rule
+                    if (line === '---') {
+                        blocks.push({ type: 'hr' });
+                        inList = false;
+                        continue;
+                    }
+                    // Unordered List Item
+                    const unorderedMatch = line.match(/^(-|\*)\s+(.*)/);
+                    if (unorderedMatch) {
+                        const indent = line.indexOf(unorderedMatch[0]); // Get actual indent
+                        const listItemText = unorderedMatch[2].trim();
+                        if (!inList || currentListType !== 'unordered' || indent !== currentListIndent) {
+                            blocks.push({ type: 'list', listType: 'unordered', items: [{ text: listItemText, indent: indent }] });
+                            inList = true;
+                            currentListType = 'unordered';
+                            currentListIndent = indent;
+                        } else {
+                            // Add to the last list block
+                            blocks[blocks.length - 1].items.push({ text: listItemText, indent: indent });
+                        }
+                        continue;
+                    }
+
+                    // Ordered List Item
+                    const orderedMatch = line.match(/^(\d+)\.\s+(.*)/);
+                    if (orderedMatch) {
+                        const indent = line.indexOf(orderedMatch[0]); // Get actual indent
+                        const listItemText = orderedMatch[2].trim();
+                        if (!inList || currentListType !== 'ordered' || indent !== currentListIndent) {
+                            blocks.push({ type: 'list', listType: 'ordered', items: [{ text: listItemText, indent: indent }] });
+                            inList = true;
+                            currentListType = 'ordered';
+                            currentListIndent = indent;
+                        } else {
+                            // Add to the last list block
+                            blocks[blocks.length - 1].items.push({ text: listItemText, indent: indent });
+                        }
+                        continue;
+                    }
+
+                    // Image
+                    const imageMatch = line.match(/^!\[(.*?)\]\((.*?)\)$/);
+                    if (imageMatch) {
+                        blocks.push({ type: 'image', alt: imageMatch[1], url: imageMatch[2] });
+                        inList = false;
+                        continue;
+                    }
+
+                    // YouTube Embed
+                    const youtubeMatch = line.match(/^@\[youtube\]\((.*?)\)$/);
+                    if (youtubeMatch) {
+                        blocks.push({ type: 'embed', service: 'youtube', id: youtubeMatch[1] });
+                        inList = false;
+                        continue;
+                    }
+
+                    // Table (simplified parsing for two-line header/separator)
+                    if (line.startsWith('|') && lines[i + 1] && lines[i + 1].startsWith('|')) {
+                        const headerLine = line;
+                        const table = { type: 'table', headers: [], rows: [] };
+
+                        // Parse headers
+                        table.headers = headerLine.split('|').slice(1, -1).map(h => this._parseInlineFormatting(h.trim())); // Parse inline formatting in headers
+
+                        // Skip separator line
+                        i++;
+
+                        // Parse rows until an empty line or non-table line is encountered
+                        while (i + 1 < lines.length && lines[i + 1].startsWith('|')) {
+                            i++;
+                            const rowLine = lines[i];
+                            const row = rowLine.split('|').slice(1, -1).map(c => this._parseInlineFormatting(c.trim())); // Parse inline formatting in cells
+                            table.rows.push(row);
+                        }
+                        blocks.push(table);
+                        inList = false;
+                        continue;
+                    }
+
+                    // Paragraph or remaining text
+                    if (line) {
+                        blocks.push({ type: 'paragraph', tokens: this._parseInlineFormatting(line) });
+                        inList = false;
+                    } else {
+                        // Treat empty lines as paragraphs with a single space token for consistent spacing
+                        blocks.push({ type: 'paragraph', tokens: [{ text: ' ', style: {} }] });
+                        inList = false; // Ensure list state is reset on empty line
+                    }
+                }
+                return blocks;
+            }
+
+            /**
+             * Measures the height required to draw a given content block.
+             * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+             * @param {object} block - The content block object.
+             * @param {number} maxWidth - The maximum width for the block content.
+             * @returns {number} The height in pixels.
+             */
+            _measureBlockHeight(ctx, block, maxWidth) {
+                const baseFont = '14px "Rodin", sans-serif';
+                const headingFont = 'bold 18px "Rodin", sans-serif';
+                const measurer = new TextCanvasMeasurer();
+
+                switch (block.type) {
+                    case 'paragraph':
+                        // If it's just a space, give it a standard line height
+                        if (block.tokens.length === 1 && block.tokens[0].text === ' ') {
+                            return parseInt(baseFont) * this.lineSpacingFactor;
+                        }
+                        return this._renderInlineFormattedText(ctx, block.tokens, 0, 0, baseFont, 'black', maxWidth, this.lineSpacingFactor, true).height;
+                    case 'heading':
+                        return measurer.estimateWrappedTextHeight(block.text, headingFont, maxWidth, 1.2);
+                    case 'hr':
+                        return 10; // Height of a horizontal rule
+                    case 'list':
+                        let listHeight = 0;
+                        const listItemIndent = 20 // Indent for list items
+                        for (const item of block.items) {
+                            const itemTextWidth = maxWidth - listItemIndent;
+                            listHeight += this._renderInlineFormattedText(ctx, item.tokens, 0, 0, baseFont, 'black', itemTextWidth, this.lineSpacingFactor, true).height;
+                        }
+                        return listHeight;
+                    case 'image':
+                        const img = this.imageManager.getImage(block.url);
+                        if (img && img.complete) {
+                            const aspectRatio = img.height / img.width;
+                            return maxWidth * aspectRatio;
+                        }
+                        return 50; // Default height if image not loaded yet
+                    case 'embed':
+                        // For YouTube embeds, use a fixed height for the placeholder/thumbnail
+                        return maxWidth * (9 / 16); // 16:9 aspect ratio
+                    case 'table':
+                        let totalTableHeight = 0;
+                        const cellPadding = 5;
+                        const columnWidth = maxWidth / block.headers.length;
+
+                        // Measure header height
+                        let headerRowHeight = 0;
+                        block.headers.forEach(headerTokens => {
+                            const headerResult = this._renderInlineFormattedText(ctx, headerTokens, 0, 0, 'bold 14px "Rodin", sans-serif', 'black', columnWidth - cellPadding * 2, 1.2, true);
+                            headerRowHeight = Math.max(headerRowHeight, headerResult.height);
+                        });
+                        totalTableHeight += headerRowHeight + cellPadding * 2; // Header + padding
+
+                        // Measure row heights
+                        block.rows.forEach(row => {
+                            let maxRowHeight = 0;
+                            row.forEach(cellTokens => {
+                                const cellResult = this._renderInlineFormattedText(ctx, cellTokens, 0, 0, baseFont, 'black', columnWidth - cellPadding * 2, 1.2, true);
+                                maxRowHeight = Math.max(maxRowHeight, cellResult.height);
+                            });
+                            totalTableHeight += maxRowHeight + cellPadding * 2; // Row + padding
+                        });
+                        return totalTableHeight;
+                    default:
+                        return 0;
+                }
+            }
+
+            /**
+             * Draws a formatted content block onto the canvas.
+             * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+             * @param {HTMLElement} htmlOverlay - The HTML element to overlay HTML content (like iframes).
+             * @param {object} block - The content block object.
+             * @param {number} x - The X coordinate for drawing.
+             * @param {number} y - The Y coordinate for drawing.
+             * @param {number} maxWidth - The maximum width for the block content.
+             * @returns {number} The height used by the drawn block.
+             */
+            _drawFormattedBlock(ctx, htmlOverlay, block, x, y, maxWidth) {
+                const baseFont = '14px "Rodin", sans-serif';
+                const headingFont = 'bold 18px "Rodin", sans-serif';
+                const baseColor = this.cssVars['--ds-text'];
+                const lineSpacingFactor = this.lineSpacingFactor;
+                const verticalPadding = this.cssVars.productContentVerticalPadding; // Use product content padding
+
+                let blockHeight = 0;
+
+                switch (block.type) {
+                    case 'paragraph':
+                        const paragraphResult = this._renderInlineFormattedText(ctx, block.tokens, x, y, baseFont, baseColor, maxWidth, lineSpacingFactor);
+                        blockHeight = paragraphResult.height;
+                        this.hyperlinks.push(...paragraphResult.links);
+                        break;
+                    case 'heading':
+                        blockHeight = this._drawTextOnCanvas(ctx, block.text, x, y, headingFont, baseColor, 'left', 'top', maxWidth, 1.2);
+                        break;
+                    case 'hr':
+                        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(x, y + 4);
+                        ctx.lineTo(x + maxWidth, y + 4);
+                        ctx.stroke();
+                        blockHeight = 10;
+                        break;
+                    case 'list':
+                        let currentListItemY = y;
+                        const listItemIndent = 20;
+                        block.items.forEach((item, index) => {
+                            const itemX = x + (item.level * listItemIndent);
+                            const itemTextWidth = maxWidth - (item.level * listItemIndent) - listItemIndent; // Adjust for bullet/number
+                            let bulletOrNumber = '';
+                            if (block.listType === 'unordered') {
+                                bulletOrNumber = 'â€¢ ';
+                                ctx.beginPath();
+                                ctx.arc(itemX + 4, currentListItemY + (parseInt(baseFont) * lineSpacingFactor / 2), 3, 0, Math.PI * 2);
+                                ctx.fillStyle = baseColor;
+                                ctx.fill();
+                            } else {
+                                bulletOrNumber = `${index + 1}. `;
+                                this._drawTextOnCanvas(ctx, bulletOrNumber, itemX, currentListItemY, baseFont, baseColor, 'left', 'top');
+                            }
+
+                            const textStartX = itemX + (ctx.measureText(bulletOrNumber).width || 0); // Start text after bullet/number
+                            const itemTextResult = this._renderInlineFormattedText(ctx, item.tokens, textStartX, currentListItemY, baseFont, baseColor, itemTextWidth, lineSpacingFactor);
+                            currentListItemY += itemTextResult.height;
+                            blockHeight += itemTextResult.height;
+                            this.hyperlinks.push(...itemTextResult.links);
+                        });
+                        break;
+                    case 'image':
+                        const img = this.imageManager.getImage(block.url);
+                        if (img && img.complete) {
+                            const imgHeight = (maxWidth / img.width) * img.height;
+                            ctx.drawImage(img, x, y, maxWidth, imgHeight);
+                            blockHeight = imgHeight;
+                            this.hyperlinks.push({ rect: { x: x, y: y, width: maxWidth, height: imgHeight }, url: block.url });
+                        } else {
+                            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+                            ctx.fillRect(x, y, maxWidth, 50);
+                            this._drawTextOnCanvas(ctx, 'Loading Image...', x + maxWidth / 2, y + 25, '12px "Rodin", sans-serif', 'rgba(0,0,0,0.4)', 'center', 'middle');
+                            blockHeight = 50;
+                        }
+                        break;
+                    case 'embed':
+                        const embedHeight = (maxWidth * 9 / 16);
+                        const iframe = this.createElement('iframe', 'embedded-media');
+                        iframe.style.position = 'absolute';
+                        iframe.style.left = `${x}px`;
+                        iframe.style.top = `${y - verticalPadding}px`; // Adjust for vertical padding of the content area
+                        iframe.style.width = `${maxWidth}px`;
+                        iframe.style.height = `${embedHeight}px`;
+                        iframe.setAttribute('frameborder', '0');
+                        iframe.setAttribute('allowfullscreen', 'true');
+                        if (block.service === 'youtube') {
+                            iframe.src = `https://www.youtube.com/embed/${block.id}`;
+                        }
+                        htmlOverlay.appendChild(iframe);
+                        blockHeight = embedHeight;
+                        break;
+                    case 'table':
+                        let currentTableY = y;
+                        const cellPadding = 5;
+                        const columnWidth = maxWidth / block.headers.length;
+
+                        // Draw table headers
+                        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                        ctx.lineWidth = 1;
+                        block.headers.forEach((headerTokens, i) => {
+                            const headerResult = this._renderInlineFormattedText(ctx, headerTokens, x + i * columnWidth + cellPadding, currentTableY + cellPadding, `bold ${baseFont}`, baseColor, colWidth - cellPadding * 2, lineSpacingFactor);
+                            this.hyperlinks.push(...headerResult.links);
+                        });
+                        currentTableY += (parseInt(baseFont) * lineSpacingFactor) + cellPadding * 2; // Approximate header row height
+                        ctx.beginPath();
+                        ctx.moveTo(x, currentTableY);
+                        ctx.lineTo(x + maxWidth, currentTableY);
+                        ctx.stroke();
+
+                        // Draw table rows
+                        block.rows.forEach(row => {
+                            let maxRowHeight = (parseInt(baseFont) * lineSpacingFactor); // Min row height
+                            row.forEach((cellTokens, i) => {
+                                const cellResult = this._renderInlineFormattedText(ctx, cellTokens, x + i * columnWidth + cellPadding, currentTableY + cellPadding, baseFont, baseColor, colWidth - cellPadding * 2, lineSpacingFactor);
+                                this.hyperlinks.push(...cellResult.links);
+                                maxRowHeight = Math.max(maxRowHeight, cellResult.height);
+                            });
+                            currentTableY += maxRowHeight + cellPadding * 2;
+                            ctx.beginPath();
+                            ctx.moveTo(x, currentTableY);
+                            ctx.lineTo(x + maxWidth, currentTableY);
+                            ctx.stroke();
+                        });
+
+                        // Draw vertical borders
+                        for (let i = 1; i < block.headers.length; i++) {
+                            ctx.beginPath();
+                            ctx.moveTo(x + i * columnWidth, y);
+                            ctx.lineTo(x + i * columnWidth, currentTableY);
+                            ctx.stroke();
+                        }
+                        blockHeight = currentTableY - y;
+                        break;
+                }
+                return blockHeight;
+            }
+
+            /**
+             * Displays an app-wide error message on a dedicated canvas.
+             * Plays an error sound.
+             * @param {string} messageKey - The translation key for the message to display.
+             */
+            _showAppError(messageKey) {
+                this.sounds.errorBeep.play();
+                const message = this.t(messageKey); // Get translated error message
+                const ctx = this.messageCtx;
+                const canvas = this.messageCanvas;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw background with rounded corners and shadow
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 4;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.beginPath();
+                ctx.roundRect(0, 0, canvas.width, canvas.height, 8); // Rounded corners
+                ctx.fill();
+                ctx.restore();
+
+                this._drawTextOnCanvas(ctx, message, canvas.width / 2, canvas.height / 2, '16px "Rodin", sans-serif', 'red', 'center', 'middle');
+                this.messageCanvas.style.display = 'block';
+                clearTimeout(this.errorTimer);
+                this.errorTimer = setTimeout(() => {
+                    this.messageCanvas.style.display = 'none';
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }, 5000);
+            }
+
+            /**
+             * Initializes the application: injects styles, loads translations, audio settings,
+             * initializes sounds, loads sprites, creates UI components, and displays the initial storefront.
+             */
+            async start() {
+                this.injectStyles(); // Inject dynamic CSS
+                this.loadTranslations(); // Load translations
+                // Load custom font before rendering text
+                await document.fonts.load('1px "Rodin"', ' ');
+                await document.fonts.ready;
+                this.loadAudioSettings(); // Load audio settings from storage
+                this._initializeSounds(); // Initialize Howler.js sounds
+                this._applyAudioSettings(); // Apply loaded audio settings
+
+                // Load SVG sprites for buttons
+                const spritePromises = [];
+                const loadSprite = (name, src) => {
+                    return new Promise(resolve => {
+                        const img = new Image();
+                        img.onload = () => { this.sprites[name] = img; resolve(); };
+                        img.onerror = () => {
+                            console.error(`Failed to load sprite: ${src}`);
+                            this.sprites[name] = null; // Mark as failed
+                            resolve(); // Still resolve so Promise.all can complete
+                        };
+                        img.src = src;
+                    });
+                };
+
+                spritePromises.push(loadSprite('share', `/content/common/assets/icons/share_64px.png`));
+                spritePromises.push(loadSprite('backArrow', `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z'/%3E%3C/svg%3E`));
+                spritePromises.push(loadSprite('checkmark', `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E`));
+                spritePromises.push(loadSprite('cart', `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zm-8.9-5h7.45c.75 0 1.41-.42 1.75-1.04L22 6.41V4H7V3H4c-1.1 0-1.99.9-1.99 2L2 7l3.63 7.59-1.35 2.44C3.12 17.03 3.96 18 5 18h14v-2H5l1.1-2.2zM12 9l-1.41-1.41L12 5.17l1.41 1.42L12 9zm0 4l-1.41-1.41L12 9.17l1.41 1.42L12 13z'/%3E%3C/svg%3E`));
+
+
+                await Promise.all(spritePromises); // Wait for all sprites to load
+
+                // Initialize UI components
+                // this.topScreen is already initialized in the constructor before this.messageCanvas is appended.
+                this.pageViewManager = new PageViewManager(this.root, this.topScreen); // Pass this.root and this.topScreen
+
+                // Corrected order: topScreen (top) first, then pagesContainer (bottom)
+                this.root.appendChild(this.topScreen.element);
+                this.root.appendChild(this.pageViewManager.pagesContainer);
+
+                this.storefrontPage = new StorefrontPage({
+                    appInstance: this,
+                    onViewProduct: (product) => this.showProductDetail(product),
+                    onViewCart: () => this.showCart(),
+                    onExitApp: () => this.handleExitApp() // Pass exit handler
+                });
+                this.pageViewManager.registerPage('storefront', this.storefrontPage);
+
+                this.productDetailPage = new ProductDetailPage({
+                    appInstance: this,
+                    onShare: () => this.handleShare(),
+                    onBackToStore: () => this.showStorefront(),
+                    onAddToCart: (product) => this.addToCart(product)
+                });
+                this.pageViewManager.registerPage('product-detail', this.productDetailPage);
+
+                this.cartPage = new CartPage({
+                    appInstance: this,
+                    onBackToStore: () => this.showStorefront(),
+                    onCheckout: () => this.checkout()
+                });
+                this.pageViewManager.registerPage('cart', this.cartPage);
+
+                this.purchaseConfirmationPage = new PurchaseConfirmationPage({
+                    appInstance: this,
+                    onBackToStore: () => this.showStorefront()
+                });
+                this.pageViewManager.registerPage('purchase-confirmation', this.purchaseConfirmationPage);
+
+
+                // Initialize 3D scene manager
+                this.threeDSceneManager = new ThreeDSceneManager('myCanvas', this);
+                this.threeDSceneManager.init();
+
+                // Delaying the initial setView to ensure all parts of 'this' are fully ready.
+                setTimeout(() => {
+                    this.showStorefront(); // Start with the storefront view
+
+                    if (this.sounds.appLaunch) this.sounds.appLaunch.play(); // Play app launch sound
+
+                    // Notify parent frame that the app is ready (if running in an iframe)
+                    if (window.parent !== window) {
+                        window.parent.postMessage({ type: 'app-ready' }, '*');
+                    } else {
+                        console.warn('Not running in an iframe, cannot post message to parent.');
+                    }
+                }, 0); // Small delay
+            }
+
+            /**
+             * Displays the storefront view.
+             */
+            showStorefront() {
+                this.pageViewManager.showPage('storefront', { products: this.products });
+            }
+
+            /**
+             * Displays a specific product's detail page.
+             * @param {object} product - The product object to display.
+             */
+            showProductDetail(product) {
+                this.selectedProduct = product;
+                this.pageViewManager.showPage('product-detail', { product: this.selectedProduct });
+            }
+
+            /**
+             * Adds a product to the shopping cart.
+             * @param {object} product - The product to add.
+             */
+            addToCart(product) {
+                this.cart.push(product);
+                console.log(`Added "${product.name}" to cart. Cart count: ${this.cart.length}`);
+                this._showAppError(`Added "${product.name}" to cart!`);
+                // Update cart button text on storefront if it's visible
+                if (this.pageViewManager.currentPage === this.storefrontPage) {
+                    this.storefrontPage.cartButton.updateText(this.t('viewCart', { count: this.cart.length }));
+                }
+            }
+
+            /**
+             * Displays the shopping cart page.
+             */
+            showCart() {
+                this.pageViewManager.showPage('cart');
+            }
+
+            /**
+             * Simulates the checkout process.
+             */
+            checkout() {
+                if (this.cart.length === 0) {
+                    this._showAppError("Your cart is empty!");
+                    return;
+                }
+                console.log("Checking out with items:", this.cart);
+                this.cart = []; // Clear the cart after checkout
+                this.pageViewManager.showPage('purchase-confirmation');
+            }
+
+            /**
+             * Handles the share action: copies the product URL to the clipboard.
+             * @returns {void}
+             */
+            handleShare() {
+                if (!this.selectedProduct) return;
+                if (this.sounds.shareConfirm) this.sounds.shareConfirm.play(); // Play share confirmation sound
+
+                try {
+                    // Construct a mock URL for the product
+                    const url = `${window.location.origin}/product/${this.selectedProduct.slug}`;
+                    // Use a temporary textarea to copy text to clipboard
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = url;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy'); // Fallback for clipboard API in iframes
+                    document.body.removeChild(tempInput);
+                    console.log(`Link copied: ${url}`); // Log success message
+                } catch (e) {
+                    console.error('Clipboard copy failed:', e);
+                }
+            }
+
+            /**
+             * Handles exiting the application.
+             * @returns {void}
+             */
+            handleExitApp() {
+                console.log('Exiting application.');
+                if (this.sounds.appExit) this.sounds.appExit.play();
+                // Dispose of Three.js scene resources
+                if (this.threeDSceneManager) this.threeDSceneManager.dispose();
+                // In a real application, this would trigger an actual exit or navigation away.
+                // For this example, we'll just log and clear the content.
+                this.root.innerHTML = ''; // Clear app content
+                this.topScreen.productImageElement.src = ''; // Clear image
+                this.messageCanvas.style.display = 'none'; // Hide message box
+            }
+
+            /**
+             * Injects dynamic CSS styles into the document's head.
+             * This includes global styles, layout, and styles for canvas-rendered elements.
+             * @returns {void}
+             */
+            injectStyles() {
+                const styleSheet = document.createElement("style");
+                styleSheet.innerText = `
+        /* Root CSS Variables for consistent theming */
+        :root { --ds-bg: #E0F2F7; --ds-bg-grad: linear-gradient(180deg, #B2EBF2 0%, #80DEEA 100%); --ds-bg-grad-start-color: #B2EBF2; --ds-bg-grad-end-color: #80DEEA; --ds-text: #000000; --ds-text-subtle: #004D40; --ds-accent-blue: #00BCD4; --ds-accent-blue-dark: #00838F; --ds-accent-red: #D32F2F; --ds-interactive-bg: rgba(0,188,212,0.1); --ds-interactive-hover: rgba(0,188,212,0.2); --ds-list-bg: #E0F7FA; }
+
+        /* Custom font import */
+        @font-face { font-family: "Rodin"; src: url("/content/common/fonts/FOT-RodinNTLG Pro DB.otf") format("opentype"); }
+
+        /* Global body styling */
+        body { background: #000000; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: "Rodin", sans-serif; overflow: hidden; -webkit-font-smoothing: none; }
+
+        /* Main app container */
+        .ds-container { width: 400px; height: 480px; background: #000000; user-select: none; overflow: hidden; display: flex; flex-direction: column; align-items: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 0; }
+
+        /* Top screen for product image or 3D scene */
+        .top-screen { width: 400px; height: 240px; background: var(--ds-bg-grad); flex-shrink: 0; position: relative; overflow: hidden; border-radius: 0; }
+
+        /* Product image styling */
+        .product-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s ease-in-out; }
+
+        /* Three.js Canvas */
+        .three-d-canvas { display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+
+        /* Top screen text overlays */
+        .top-screen-product-name { position: absolute; top: 10px; left: 0; right: 0; margin: 0 auto; z-index: 2; }
+        .top-screen-product-price { position: absolute; top: 60px; left: 0; right: 0; margin: 0 auto; z-index: 2; }
+        .top-screen-product-meta { position: absolute; top: 85px; left: 0; right: 0; margin: 0 auto; z-index: 2; }
+
+
+        /* Container for all pages (bottom screen equivalent) */
+        .pages-container { width: 320px; height: 240px; background: var(--ds-bg-grad); position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; padding-top: 0; box-sizing: border-box; border-radius: 0; }
+        
+        /* General view styling for transitions */
+        .view { width: 100%; height: 100%; display: flex; flex-direction: column; position: absolute; top: 0; left: 0; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, transform 0.3s ease; transform: translateY(15px); pointer-events: none; }
+
+        .view.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+
+        /* Specific styling for the product detail page */
+        .product-detail-page { background: var(--ds-bg); }
+
+        /* Storefront Page */
+        .storefront-page { background: var(--ds-bg); display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
+        .storefront-header { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 10px; margin-bottom: 10px; flex-shrink: 0; }
+        .storefront-header-canvas { flex-grow: 1; height: 40px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; overflow-y: auto; flex-grow: 1; padding-right: 6px; scrollbar-width: none; position: relative; /* Needed for custom scrollbar positioning */ }
+        .products-grid::-webkit-scrollbar { display: none; }
+        .product-card { width: 100%; height: 160px; display: block; cursor: pointer; }
+
+        /* Cart Page */
+        .cart-page { background: var(--ds-bg); display: flex; flex-direction: column; padding: 10px; box-sizing: border-box; }
+        .cart-header { display: flex; justify-content: center; align-items: center; width: 100%; padding: 0 10px; margin-bottom: 10px; flex-shrink: 0; }
+        .cart-header-canvas { flex-grow: 1; height: 40px; }
+        .cart-items-container { flex-grow: 1; overflow-y: auto; scrollbar-width: none; padding-right: 6px; }
+        .cart-items-container::-webkit-scrollbar { display: none; }
+        .cart-item { background: #FFFFFF; border-radius: 6px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .cart-footer { flex-shrink: 0; width: 100%; padding-top: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .cart-total-canvas { width: 100%; height: 30px; }
+        .cart-buttons-wrapper { display: flex; justify-content: space-around; width: 100%; }
+
+
+        /* Purchase Confirmation Page */
+        .purchase-confirmation-page { background: var(--ds-bg-grad); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* Product header content container */
+        .product-header-content { padding: 10px 0; flex-shrink: 0; width: 320px; height: 90px; box-sizing: border-box; position: relative; overflow: hidden; }
+        /* Header background canvas positioned behind content */
+        .product-header-content canvas.header-background-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        /* Product header buttons (e.g., share button) */
+        .product-header-buttons { position: absolute; top: 10px; right: 10px; z-index: 10; }
+
+
+        /* Wrapper for scrollable product content and scrollbar */
+        .product-body-wrapper { flex-grow: 1; display: flex; position: relative; overflow: hidden; width: 300px; margin: 0 auto; }
+
+        /* Container for the product content canvas, enabling custom scrolling */
+        .scrollable-canvas-wrapper { flex-grow: 1; overflow-y: auto; scrollbar-width: none; height: 110px; position: relative; width: 280px; padding-right: 6px; }
+        /* Hide Webkit scrollbar */
+        .scrollable-canvas-wrapper::-webkit-scrollbar { display: none; }
+
+        /* Styling for the product content canvas */
+        .product-content-canvas { display: block; height: auto; width: 100%; margin: 0 auto; cursor: pointer; }
+
+        /* Overlay for HTML elements (like iframes) within the product content */
+        .product-html-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        /* Make iframes interactive */
+        .product-html-overlay > iframe { pointer-events: auto; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+
+        /* Message Box (canvas-rendered) */
+        .message-canvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 15px 25px; z-index: 1000; font-family: "Rodin", sans-serif; font-size: 16px; text-align: center; display: none; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* Reset all button styles for custom canvas rendering */
+        button { all: unset; }
+
+        /* Base styling for canvas-rendered buttons */
+        .canvas-button { display: block; cursor: pointer; padding: 0; border: none; margin: 0; outline: none; height: 36px; }
+
+        .canvas-button canvas { width: 100%; height: 100%; transition: none; }
+
+        /* Disabled state for canvas buttons */
+        .canvas-button:disabled { cursor: not-allowed; opacity: 0.6; }
+
+        /* Custom scrollbar styling */
+        .custom-scrollbar { position: absolute; right: 0; top: 0; bottom: 0; flex-shrink: 0; padding: 0 4px; cursor: grab; z-index: 2; }
+
+        /* Footer containing action buttons */
+        .product-footer { display: flex; justify-content: center; align-items: center; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; padding: 0; box-sizing: border-box; }
+
+        /* Styling for back and add-to-cart/checkout buttons */
+        .back-button, .add-to-cart-button, .checkout-button, .back-to-store-button { display: flex; align-items: center; justify-content: center; gap: 5px; }
+        `;
+                document.head.appendChild(styleSheet);
+            }
+        }
+
+        // Initialize the app when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = new UltStoreApp('app-root');
+            window.appInstance = app; // Make the instance globally available
+            app.start();
+        });
+
+        class ThreeDSceneManager {
+            constructor(canvasId, appInstance) {
+                this.app = appInstance;
+                this.canvas = document.getElementById(canvasId);
+                if (!this.canvas) {
+                    console.error(`3D Canvas element with ID '${canvasId}' not found!`);
+                    return;
+                }
+
+                this.renderer = null;
+                this.scene = null;
+                this.camera = null;
+                this.activeMixer = null;
+                this.activeActions = [];
+                this.currentLoopMode = THREE.LoopOnce; // Default loop mode: Play Once
+                this.clock = new THREE.Clock();
+                this.animationFrameId = null; // To store requestAnimationFrame ID
+
+                // Initialize cameraPositions here
+                this.cameraPositions = {
+                    default: {
+                        position: new THREE.Vector3(12, 10.5, -1.5),
+                        lookAt: new THREE.Vector3(5, 10.5, -1.5)
+                    }
+                };
+            }
+
+   
+            init() {
+                if (!this.canvas) return;
+
+                // Set up renderer
+                this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true });
+                this.renderer.setSize(this.canvas.width, this.canvas.height, false);
+
+                // Set up scene
+                this.scene = new THREE.Scene();
+
+                // Calculate FOV for 35mm focal length (assuming 24mm sensor height for 35mm equivalent)
+                const focalLength = 35; // mm
+                const sensorHeight = 24; // mm (common for 35mm equivalent)
+                const fov = 2 * Math.atan((sensorHeight / 2) / focalLength) * (180 / Math.PI);
+
+                // Set up camera
+                this.camera = new THREE.PerspectiveCamera(fov, this.canvas.width / this.canvas.height, 0.1, 1000);
+
+                // Lighting setup
+                this.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+                const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+                dirLight.position.set(5, 10, 7.5);
+                this.scene.add(dirLight);
+                const pointLight = new THREE.PointLight(0xffffff, 15);
+                this.camera.add(pointLight);
+                this.scene.add(this.camera);
+
+            }
+        }
+
+    </script>
+</body>
+
+</html>

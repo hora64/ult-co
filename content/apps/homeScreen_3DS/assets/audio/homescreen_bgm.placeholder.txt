@@ -1,0 +1,19 @@
+﻿# Placeholder Audio File
+
+This is a placeholder for the homescreen background music.
+
+To add actual music:
+1. Create or obtain a music file (OGG Vorbis format recommended)
+2. Name it `homescreen_bgm.ogg`
+3. Place it in this directory
+
+Recommended specifications:
+- Format: OGG Vorbis or MP3
+- Duration: 30-120 seconds (will loop)
+- Sample Rate: 44100 Hz
+- Bitrate: 128-192 kbps
+- Channels: Stereo or Mono
+
+The file should be licensed appropriately for use in your project.
+
+**Current Status**: No background music file present. The system will handle this gracefully by not playing any music.

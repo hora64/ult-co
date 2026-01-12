@@ -1,0 +1,140 @@
+﻿/**
+ * Default Theme CSS Variables for Home Screen
+ * These can be overridden by custom themes or app.js properties
+ * 
+ * Priority hierarchy:
+ * 1. app.js properties (highest priority)
+ * 2. Theme CSS variables (can override these defaults)
+ * 3. These default values (fallback)
+ */
+
+:root {
+    /* ========================================
+     * UNOPENED APP DEFAULTS
+     * ======================================== */
+    
+    /* Default gift box icon for unopened apps */
+    --hs-unopened-icon: '/content/common/assets/giftbox_48px.png';
+    
+    /* Default unopened banner module path */
+    --hs-unopened-banner-module: '/content/apps/homeScreen_3DS/assets/banners/unopened/unopened.js';
+    
+    /* Default unopened banner jingle */
+    --hs-unopened-jingle: '/content/apps/homeScreen_3DS/assets/banners/unopened/SE_CTR_HOME_BANNER_PRESENT.wav';
+    
+    
+    /* ========================================
+     * DEFAULT APP ICONS
+     * ======================================== */
+    
+    /* Default app icon (used when no icon is specified) */
+    --hs-default-app-icon: '/content/common/assets/BlankApp_64px.png';
+    
+    /* Default background icon for non-baseIcon apps */
+    --hs-default-background-icon: '';
+    
+    
+    /* ========================================
+     * SOUND EFFECTS
+     * ======================================== */
+    
+    /* Click sound when selecting an app */
+    --hs-sound-click: '/content/common/sfx/select6.ogg';
+    
+    /* Navigation/selection sound */
+    --hs-sound-select: '/content/common/sfx/select5.ogg';
+    
+    /* App launch sound */
+    --hs-sound-launch: '/content/common/sfx/select3.ogg';
+    
+    /* Size increase sound */
+    --hs-sound-size-up: '/content/common/sfx/select2.ogg';
+    
+    /* Size decrease sound */
+    --hs-sound-size-down: '/content/common/sfx/select.ogg';
+    
+    /* Drag/grab sound */
+    --hs-sound-grab: '/content/common/sfx/select.ogg';
+    
+    /* Gift box opening sound */
+    --hs-sound-open-box: '/content/common/sfx/open.ogg';
+    
+    
+    /* ========================================
+     * UI SPRITES & GRAPHICS
+     * ======================================== */
+    
+    /* Selection glow sprite */
+    --hs-selection-glow-sprite: url('/content/common/themes/blackTheme/Select_128px.png');
+    
+    /* Scrollbar middle section sprite */
+    --hs-scrollbar-middle-sprite: '/content/common/themes/blackTheme/HorizontalScrollBar_Middle.png';
+    
+    /* Scrollbar side/edge sprite */
+    --hs-scrollbar-side-sprite: '/content/common/themes/blackTheme/HorizontalScrollBar_Side.png';
+    
+    /* Size increase button sprite */
+    --hs-size-increase-sprite: '/content/common/themes/blackTheme/PlusSpriteButton_64px.png';
+    
+    /* Size decrease button sprite */
+    --hs-size-decrease-sprite: '/content/common/themes/blackTheme/MinusSpriteButton_64px.png';
+}
+
+
+/**
+ * THEME OVERRIDE EXAMPLES
+ * ========================
+ * 
+ * Custom themes can override these variables to change the entire system's appearance:
+ * 
+ * Example 1: Holiday Theme
+ * ------------------------
+ * [data-theme="holiday"] {
+ *     --hs-unopened-icon: '/themes/holiday/christmas_present.png';
+ *     --hs-unopened-jingle: '/themes/holiday/jingle_bells.mp3';
+ *     --hs-sound-open-box: '/themes/holiday/present_unwrap.ogg';
+ * }
+ * 
+ * 
+ * Example 2: Retro Theme
+ * ----------------------
+ * [data-theme="retro"] {
+ *     --hs-unopened-icon: '/themes/retro/mystery_box.png';
+ *     --hs-selection-glow-sprite: url('/themes/retro/cursor_glow.png');
+ *     --hs-sound-click: '/themes/retro/blip.ogg';
+ *     --hs-sound-select: '/themes/retro/beep.ogg';
+ * }
+ * 
+ * 
+ * Example 3: Sci-Fi Theme
+ * -----------------------
+ * [data-theme="scifi"] {
+ *     --hs-unopened-icon: '/themes/scifi/data_package.png';
+ *     --hs-unopened-banner-module: '/themes/scifi/hologram_banner.js';
+ *     --hs-unopened-jingle: '/themes/scifi/digital_chime.wav';
+ *     --hs-default-app-icon: '/themes/scifi/app_node.png';
+ * }
+ * 
+ * 
+ * APP-SPECIFIC OVERRIDES
+ * =======================
+ * 
+ * Individual apps can still override these in their app.js:
+ * 
+ * export const app = {
+ *     "id": "specialApp",
+ *     "icon": "/apps/special/icon.png",
+ *     "actualIcon": "/apps/special/icon.png",
+ *     
+ *     // Custom wrap icon (overrides CSS variable and default)
+ *     "wrapIcon": "/apps/special/custom_gift.png",
+ *     
+ *     // Custom unopened banner (overrides CSS variable)
+ *     "unopenedBannerModule": "/apps/special/custom_banner.js",
+ *     "unopenedJingle": "/apps/special/custom_jingle.mp3",
+ *     
+ *     // Or set to null to use CSS variable/default
+ *     "wrapIcon": null,  // Will use --hs-unopened-icon
+ *     "unopenedBannerModule": null,  // Will use --hs-unopened-banner-module
+ * }
+ */

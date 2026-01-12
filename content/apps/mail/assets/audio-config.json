@@ -1,0 +1,78 @@
+{
+    "click": {
+        "src": ["https://assets.codepen.io/210284/transform.mp3"],
+        "volume": 0.6,
+        "type": "sfx"
+    },
+    "swoosh": {
+        "src": ["https://assets.codepen.io/210284/whoosh.mp3"],
+        "volume": 0.5,
+        "type": "sfx"
+    },
+    "hover": {
+        "src": ["assets/sfx/Hover_1.wav"],
+        "volume": 1.0,
+        "type": "sfx"
+    },
+    "inputFocus": {
+        "src": ["https://assets.codepen.io/210284/soft-blip.mp3"],
+        "volume": 0.3,
+        "type": "sfx"
+    },
+    "inputBlur": {
+        "src": ["https://assets.codepen.io/210284/soft-blip-down.mp3"],
+        "volume": 0.3,
+        "type": "sfx"
+    },
+    "errorBeep": {
+        "src": ["https://assets.codepen.io/210284/error-beep.mpd"],
+        "volume": 0.4,
+        "type": "sfx"
+    },
+    "filterApply": {
+        "src": ["assets/sfx/Start_2.wav"],
+        "volume": 0.5,
+        "type": "sfx"
+    },
+    "typing": {
+        "src": ["assets/codepen.io/210284/keyboard-tap.mp3"],
+        "volume": 0.1,
+        "type": "sfx",
+        "sprite": {
+            "s1": [0, 100],
+            "s2": [100, 200],
+            "s3": [200, 300]
+        }
+    },
+    "music": {
+        "src": ["assets/sfx/part-time human.mp3"],
+        "loop": true,
+        "volume": 0.2,
+        "type": "music"
+    },
+    "scroll": {
+        "src": ["https://assets.codepen.io/210284/scroll.mp3"],
+        "volume": 0.05,
+        "type": "sfx"
+    },
+    "unopenedOpen": {
+        "src": ["assets/codepen.io/210284/notification-ding.mp3"],
+        "volume": 0.7,
+        "type": "sfx"
+    },
+    "shareConfirm": {
+        "src": ["assets/sfx/Start_2.wav"],
+        "volume": 0.8,
+        "type": "sfx"
+    },
+    "appLaunch": {
+        "src": ["assets/sfx/Change_Tab_Open.wav"],
+        "volume": 0.7,
+        "type": "sfx"
+    },
+    "appExit": {
+        "src": ["assets/sfx/Change_Tab_Close.wav"],
+        "volume": 0.7,
+        "type": "sfx"
+    }
+}
