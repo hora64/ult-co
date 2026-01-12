@@ -1,0 +1,46 @@
+{
+  "assets": {
+    "scrollBarMiddle": "/content/common/themes/blackTheme/HorizontalScrollBar_Middle.png",
+    "scrollBarSide": "/content/common/themes/blackTheme/HorizontalScrollBar_Side.png",
+    "selectionGlow": "/content/common/themes/blackTheme/Select_128px.png",
+    "sizeIncrease": "/content/common/themes/blackTheme/PlusSpriteButton_64px.png",
+    "sizeDecrease": "/content/common/themes/blackTheme/MinusSpriteButton_64px.png",
+    "topBar": "/content/common/themes/blackTheme/TopBar.png",
+    "soundClick": "/content/common/sfx/select6.ogg",
+    "soundSelect": "/content/common/sfx/select5.ogg",
+    "soundLaunch": "/content/common/sfx/select3.ogg",
+    "soundSizeUp": "/content/common/sfx/select2.ogg",
+    "soundSizeDown": "/content/common/sfx/select.ogg",
+    "soundGrab": "/content/common/sfx/select.ogg",
+    "soundOpenBox": "/content/common/sfx/open.ogg"
+  },
+  "colors": {
+    "topScreen": "#000000",
+    "bottomScreen": "#000000",
+    "dsContainer": "#000"
+  },
+  "cssVars": {
+    "--hs-unopened-icon": "/content/common/assets/giftbox_48px.png",
+    "--hs-unopened-banner-module": "/content/apps/homeScreen/banners/unopened/unopened.js",
+    "--hs-unopened-jingle": "/content/apps/homeScreen/banners/unopened/TestJingle.mp3",
+    "--hs-default-app-icon": "/content/common/assets/BlankApp_64px.png",
+    "--hs-sound-click": "/content/common/sfx/select6.ogg",
+    "--hs-sound-select": "/content/common/sfx/select5.ogg",
+    "--hs-sound-launch": "/content/common/sfx/select3.ogg",
+    "--hs-sound-size-up": "/content/common/sfx/select2.ogg",
+    "--hs-sound-size-down": "/content/common/sfx/select.ogg",
+    "--hs-sound-grab": "/content/common/sfx/select.ogg",
+    "--hs-sound-open-box": "/content/common/sfx/open.ogg",
+    "--hs-selection-glow-sprite": "/content/common/themes/blackTheme/Select_128px.png",
+    "--hs-scrollbar-middle-sprite": "/content/common/themes/blackTheme/HorizontalScrollBar_Middle.png",
+    "--hs-scrollbar-side-sprite": "/content/common/themes/blackTheme/HorizontalScrollBar_Side.png",
+    "--hs-size-increase-sprite": "/content/common/themes/blackTheme/PlusSpriteButton_64px.png",
+    "--hs-size-decrease-sprite": "/content/common/themes/blackTheme/MinusSpriteButton_64px.png",
+    "--hs-scrollbar-thumb": "rgba(100, 150, 255, 0.6)",
+    "--hs-scrollbar-track": "rgba(0, 0, 0, 0.2)",
+    "--hs-scrollbar-thumb-border": "rgba(100, 150, 255, 0.8)",
+    "--hs-scrollbar-base-color": "rgba(255, 100, 100, 0.5)",
+    "--empty-tile-color": "rgba(255, 255, 255, 0.08)",
+    "--empty-tile-border": "rgba(255, 255, 255, 0.15)"
+  }
+}

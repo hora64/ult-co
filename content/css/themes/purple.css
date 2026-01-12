@@ -1,0 +1,20 @@
+﻿/* Purple Theme */
+:root {
+    --theme-color-primary: #8A2BE2;
+    --theme-color-secondary: #9932CC;
+    --theme-color-background: #3A003A;
+    --theme-color-top-screen-gradient-start: #4B0082;
+    --theme-color-top-screen-gradient-end: #2A002A;
+    --theme-color-bottom-screen-background: #3A003A;
+    --theme-color-button-text: #FFFFFF;
+    --theme-color-text: #FFFFFF;
+    --theme-scrollbar-thumb-color: #8A2BE2;
+    --theme-scrollbar-track-color: #4B0082;
+    --theme-slider-thumb-color: #D3D3D3;
+    --theme-slider-track-color: #4B0082;
+    --theme-slider-filled-track-color: #8A2BE2;
+    --theme-toggle-thumb-color: #D3D3D3;
+    --theme-toggle-track-color: #4B0082;
+    --theme-toggle-active-thumb-color: #FFFFFF;
+    --theme-toggle-active-track-color: #8A2BE2;
+}
