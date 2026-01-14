@@ -1,6 +1,8 @@
 // Define the info app message
 console.log('[INFO APP] app.js is being loaded');
 
+import { loadTranslation, getSupportedLanguages } from './i18n/index.js';
+
 export const app = {
     "id": "info",
     "icon": "/content/common/assets/icons/warning_64px.png",
@@ -50,6 +52,10 @@ Please check back in a future update.`;
       "scale": "fit"
     },
     
+    "i18n": {
+      "loadTranslation": loadTranslation,
+      "getSupportedLanguages": getSupportedLanguages
+    },
     "locales": {
       "en-US": {
         "label": "Info",
@@ -78,6 +84,38 @@ Please check back in a future update.`;
       "pt-BR": {
         "label": "Info",
         "description": "Informações e estatísticas do sistema"
+      },
+      "zh-Hans-CN": {
+        "label": "信息",
+        "description": "系统信息和统计数据"
+      },
+      "zh-Hant": {
+        "label": "資訊",
+        "description": "系統資訊和統計數據"
+      },
+      "x-pirate": {
+        "label": "Ship's Info",
+        "description": "Vessel information an' statistics, arr!"
+      },
+      "x-uwu": {
+        "label": "Infu OwO",
+        "description": "System infuwmation and statistics >w<"
+      },
+      "x-valley": {
+        "label": "Info, Like",
+        "description": "System info and stats, you know?"
+      },
+      "x-debug-en-US": {
+        "label": "[DEBUG] Info",
+        "description": "[DEBUG] System information and statistics"
+      },
+      "x-debug-zh-Hans-CN": {
+        "label": "[调试] 信息",
+        "description": "[调试] 系统信息和统计数据"
       }
     }
-}
+};
+
+console.log('[Info App] Module loaded successfully');
+console.log('[Info App] Configuration:', app);
+console.log('[Info App] Supported languages:', getSupportedLanguages());

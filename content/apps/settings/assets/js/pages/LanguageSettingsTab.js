@@ -25,25 +25,22 @@ export class LanguageSettingsTab extends UIComponent {
             value: 'ko-KR',
             display: '한국어'
         }, {
+            value: 'zh-Hans-CN',
+            display: '简体中文'
+        }, {
+            value: 'zh-Hant',
+            display: '繁體中文'
+        }, {
             value: 'pt-BR',
             display: 'Português'
         }, {
-            value: 'pi-RR',
+            value: 'x-pirate',
             display: 'Pirate'
         }, {
-            value: 'ma-RS',
-            display: 'Martian'
-        }, {
-            value: 'dr-AC',
-            display: 'Clanker'
-        }, {
-            value: 'uw-UU',
+            value: 'x-uwu',
             display: 'UwU Speak'
         }, {
-            value: 'le-ET',
-            display: '1337 Sp34k'
-        }, {
-            value: 'va-LY',
+            value: 'x-valley',
             display: 'Valley Girl'
         }];
     }

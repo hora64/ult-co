@@ -46,6 +46,47 @@ const metalColorStops = {
         { stop: 0, color: '#E8E8E8' }, { stop: 0.2, color: '#FFFFFF' },
         { stop: 0.4, color: '#C0C0C0' }, { stop: 0.6, color: '#A9A9A9' },
         { stop: 0.8, color: '#E8E8E8' }, { stop: 1, color: '#808080' }
+    ],
+    // Colored Metallic Variants
+    red: [
+        { stop: 0, color: '#FF6B6B' }, { stop: 0.2, color: '#FFB3B3' },
+        { stop: 0.4, color: '#FF8787' }, { stop: 0.6, color: '#E63946' },
+        { stop: 0.8, color: '#FF6B6B' }, { stop: 1, color: '#C1121F' }
+    ],
+    blue: [
+        { stop: 0, color: '#4A90E2' }, { stop: 0.2, color: '#A8D0FF' },
+        { stop: 0.4, color: '#6CA8E8' }, { stop: 0.6, color: '#2E5C8A' },
+        { stop: 0.8, color: '#4A90E2' }, { stop: 1, color: '#1E3A5F' }
+    ],
+    green: [
+        { stop: 0, color: '#52C41A' }, { stop: 0.2, color: '#B7EB8F' },
+        { stop: 0.4, color: '#73D13D' }, { stop: 0.6, color: '#389E0D' },
+        { stop: 0.8, color: '#52C41A' }, { stop: 1, color: '#237804' }
+    ],
+    purple: [
+        { stop: 0, color: '#9C27B0' }, { stop: 0.2, color: '#E1BEE7' },
+        { stop: 0.4, color: '#BA68C8' }, { stop: 0.6, color: '#7B1FA2' },
+        { stop: 0.8, color: '#9C27B0' }, { stop: 1, color: '#4A148C' }
+    ],
+    pink: [
+        { stop: 0, color: '#FF69B4' }, { stop: 0.2, color: '#FFB6D9' },
+        { stop: 0.4, color: '#FF85C0' }, { stop: 0.6, color: '#E91E63' },
+        { stop: 0.8, color: '#FF69B4' }, { stop: 1, color: '#C2185B' }
+    ],
+    yellow: [
+        { stop: 0, color: '#FFD700' }, { stop: 0.2, color: '#FFEB99' },
+        { stop: 0.4, color: '#FFE066' }, { stop: 0.6, color: '#FFC107' },
+        { stop: 0.8, color: '#FFD700' }, { stop: 1, color: '#FFA000' }
+    ],
+    orange: [
+        { stop: 0, color: '#FF8C42' }, { stop: 0.2, color: '#FFD4A3' },
+        { stop: 0.4, color: '#FFA666' }, { stop: 0.6, color: '#FF6B35' },
+        { stop: 0.8, color: '#FF8C42' }, { stop: 1, color: '#D84315' }
+    ],
+    cyan: [
+        { stop: 0, color: '#00BCD4' }, { stop: 0.2, color: '#B2EBF2' },
+        { stop: 0.4, color: '#4DD0E1' }, { stop: 0.6, color: '#0097A7' },
+        { stop: 0.8, color: '#00BCD4' }, { stop: 1, color: '#006064' }
     ]
 };
 
@@ -76,8 +117,8 @@ originalMetals.forEach(metalName => {
  * Example: {metallic:gold|Heavy Metal}
  */
 export class MetallicEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'metallic';
         this.regex = /\{(metallic|staticmetallic):([^|]+)\|([^}]+?)(?:\|([^}]+))?\}/g;
         this.isAnimated = !options.static;
@@ -132,6 +173,10 @@ export class MetallicEffect extends Material {
         }
 
         ctx.save();
+
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
 
         const width = ctx.measureText(text).width;
         this.metalType = token.style.metalType || 'silver';

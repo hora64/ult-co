@@ -1,4 +1,4 @@
-﻿import * as THREE from 'three';
+import * as THREE from 'three';
 
 const _FFLShader_vert = `
     attribute vec4 _color;

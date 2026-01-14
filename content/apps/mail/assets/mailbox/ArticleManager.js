@@ -148,6 +148,7 @@ export class ArticleManager {
             result = result.filter((a) => !a.read);
         }
 
+        // First, sort by the selected criteria
         switch (activeFilters.sort) {
             case "date-asc":
                 result.sort(
@@ -167,6 +168,33 @@ export class ArticleManager {
                 );
                 break;
         }
+
+        // Then, stable sort to prioritize articles by importance:
+        // 1. Pinned articles (highest priority)
+        // 2. Time-limited articles (medium priority)
+        // 3. Regular articles (normal priority)
+        result.sort((a, b) => {
+            // Check pinned status (explicit flag OR legacy 'always' type)
+            const aIsPinned = a.pinned === true || a.unreadIndicator?.type === 'always';
+            const bIsPinned = b.pinned === true || b.unreadIndicator?.type === 'always';
+            
+            // Check time-limited status (explicit flag OR 'hourglass' type)
+            const aIsTimeLimited = a.timeLimited === true || a.unreadIndicator?.type === 'hourglass';
+            const bIsTimeLimited = b.timeLimited === true || b.unreadIndicator?.type === 'hourglass';
+            
+            // Pinned articles always come first
+            if (aIsPinned && !bIsPinned) return -1;
+            if (!aIsPinned && bIsPinned) return 1;
+            
+            // If both are pinned or both are not pinned, check time-limited status
+            if (aIsPinned === bIsPinned) {
+                if (aIsTimeLimited && !bIsTimeLimited) return -1;
+                if (!aIsTimeLimited && bIsTimeLimited) return 1;
+            }
+            
+            return 0; // Maintain existing order
+        });
+
         this.filteredAnnouncements = result;
     }
 

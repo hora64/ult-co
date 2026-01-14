@@ -1,0 +1,262 @@
+/**
+ * Holiday Theme for Home Screen
+ * Demonstrates CSS variable override system
+ * 
+ * To use: <html data-theme="holiday">
+ */
+
+[data-theme="holiday"] {
+    /* ========================================
+     * HOLIDAY THEME - UNOPENED APPS
+     * ======================================== */
+    
+    /* Christmas present icon for all unopened apps */
+    --hs-unopened-icon: '/content/themes/holiday/assets/christmas_present_48px.png';
+    
+    /* Holiday-themed unopened banner (optional custom module) */
+    --hs-unopened-banner-module: '/content/themes/holiday/banners/snow_globe_banner.js';
+    
+    /* Festive jingle bells sound */
+    --hs-unopened-jingle: '/content/themes/holiday/audio/jingle_bells_short.mp3';
+    
+    
+    /* ========================================
+     * HOLIDAY THEME - SOUND EFFECTS
+     * ======================================== */
+    
+    /* Bell ding for selection */
+    --hs-sound-click: '/content/themes/holiday/audio/bell_ding.ogg';
+    
+    /* Chime for navigation */
+    --hs-sound-select: '/content/themes/holiday/audio/chime.ogg';
+    
+    /* Sleigh bell launch sound */
+    --hs-sound-launch: '/content/themes/holiday/audio/sleigh_bells.ogg';
+    
+    /* Size up with cheerful tone */
+    --hs-sound-size-up: '/content/themes/holiday/audio/size_up_cheer.ogg';
+    
+    /* Size down with soft bell */
+    --hs-sound-size-down: '/content/themes/holiday/audio/size_down_soft.ogg';
+    
+    /* Gift unwrap with ribbon tear sound */
+    --hs-sound-open-box: '/content/themes/holiday/audio/ribbon_tear.ogg';
+    
+    
+    /* ========================================
+     * HOLIDAY THEME - UI SPRITES
+     * ======================================== */
+    
+    /* Snowflake selection glow */
+    --hs-selection-glow-sprite: url('/content/themes/holiday/sprites/snowflake_glow_128px.png');
+    
+    /* Candy cane scrollbar */
+    --hs-scrollbar-middle-sprite: '/content/themes/holiday/sprites/candy_cane_scrollbar_middle.png';
+    --hs-scrollbar-side-sprite: '/content/themes/holiday/sprites/candy_cane_scrollbar_side.png';
+    
+    /* Festive button sprites */
+    --hs-size-increase-sprite: '/content/themes/holiday/sprites/plus_ornament_64px.png';
+    --hs-size-decrease-sprite: '/content/themes/holiday/sprites/minus_ornament_64px.png';
+    
+    
+    /* ========================================
+     * HOLIDAY THEME - COLORS & STYLING
+     * (Optional - enhance existing UI)
+     * ======================================== */
+    
+    /* Holiday color scheme */
+    --primary-color: #c41e3a; /* Christmas red */
+    --secondary-color: #0f8a4f; /* Christmas green */
+    --accent-color: #ffd700; /* Gold */
+    
+    /* Snowflake background */
+    --background-overlay: url('/content/themes/holiday/backgrounds/snowflakes.png');
+    
+    /* Festive fonts */
+    --heading-font: 'Mountains of Christmas', cursive;
+    --body-font: 'Nunito', sans-serif;
+}
+
+
+/**
+ * ADDITIONAL STYLING FOR HOLIDAY THEME
+ * These enhance the visual experience beyond CSS variables
+ */
+
+[data-theme="holiday"] body {
+    background: 
+        linear-gradient(135deg, #1a1a2e 0%, #16213e 100%),
+        var(--background-overlay);
+    background-blend-mode: overlay;
+}
+
+/* Animated snowfall effect */
+[data-theme="holiday"]::before {
+    content: '';
+    position: fixed;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background-image: 
+        radial-gradient(2px 2px at 20% 30%, white, transparent),
+        radial-gradient(2px 2px at 60% 70%, white, transparent),
+        radial-gradient(1px 1px at 50% 50%, white, transparent),
+        radial-gradient(1px 1px at 80% 10%, white, transparent);
+    background-size: 200px 200px, 300px 300px, 150px 150px, 250px 250px;
+    animation: snowfall 20s linear infinite;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 1;
+}
+
+@keyframes snowfall {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(100%);
+    }
+}
+
+/* Holiday-themed app grid styling */
+[data-theme="holiday"] .app-grid {
+    border-radius: 15px;
+    box-shadow: 
+        0 0 20px rgba(196, 30, 58, 0.3),
+        0 0 40px rgba(15, 138, 79, 0.2);
+}
+
+/* Festive glow on unopened apps */
+[data-theme="holiday"] .app-icon-container[data-unopened="true"] {
+    animation: festiveGlow 2s ease-in-out infinite;
+}
+
+@keyframes festiveGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+    }
+}
+
+/* Holiday scrollbar styling */
+[data-theme="holiday"] .slim-scroll-indicator {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+/* Festive button hover effects */
+[data-theme="holiday"] .app-button:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+    transition: all 0.2s ease;
+}
+
+/* Christmas lights border effect */
+[data-theme="holiday"] .top-screen {
+    border: 2px solid transparent;
+    background: 
+        linear-gradient(white, white) padding-box,
+        repeating-linear-gradient(
+            90deg,
+            #c41e3a 0px, #c41e3a 10px,
+            #0f8a4f 10px, #0f8a4f 20px,
+            #ffd700 20px, #ffd700 30px
+        ) border-box;
+    border-radius: 10px;
+    animation: lightsRotate 3s linear infinite;
+}
+
+@keyframes lightsRotate {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 30px 0;
+    }
+}
+
+
+/**
+ * ACCESSIBILITY ENHANCEMENTS
+ */
+
+/* Ensure text remains readable */
+[data-theme="holiday"] {
+    --text-color: #ffffff;
+    --text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    [data-theme="holiday"] {
+        --primary-color: #ff0000;
+        --secondary-color: #00ff00;
+        --accent-color: #ffff00;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="holiday"]::before,
+    [data-theme="holiday"] .app-icon-container[data-unopened="true"],
+    [data-theme="holiday"] .top-screen {
+        animation: none !important;
+    }
+}
+
+
+/**
+ * RESPONSIVE ADJUSTMENTS
+ */
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    [data-theme="holiday"]::before {
+        opacity: 0.3; /* Less intensive snowfall on mobile */
+    }
+    
+    [data-theme="holiday"] .app-grid {
+        box-shadow: 
+            0 0 10px rgba(196, 30, 58, 0.3),
+            0 0 20px rgba(15, 138, 79, 0.2);
+    }
+}
+
+/* Tablet optimization */
+@media (min-width: 769px) and (max-width: 1024px) {
+    [data-theme="holiday"] {
+        --heading-font: 'Mountains of Christmas', cursive;
+        font-size: 1.1em;
+    }
+}
+
+
+/**
+ * DARK MODE SUPPORT
+ */
+
+@media (prefers-color-scheme: dark) {
+    [data-theme="holiday"] {
+        /* Darker holiday theme */
+        --primary-color: #8b1a2e;
+        --secondary-color: #0a5c35;
+    }
+    
+    [data-theme="holiday"] body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #0d121f 100%);
+    }
+}
+
+
+/**
+ * PRINT STYLES
+ */
+
+@media print {
+    [data-theme="holiday"]::before,
+    [data-theme="holiday"] .top-screen {
+        display: none !important;
+    }
+}

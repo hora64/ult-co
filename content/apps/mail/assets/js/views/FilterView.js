@@ -112,10 +112,15 @@ export class FilterView extends UIComponent {
 
         // --- Footer Buttons ---
         const filterFooter = this.createElement("div", "list-footer");
+        
+        // Use larger font size for Chinese text (14px instead of 12px)
+        const buttonFontSize = 14;
+        
         this.resetFilterButton = new CanvasButton({
             text: this.app.t("footer.resetFilter"),
             width: 160,
             height: 40,
+            font: `${buttonFontSize}px "Rodin", sans-serif`,
             onClick: () => {
                 this.app.sounds.filterApply.play();
                 this.onFilterChange({ sort: "date-desc", readStatus: "all", tag: "All" }, false);
@@ -123,11 +128,13 @@ export class FilterView extends UIComponent {
             backgroundColor: "#E0DACE",
             pressedBackgroundColor: "#CAC4B9",
             borderRadius: [12, 0, 0, 0],
+            appInstance: this.app, // Pass app instance for Chinese font support
         });
         this.applyFilterButton = new CanvasButton({
             text: this.app.t("footer.applyFilter"),
             width: 160,
             height: 40,
+            font: `${buttonFontSize}px "Rodin", sans-serif`,
             onClick: () => {
                 this.app.sounds.filterApply.play();
                 this.onFilterChange({}, true);
@@ -135,6 +142,7 @@ export class FilterView extends UIComponent {
             backgroundColor: this.app.cssVars["--ds-accent-blue"],
             pressedBackgroundColor: "#0C63E4",
             borderRadius: [0, 12, 0, 0],
+            appInstance: this.app, // Pass app instance for Chinese font support
         });
         filterFooter.appendChild(this.resetFilterButton.element);
         filterFooter.appendChild(this.applyFilterButton.element);
@@ -145,6 +153,9 @@ export class FilterView extends UIComponent {
         this.sortButtons = {};
         this.readStatusButtons = {};
         this.tagButtons = {};
+
+        // Use larger font size for Chinese text (14px instead of 12px)
+        const optionFontSize = 14;
 
         // Sort By
         menuContent.appendChild(this._createHeadingCanvas(this.app.t("sortBy")));
@@ -160,7 +171,7 @@ export class FilterView extends UIComponent {
                 text: opt.label,
                 width: 76,
                 height: 32,
-                font: '12px "Rodin", sans-serif',
+                font: `${optionFontSize}px "Rodin", sans-serif`,
                 textColor: "black",
                 onClick: () => this.onFilterChange({ sort: opt.key }, false),
                 backgroundColor: "#FDF5E6",
@@ -169,6 +180,7 @@ export class FilterView extends UIComponent {
                 borderRadius: 6,
                 borderColor: 'rgba(0,0,0,0.2)',
                 borderWidth: 1,
+                appInstance: this.app, // Pass app instance for Chinese font support
             });
             this.sortButtons[opt.key] = btn;
             sortGroup.appendChild(btn.element);
@@ -189,7 +201,7 @@ export class FilterView extends UIComponent {
                 text: opt.label,
                 width: 76,
                 height: 32,
-                font: '12px "Rodin", sans-serif',
+                font: `${optionFontSize}px "Rodin", sans-serif`,
                 textColor: "black",
                 onClick: () => this.onFilterChange({ readStatus: opt.key }, false),
                 backgroundColor: "#FDF5E6",
@@ -198,6 +210,7 @@ export class FilterView extends UIComponent {
                 borderRadius: 6,
                 borderColor: 'rgba(0,0,0,0.2)',
                 borderWidth: 1,
+                appInstance: this.app, // Pass app instance for Chinese font support
             });
             this.readStatusButtons[opt.key] = btn;
             readStatusGroup.appendChild(btn.element);
@@ -211,9 +224,9 @@ export class FilterView extends UIComponent {
         tags.forEach(tag => {
             const btn = new CanvasButton({
                 text: tag,
-                width: Math.max(76, new TextCanvasMeasurer().measureText(tag, '12px "Rodin", sans-serif').width + 12),
+                width: Math.max(76, new TextCanvasMeasurer().measureText(tag, `${optionFontSize}px "Rodin", sans-serif`).width + 12),
                 height: 32,
-                font: '12px "Rodin", sans-serif',
+                font: `${optionFontSize}px "Rodin", sans-serif`,
                 textColor: "black",
                 onClick: () => {
                     const newTag = activeFilters.tag === tag ? "All" : tag;
@@ -225,6 +238,7 @@ export class FilterView extends UIComponent {
                 borderRadius: 6,
                 borderColor: 'rgba(0,0,0,0.2)',
                 borderWidth: 1,
+                appInstance: this.app, // Pass app instance for Chinese font support
             });
             this.tagButtons[tag] = btn;
             tagGroup.appendChild(btn.element);

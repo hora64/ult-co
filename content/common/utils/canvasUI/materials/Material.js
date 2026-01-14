@@ -1,8 +1,9 @@
 export class Material {
-    constructor(options = {}) {
+    constructor(app, options = {}) {
         if (this.constructor === Material) {
             throw new Error("Abstract classes can't be instantiated.");
         }
+        this.app = app;
         this.options = options;
         this.name = '';
         this.regex = null;
@@ -37,6 +38,61 @@ export class Material {
 
     update(deltaTime) {
         throw new Error("Method 'update()' must be implemented.");
+    }
+
+    /**
+     * Gets the appropriate font for rendering, respecting language-specific font requirements.
+     * This ensures Chinese text uses DFPHeiW5-GB font and other languages use their configured fonts.
+     * @param {CanvasRenderingContext2D} ctx - The canvas context
+     * @returns {string} The font string to use for rendering
+     */
+    _getContextFont(ctx) {
+        if (!ctx || !ctx.font) {
+            return ctx.font || '16px sans-serif';
+        }
+
+        let font = ctx.font;
+        
+        // Check if we should use Chinese font
+        if (this.app && this.app.chineseFontLoaded) {
+            const userLanguage = this.app.language || localStorage.getItem("userLanguage") || "en-US";
+            if (userLanguage === 'zh-Hans-CN' || userLanguage === 'zh-Hant' || userLanguage === 'x-debug-zh-Hans-CN') {
+                // Replace Rodin and other fonts with Chinese font
+                font = font
+                    .replace(/(['"]?)FOT-RodinNTLG Pro DB\1/g, '"DFPHeiW5-GB"')
+                    .replace(/\bFOT-RodinNTLG Pro DB\b/g, 'DFPHeiW5-GB')
+                    .replace(/(['"]?)Rodin\1/g, '"DFPHeiW5-GB"')
+                    .replace(/\bRodin\b/g, 'DFPHeiW5-GB');
+            }
+        }
+        
+        return font;
+    }
+
+    /**
+     * Sets the font on the context, respecting language-specific requirements.
+     * @param {CanvasRenderingContext2D} ctx - The canvas context
+     * @param {string} font - The font string to set (will be adjusted for Chinese if needed)
+     */
+    _setContextFont(ctx, font) {
+        if (!ctx) return;
+        
+        let adjustedFont = font;
+        
+        // Check if we should use Chinese font
+        if (this.app && this.app.chineseFontLoaded) {
+            const userLanguage = this.app.language || localStorage.getItem("userLanguage") || "en-US";
+            if (userLanguage === 'zh-Hans-CN' || userLanguage === 'zh-Hant' || userLanguage === 'x-debug-zh-Hans-CN') {
+                // Replace Rodin and other fonts with Chinese font
+                adjustedFont = font
+                    .replace(/(['"]?)FOT-RodinNTLG Pro DB\1/g, '"DFPHeiW5-GB"')
+                    .replace(/\bFOT-RodinNTLG Pro DB\b/g, 'DFPHeiW5-GB')
+                    .replace(/(['"]?)Rodin\1/g, '"DFPHeiW5-GB"')
+                    .replace(/\bRodin\b/g, 'DFPHeiW5-GB');
+            }
+        }
+        
+        ctx.font = adjustedFont;
     }
 
     hexToRgb(hex) {

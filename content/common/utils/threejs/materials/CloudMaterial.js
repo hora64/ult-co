@@ -1,4 +1,4 @@
-﻿import * as THREE from 'three';
+import * as THREE from 'three';
 
 /**
  * Creates a material for rendering clouds with dynamic lighting and color.

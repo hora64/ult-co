@@ -8,8 +8,16 @@ export class TopScreen extends UIComponent {
     this.element = this.createElement("div", "top-screen");
     this.mailScene = new MailScene(this.app);
     this.element.appendChild(this.mailScene.renderer.domElement);
+    
+    // Create two image elements for crossfade transitions
     this.articleImageElement = this.createElement("img", "article-image");
+    this.articleImageElement.style.opacity = "0";
     this.element.appendChild(this.articleImageElement);
+    
+    this.articleImageElement2 = this.createElement("img", "article-image");
+    this.articleImageElement2.style.opacity = "0";
+    this.element.appendChild(this.articleImageElement2);
+    
     this.homeCanvas = this.createElement("canvas", "home-canvas");
     this.homeCtx = this.homeCanvas.getContext("2d");
     this.homeCtx.imageSmoothingEnabled = false;
@@ -18,10 +26,35 @@ export class TopScreen extends UIComponent {
     this.lastUnopenedCount = 0;
     this.timeOffset = 0;
     
+    // Track which image element is currently active
+    this.activeImageElement = this.articleImageElement;
+    this.inactiveImageElement = this.articleImageElement2;
+    
+    // Image cache for preloading
+    this.imageCache = new Map();
+    this.currentImageUrl = null;
+    
     // Load time offset from localStorage
     this._loadTimeOffset();
     
     window.addEventListener("resize", () => this.handleResize());
+  }
+
+  /**
+   * Preload an image into cache
+   */
+  _preloadImage(url) {
+    if (!url || this.imageCache.has(url)) return;
+    
+    const img = new Image();
+    img.onload = () => {
+      this.imageCache.set(url, img);
+      console.log(`[Mail TopScreen] Preloaded image: ${url}`);
+    };
+    img.onerror = () => {
+      console.warn(`[Mail TopScreen] Failed to preload image: ${url}`);
+    };
+    img.src = url;
   }
 
   /**
@@ -58,19 +91,70 @@ export class TopScreen extends UIComponent {
   }
 
   showArticleImage(imageUrl) {
-    this.articleImageElement.src = imageUrl;
-    this.articleImageElement.style.opacity = "1";
+    // Don't switch if it's the same image
+    if (this.currentImageUrl === imageUrl) {
+      return;
+    }
+    
+    this.currentImageUrl = imageUrl;
+    
+    // Hide home canvas
     this.homeCanvas.style.opacity = "0";
     this.mailScene.setOpacity(0.3);
     if (this.clockInterval) {
       clearInterval(this.clockInterval);
       this.clockInterval = null;
     }
+    
+    // Check if image is cached
+    if (this.imageCache.has(imageUrl)) {
+      // Use cached image for instant display
+      this._crossfadeToImage(imageUrl);
+    } else {
+      // Preload and then crossfade
+      const img = new Image();
+      img.onload = () => {
+        this.imageCache.set(imageUrl, img);
+        this._crossfadeToImage(imageUrl);
+      };
+      img.onerror = () => {
+        console.warn(`[Mail TopScreen] Failed to load image: ${imageUrl}`);
+        // Fallback: show image anyway
+        this._crossfadeToImage(imageUrl);
+      };
+      img.src = imageUrl;
+    }
+  }
+
+  /**
+   * Crossfade between two image elements for smooth transitions
+   */
+  _crossfadeToImage(imageUrl) {
+    // Swap active/inactive elements
+    const temp = this.activeImageElement;
+    this.activeImageElement = this.inactiveImageElement;
+    this.inactiveImageElement = temp;
+    
+    // Set new image on now-active element
+    this.activeImageElement.src = imageUrl;
+    
+    // Use requestAnimationFrame for smooth transition
+    requestAnimationFrame(() => {
+      // Fade in new image
+      this.activeImageElement.style.opacity = "1";
+      // Fade out old image
+      this.inactiveImageElement.style.opacity = "0";
+    });
   }
 
   showHomeScreen(unopenedCount) {
     this.lastUnopenedCount = unopenedCount;
+    this.currentImageUrl = null;
+    
+    // Fade out both image elements
     this.articleImageElement.style.opacity = "0";
+    this.articleImageElement2.style.opacity = "0";
+    
     this.homeCanvas.style.opacity = "1";
     this.mailScene.setOpacity(1);
     if (this.clockInterval) clearInterval(this.clockInterval);
@@ -116,5 +200,16 @@ export class TopScreen extends UIComponent {
     if (this.homeCanvas.style.opacity === "1") {
       this.drawHomeInfo(this.lastUnopenedCount, performance.now());
     }
+  }
+  
+  /**
+   * Preload images for articles (call this when articles are loaded)
+   */
+  preloadArticleImages(articles) {
+    if (!articles || !Array.isArray(articles)) return;
+    
+    // Preload up to 10 article images
+    const imagesToPreload = articles.slice(0, 10).map(a => a.image).filter(Boolean);
+    imagesToPreload.forEach(url => this._preloadImage(url));
   }
 }

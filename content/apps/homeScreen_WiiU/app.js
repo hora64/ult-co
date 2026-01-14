@@ -41,39 +41,56 @@ export const app = {
     },
     "es-ES": {
       "label": "Menú Principal Wii U",
-      "description": "Menú principal de aplicaciones de Wii U"
+      "description": "Tema de Wii U"
     },
     "fr-FR": {
       "label": "Menu Accueil Wii U",
-      "description": "Écran principal pour les applications Wii U"
+      "description": "Thème Wii U"
     },
     "de-DE": {
       "label": "Wii U Startmenü",
-      "description": "Hauptmenü für Wii U-Anwendungen"
+      "description": "Wii U-Thema"
     },
     "ja-JP": {
       "label": "Wii U ホームメニュー",
-      "description": "Wii U アプリケーション用メインメニュー"
+      "description": "Wii U テーマ"
     },
     "ko-KR": {
       "label": "Wii U 홈 메뉴",
-      "description": "Wii U 애플리케이션의 메인 메뉴"
+      "description": "Wii U 테마"
     },
     "pt-BR": {
       "label": "Menu Inicial Wii U",
-      "description": "Menu principal das aplicações Wii U"
+      "description": "Tema Wii U"
     },
-    "pi-RR": {
-      "label": "Wii U Deck",
-      "description": "Main deck of the ship, arrr!"
+    "zh-Hans-CN": {
+      "label": "Wii U 主菜单",
+      "description": "Wii U 主题"
     },
-    "ma-RS": {
-      "label": "Zeph'home",
-      "description": "Main crystal interface"
+    "zh-Hant": {
+      "label": "Wii U 主選單",
+      "description": "Wii U 主題"
     },
-    "dr-AC": {
-      "label": "Mainframe",
-      "description": "Central hub for all applications"
+    "x-pirate": {
+      "label": "Wii U Ship's Quarters",
+      "description": "Wii U theme, arr!"
+    },
+    "x-uwu": {
+      "label": "Wii U Home Menyu OwO",
+      "description": "Wii U theme, uwu~"
+    },
+    "x-valley": {
+      "label": "Wii U Home Menu, Like",
+      "description": "Wii U theme, you know?"
+
+    },
+    "x-debug-en-US": {
+      "label": "[DEBUG] Wii U Home Menu",
+      "description": "[DEBUG] Wii U Theme"
+    },
+    "x-debug-zh-Hans-CN": {
+      "label": "[调试] Wii U 主菜单",
+      "description": "[调试] Wii U 主题"
     }
   },
   "manualArticle": {

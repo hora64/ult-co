@@ -74,7 +74,10 @@ export class BottomScreen extends UIComponent {
                 break;
             case "article":
                 this.activeView = this.articleView;
-                this.articleView.render(data.article);
+                // Pass options including parentArticleSlug to article view
+                this.articleView.render(data.article, {
+                    parentArticleSlug: data.parentArticleSlug
+                });
                 break;
             case "filter":
                 this.activeView = this.filterView;

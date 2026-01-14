@@ -1,7 +1,7 @@
 import { UIComponent, TextCanvasMeasurer, LocalStorage, DateTimeFormatter, Scrollbar, CanvasButton } from "/content/common/utils/index.js";
 import { ModalManager } from "/content/common/utils/canvasUI/layouts/modal/ModalManager.js";
 import { TopScreen } from "./TopScreen.js";
-import { translations as settingsTranslations } from "../../i18n.js";
+import { loadTranslation, getSupportedLanguages } from "../../i18n/index.js";
 import { MainMenuTab } from './pages/MainMenuTab.js';
 import { SystemSettingsMenuTab } from './pages/SystemSettingsMenuTab.js';
 import { AudioSettingsTab } from './pages/AudioSettingsTab.js';
@@ -104,9 +104,9 @@ export class SettingsApp extends UIComponent {
     }
 
     async loadLanguageFile(langCode) {
-        this.translations = settingsTranslations[langCode] || settingsTranslations['en-US'];
+        this.translations = await loadTranslation(langCode);
         this.currentLanguage = langCode;
-        this.appLabel = this.translations.appLabel || 'Settings';
+        this.appLabel = this.translations.appLabel || this.translations.label || 'Settings';
         console.log(`Language set to ${langCode}`);
     }
 

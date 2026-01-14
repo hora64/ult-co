@@ -42,9 +42,13 @@ export class CanvasButton extends UIComponent {
         effect = null,
         effectStates = ['backgroundColor', 'hoverBackgroundColor', 'pressedBackgroundColor', 'selectedBackgroundColor'],
         states = {},
-        spriteScale = 1.0 // New parameter for sprite scaling
+        spriteScale = 1.0, // New parameter for sprite scaling
+        appInstance // Add appInstance parameter for Chinese font support
     }) {
         super();
+
+        // Store app instance for Chinese font support
+        this.appInstance = appInstance;
 
         // --- State Management Refactor ---
         const mergedStates = {
@@ -146,6 +150,23 @@ export class CanvasButton extends UIComponent {
         }
         this.draw();
         this._updateMarqueeState();
+    }
+
+    setTextColor(newColor) {
+        this.textColor = newColor;
+        this.draw();
+    }
+
+    setEnabled(enabled) {
+        const wasDisabled = this._isDisabled;
+        this._isDisabled = !enabled;
+        
+        // Only update if state changed
+        if (wasDisabled !== this._isDisabled) {
+            this.element.disabled = this._isDisabled;
+            this.draw();
+            this._updateGradientAnimationState();
+        }
     }
 
     get isActive() { return this._isActive; }
@@ -629,6 +650,84 @@ export class CanvasButton extends UIComponent {
         this.animationFrameId = requestAnimationFrame(animate);
     }
 
+    /**
+     * Get the appropriate font for rendering, replacing Rodin with Chinese font if needed
+     * or ensuring proper fallback stack for all characters including German (�), French, Spanish, etc.
+     */
+    _getRenderedFont(font) {
+        let renderedFont = font;
+        
+        // Check if we should use Chinese font from app configuration
+        if (this.appInstance && this.appInstance.translations && 
+            this.appInstance.translations._meta && this.appInstance.translations._meta.font) {
+            
+            const fontConfig = this.appInstance.translations._meta.font;
+            const primaryFont = fontConfig.primary;
+            
+            // Only substitute if the primary font is different
+            if (primaryFont) {
+                // Replace Rodin with the primary font from config
+                renderedFont = renderedFont
+                    .replace(/(['"]?)FOT-RodinNTLG Pro DB\1/g, `"${primaryFont}"`)
+                    .replace(/\bFOT-RodinNTLG Pro DB\b/g, primaryFont)
+                    .replace(/(['"]?)Rodin\1/g, `"${primaryFont}"`)
+                    .replace(/\bRodin\b/g, primaryFont);
+                
+                // Scale up font size if configured
+                const scale = fontConfig.scale || 1.15;
+                if (scale !== 1) {
+                    const fontMatch = renderedFont.match(/(\d+(?:\.\d+)?)(px|pt|em)/i);
+                    if (fontMatch) {
+                        const originalSize = parseFloat(fontMatch[1]);
+                        const unit = fontMatch[2];
+                        const scaledSize = Math.round(originalSize * scale);
+                        renderedFont = renderedFont.replace(/\d+(?:\.\d+)?(px|pt|em)/i, `${scaledSize}${unit}`);
+                    }
+                }
+                
+                return renderedFont;
+            }
+        }
+        
+        // FALLBACK LOGIC for when appInstance or translations are not available
+        // Check if we should use Chinese font
+        if (this.appInstance && this.appInstance.chineseFontLoaded) {
+            const userLanguage = this.appInstance.language || localStorage.getItem("userLanguage") || "en-US";
+            if (userLanguage === 'zh-Hans-CN' || userLanguage === 'zh-Hant') {
+                // Replace Rodin with Chinese font, preserving size and style
+                renderedFont = renderedFont
+                    .replace(/(['"]?)FOT-RodinNTLG Pro DB\1/g, '"DFPHeiW5-GB"')
+                    .replace(/\bFOT-RodinNTLG Pro DB\b/g, 'DFPHeiW5-GB')
+                    .replace(/(['"]?)Rodin\1/g, '"DFPHeiW5-GB"')
+                    .replace(/\bRodin\b/g, 'DFPHeiW5-GB');
+                
+                // Scale up font size by 15% for Chinese characters for better readability
+                const fontMatch = renderedFont.match(/(\d+(?:\.\d+)?)(px|pt|em)/i);
+                if (fontMatch) {
+                    const originalSize = parseFloat(fontMatch[1]);
+                    const unit = fontMatch[2];
+                    const scaledSize = Math.round(originalSize * 1.15); // 15% larger
+                    renderedFont = renderedFont.replace(/\d+(?:\.\d+)?(px|pt|em)/i, `${scaledSize}${unit}`);
+                }
+            }
+        }
+        
+        // Ensure comprehensive fallback stack for all languages
+        // This fixes rendering issues with German (�), French, Spanish, and other special characters
+        if (renderedFont.includes('Rodin') || renderedFont.includes('FOT-RodinNTLG Pro DB')) {
+            // If font still contains Rodin, ensure proper fallback
+            if (!renderedFont.includes('Arial') && !renderedFont.includes('Segoe UI')) {
+                // Add comprehensive fallback stack
+                renderedFont = renderedFont.replace(
+                    /(["']?(?:FOT-RodinNTLG Pro DB|Rodin)["']?)(?:\s*,\s*sans-serif)?/g,
+                    '"FOT-RodinNTLG Pro DB", Rodin, Arial, "Segoe UI", "Helvetica Neue", Helvetica, "Liberation Sans", "Nimbus Sans L", sans-serif'
+                );
+            }
+        }
+        
+        return renderedFont;
+    }
+
     render() {
         const button = this.createElement('button', 'canvas-button');
         this.element = button;
@@ -743,11 +842,14 @@ export class CanvasButton extends UIComponent {
         const currentText = this._getCurrentText();
         if (!currentText || !this.canvas) return;
         const ctx = this.canvas.getContext('2d');
-        ctx.font = this.font;
+        
+        // Use Chinese font if appropriate
+        const renderedFont = this._getRenderedFont(this.font);
+        ctx.font = renderedFont;
 
         if (this.richTextRenderer) {
             const parsed = this.richTextRenderer.parseInlineFormatting(currentText);
-            const measurement = this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, 0, 0, this.font, this.textColor, this.width, 1.2, true);
+            const measurement = this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, 0, 0, renderedFont, this.textColor, this.width, 1.2, true);
             this.textWidth = measurement.width;
         } else {
             this.textWidth = ctx.measureText(currentText).width;
@@ -794,7 +896,10 @@ export class CanvasButton extends UIComponent {
 
     _drawTextOnCanvas(ctx, text, x, y, font, color, textAlign, textBaseline) {
         ctx.save();
-        ctx.font = font;
+        
+        // Get the appropriate font (with Chinese font replacement if needed)
+        const renderedFont = this._getRenderedFont(font);
+        ctx.font = renderedFont;
         ctx.textBaseline = textBaseline;
 
         // Apply text offsets
@@ -825,10 +930,10 @@ export class CanvasButton extends UIComponent {
                     ? this.marqueeOffset - this.textWidth - this.marqueeGap
                     : this.marqueeOffset + this.textWidth + this.marqueeGap;
 
-                this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, this.marqueeOffset, y, this.font, this.textColor, this.width, 1.2, false, 'middle');
-                this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, secondTextX, y, this.font, this.textColor, this.width, 1.2, false, 'middle');
+                this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, this.marqueeOffset, y, renderedFont, this.textColor, this.width, 1.2, false, 'middle');
+                this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, secondTextX, y, renderedFont, this.textColor, this.width, 1.2, false, 'middle');
             } else {
-                const measurement = this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, 0, 0, font, color, this.width, 1.2, true);
+                const measurement = this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, 0, 0, renderedFont, color, this.width, 1.2, true);
                 let textX = x;
                 if (textAlign === 'center') {
                     textX = x - (measurement.width / 2);
@@ -837,19 +942,12 @@ export class CanvasButton extends UIComponent {
                 } else {
                     textX = 10; // 10px padding
                 }
-                this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, textX, y, font, color, this.width, 1.2, false, 'middle');
+                this.richTextRenderer.renderInlineFormattedText(ctx, parsed.tokens, textX, y, renderedFont, color, this.width, 1.2, false, 'middle');
             }
         } else {
             // Plain text rendering
             if (useMarquee) {
-                const fadeWidth = 4;
-                const gradient = ctx.createLinearGradient(0, 0, this.width, 0);
-                const fadeStop = Math.min(0.5, fadeWidth / this.width);
-                gradient.addColorStop(0, 'transparent');
-                gradient.addColorStop(fadeStop, color);
-                gradient.addColorStop(1 - fadeStop, color);
-                gradient.addColorStop(1, 'transparent');
-                ctx.fillStyle = gradient;
+                ctx.fillStyle = color;
                 ctx.textAlign = 'left';
 
                 const secondTextX = this.marqueeDirection === 'right'

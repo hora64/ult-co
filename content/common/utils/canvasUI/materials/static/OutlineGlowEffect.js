@@ -6,8 +6,8 @@ import { Material } from "../Material.js";
  * Example: {outlineglow:white,1,5|Glowing Outline}
  */
 export class OutlineGlowEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'outlineglow';
         this.regex = /{outlineglow:([^,]+),([^,]+),([^|]+)\|([^}]+)}/g;
         this.isAnimated = false;
@@ -36,6 +36,12 @@ export class OutlineGlowEffect extends Material {
     }
 
     apply(ctx, x, y, width, height, text) {
+        ctx.save();
+        
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+        
         ctx.strokeStyle = this.color;
         ctx.lineWidth = this.width;
         ctx.lineJoin = 'round';
@@ -52,5 +58,7 @@ export class OutlineGlowEffect extends Material {
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.lineWidth = 1;
+        
+        ctx.restore();
     }
 }

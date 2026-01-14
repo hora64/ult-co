@@ -49,6 +49,82 @@ export class CanvasInput extends UIComponent {
         this.setupEventListeners();
     }
 
+    /**
+     * Get the appropriate font for rendering, replacing Rodin with Chinese font if needed
+     * or ensuring proper fallback stack for all characters including German (�), French, Spanish, etc.
+     */
+    _getRenderedFont() {
+        let renderedFont = this.font;
+        
+        // Check if we should use Chinese font from app configuration
+        if (this.appInstance && this.appInstance.translations && 
+            this.appInstance.translations._meta && this.appInstance.translations._meta.font) {
+            
+            const fontConfig = this.appInstance.translations._meta.font;
+            const primaryFont = fontConfig.primary;
+            
+            // Only substitute if the primary font is different
+            if (primaryFont) {
+                // Replace Rodin with the primary font from config
+                renderedFont = renderedFont
+                    .replace(/(['"]?)FOT-RodinNTLG Pro DB\1/g, `"${primaryFont}"`)
+                    .replace(/\bFOT-RodinNTLG Pro DB\b/g, primaryFont)
+                    .replace(/(['"]?)Rodin\1/g, `"${primaryFont}"`)
+                    .replace(/\bRodin\b/g, primaryFont);
+                
+                // Scale up font size if configured
+                const scale = fontConfig.scale || 1.15;
+                if (scale !== 1) {
+                    const fontMatch = renderedFont.match(/(\d+(?:\.\d+)?)(px|pt|em)/i);
+                    if (fontMatch) {
+                        const originalSize = parseFloat(fontMatch[1]);
+                        const unit = fontMatch[2];
+                        const scaledSize = Math.round(originalSize * scale);
+                        renderedFont = renderedFont.replace(/\d+(?:\.\d+)?(px|pt|em)/i, `${scaledSize}${unit}`);
+                    }
+                }
+                
+                return renderedFont;
+            }
+        }
+        
+        // FALLBACK LOGIC for legacy support
+        // Check if we should use Chinese font
+        if (this.appInstance && this.appInstance.chineseFontLoaded) {
+            const userLanguage = this.appInstance.language || localStorage.getItem("userLanguage") || "en-US";
+            if (userLanguage === 'zh-Hans-CN' || userLanguage === 'zh-Hant') {
+                // Replace Rodin with Chinese font, preserving size and style
+                renderedFont = renderedFont
+                    .replace(/(['"]?)Rodin\1/g, '"DFPHeiW5-GB"')
+                    .replace(/\bRodin\b/g, 'DFPHeiW5-GB');
+                
+                // Scale up font size by 15% for Chinese characters for better readability
+                const fontMatch = renderedFont.match(/(\d+(?:\.\d+)?)(px|pt|em)/i);
+                if (fontMatch) {
+                    const originalSize = parseFloat(fontMatch[1]);
+                    const unit = fontMatch[2];
+                    const scaledSize = Math.round(originalSize * 1.15); // 15% larger
+                    renderedFont = renderedFont.replace(/\d+(?:\.\d+)?(px|pt|em)/i, `${scaledSize}${unit}`);
+                }
+            }
+        }
+        
+        // Ensure comprehensive fallback stack for all languages
+        // This fixes rendering issues with German (�), French, Spanish, and other special characters
+        if (renderedFont.includes('Rodin') || renderedFont.includes('FOT-RodinNTLG Pro DB')) {
+            // If font still contains Rodin, ensure proper fallback
+            if (!renderedFont.includes('Arial') && !renderedFont.includes('Segoe UI')) {
+                // Add comprehensive fallback stack
+                renderedFont = renderedFont.replace(
+                    /(["']?(?:FOT-RodinNTLG Pro DB|Rodin)["']?)(?:\s*,\s*sans-serif)?/g,
+                    '"FOT-RodinNTLG Pro DB", Rodin, Arial, "Segoe UI", "Helvetica Neue", Helvetica, "Liberation Sans", "Nimbus Sans L", sans-serif'
+                );
+            }
+        }
+        
+        return renderedFont;
+    }
+
     render() {
         const container = this.createElement('div', 'canvas-input-wrapper');
         container.style.position = 'relative';
@@ -123,7 +199,8 @@ export class CanvasInput extends UIComponent {
         const rect = this.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left - this.padding;
         
-        this.ctx.font = this.font;
+        const renderedFont = this._getRenderedFont();
+        this.ctx.font = renderedFont;
         let clickPosition = 0;
         
         for (let i = 0; i <= this.value.length; i++) {
@@ -164,8 +241,11 @@ export class CanvasInput extends UIComponent {
         ctx.roundRect(0.5, 0.5, this.width - 1, this.height - 1, this.borderRadius);
         ctx.stroke();
         
+        // Get the appropriate font (with Chinese font replacement if needed)
+        const renderedFont = this._getRenderedFont();
+        
         // Set text properties
-        ctx.font = this.font;
+        ctx.font = renderedFont;
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'left';
         

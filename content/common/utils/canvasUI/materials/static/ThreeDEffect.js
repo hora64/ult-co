@@ -15,8 +15,8 @@ import { Material } from "../Material.js";
  * Example: {threeD:extrusionColor=#C0C0C0,baseColor=gold|Royal Text}
  */
 export class ThreeDEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'threeD';
         this.regex = /\{threeD(?::([^|]+))?\|([^}]+?)\}/gi;
         this.isAnimated = false;
@@ -59,6 +59,10 @@ export class ThreeDEffect extends Material {
     apply(ctx, text, x, y, token, baseFontSize, rendererBaseColor) {
         ctx.save();
 
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+
         const {
             angle,
             depth,
@@ -78,7 +82,12 @@ export class ThreeDEffect extends Material {
             currentFontSize *= 0.8;
             yOffset = -baseFontSize * 0.3;
         }
-        ctx.font = ctx.font.replace(/\d+px/, `${currentFontSize}px`);
+        
+        // Update font size while preserving font family (including Chinese font if applied)
+        const currentFont = this._getContextFont(ctx);
+        const fontWithNewSize = currentFont.replace(/\d+px/, `${currentFontSize}px`);
+        this._setContextFont(ctx, fontWithNewSize);
+        
         const finalY = y + yOffset;
 
         const angleInRadians = angle * (Math.PI / 180);
@@ -89,8 +98,8 @@ export class ThreeDEffect extends Material {
         ctx.fillStyle = extrusionColor;
         for (let i = depth; i > 0; i--) {
             const xOffset = i * cosAngle;
-            const yOffset = i * sinAngle;
-            ctx.fillText(text, x + xOffset, finalY + yOffset);
+            const yOffsetExtrusion = i * sinAngle;
+            ctx.fillText(text, x + xOffset, finalY + yOffsetExtrusion);
         }
 
         // --- Draw Top Text Layer (Outline and Fill) ---

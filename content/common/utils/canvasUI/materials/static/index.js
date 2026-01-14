@@ -13,3 +13,6 @@ export * from './LightPaper.js';
 export * from './StandardPaper.js';
 export * from './WhitePaper.js';
 export * from './RoughPaper.js';
+export * from './EchoEffect.js';
+export * from './StaticWoodEffect.js';
+export * from './StaticStoneEffect.js';

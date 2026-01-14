@@ -15,7 +15,12 @@
       "regex": "^\\/windows#(.+)$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "$1",
-      "description": "Windows app with hash content"
+      "description": "Windows app with hash content",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/ultco2004$",
@@ -28,91 +33,166 @@
       "regex": "^\\/#ultec5-info$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "ultec5-info",
-      "description": "ULTEC 5 Info"
+      "description": "ULTEC 5 Info",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#visionaryec-info$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "visionaryec-info",
-      "description": "Visionary EC Info"
+      "description": "Visionary EC Info",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#editorLeagueS2-info$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "editorLeagueS2-info",
-      "description": "Editor League S2 Info"
+      "description": "Editor League S2 Info",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#editorLeagueS2$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "editorLeagueS2",
-      "description": "Editor League S2"
+      "description": "Editor League S2",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#ultec3-judgingSheet$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "ultec3-judgingSheet",
-      "description": "ULTEC 3 Judging Sheet"
+      "description": "ULTEC 3 Judging Sheet",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#ultec4-judgingSheet$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "ultec4-judgingSheet",
-      "description": "ULTEC 4 Judging Sheet"
+      "description": "ULTEC 4 Judging Sheet",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#ariultec-judgingSheet$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "ariultec-judgingSheet",
-      "description": "ARI ULTEC Judging Sheet"
+      "description": "ARI ULTEC Judging Sheet",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#digitalfootprint$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "digitalfootprint",
-      "description": "Digital Footprint Easter Egg"
+      "description": "Digital Footprint Easter Egg",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#eclipsa$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "eclipsa",
-      "description": "Eclipsa Poem Easter Egg"
+      "description": "Eclipsa Poem Easter Egg",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#assets$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "assets",
-      "description": "Assets Page"
+      "description": "Assets Page",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#mobileError$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "mobileError",
-      "description": "Mobile Error Page"
+      "description": "Mobile Error Page",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#wiiTest$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "wiiTest",
-      "description": "Wii Test Page"
+      "description": "Wii Test Page",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#ultcomp$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "ultcomp",
-      "description": "ULTCOMP Contest"
+      "description": "ULTCOMP Contest",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#judgingSheetTest$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "judgingSheetTest",
-      "description": "Judging Sheet Test"
+      "description": "Judging Sheet Test",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     },
     {
       "regex": "^\\/#sandsoftime$",
       "appPath": "/content/apps/windows/windows.html",
       "hashParam": "sandsoftime",
-      "description": "Sands of Time Easter Egg"
+      "description": "Sands of Time Easter Egg",
+      "resolution": {
+        "width": 1920,
+        "height": 1080,
+        "scale": "fullscreen"
+      }
     }
   ]
 }

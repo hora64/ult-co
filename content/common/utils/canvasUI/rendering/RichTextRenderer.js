@@ -91,7 +91,8 @@ export class RichTextRenderer {
         // Add regex for built-in formats directly.
         combinedRegexParts.push('(?<style>\\{style:([^\\|]+?)\\|(.*?)\\})');
         combinedRegexParts.push('(?<link>\\[((?:[^\\[\\]]|\\[[^\\]]*\\])*)\\]\\(([^)]+)\\))');
-        combinedRegexParts.push('(?<color>\\{color:(#[0-9a-fA-F]{6}|[a-zA-Z]+)\\|.*?\\})');
+        // Fixed color regex to properly capture hex colors and color names
+        combinedRegexParts.push('(?<color>\\{color:(#[0-9a-fA-F]{6}|[a-zA-Z]+)\\|(.*?)\\})');
 
         const combinedRegex = new RegExp(combinedRegexParts.join('|'), 'gs');
 
@@ -125,26 +126,62 @@ export class RichTextRenderer {
                     };
 
                     options.forEach(option => {
+                        option = option.trim();
+                        
+                        // Handle basic styles
                         if (styleMap[option]) {
                             styleMap[option]();
-                        } else if (option.startsWith('bold')) {
+                        } 
+                        // Handle bold with optional value
+                        else if (option.startsWith('bold')) {
                             const [, value] = option.split('=');
                             style.bold = value || 'auto'; // 'native', 'pseudo', or 'auto'
-                        } else if (option.startsWith('color=')) {
+                        } 
+                        // Handle color
+                        else if (option.startsWith('color=')) {
                             style.color = option.slice(6);
-                        } else if (option.startsWith('highlight=')) {
+                        } 
+                        // Handle highlight
+                        else if (option.startsWith('highlight=')) {
                             style.highlight = option.slice(10);
+                        }
+                        // Handle ALL effect properties with parameters
+                        else if (option.includes('=')) {
+                            const [effectName, params] = option.split('=', 2);
+                            const effect = this.effects[effectName.toLowerCase()];
+                            if (effect) {
+                                // Store effect name and parameters
+                                style[effectName.toLowerCase()] = params;
+                            }
+                        }
+                        // Handle effect properties without parameters
+                        else {
+                            const effect = this.effects[option.toLowerCase()];
+                            if (effect) {
+                                style[option.toLowerCase()] = true;
+                            }
                         }
                     });
 
                     // Recursively parse the content within the style tag.
-                    const nestedContent = this.parseInlineFormatting(content);
+                    const nestedContent = this.parseInlineFormatting(content, { disableEffects: Object.keys(style).filter(k => this.effects[k]) });
                     token = {
                         type: 'container',
                         style: style,
                         children: nestedContent.tokens,
                         isAnimated: nestedContent.isAnimated,
                     };
+                    
+                    // Check if any of the styles are animated effects
+                    for (const styleKey in style) {
+                        const effect = this.effects[styleKey];
+                        if (effect && effect.isAnimated) {
+                            isAnimated = true;
+                            token.isAnimated = true;
+                            break;
+                        }
+                    }
+                    
                     if (token.isAnimated) isAnimated = true;
                 }
             } else if (groups.link) {
@@ -161,6 +198,26 @@ export class RichTextRenderer {
                         style: {
                             link: url,
                             underline: true,
+                        },
+                        children: nestedContent.tokens,
+                        isAnimated: nestedContent.isAnimated,
+                    };
+                    if (token.isAnimated) isAnimated = true;
+                }
+            } else if (groups.color) {
+                // Handle color formatting: {color:colorValue|text}
+                const colorMatch = /\{color:(#[0-9a-fA-F]{6}|[a-zA-Z]+)\|(.*?)\}/gs.exec(groups.color);
+                if (colorMatch) {
+                    const colorValue = colorMatch[1];
+                    const content = colorMatch[2];
+
+                    // Recursively parse the content within the color tag
+                    const nestedContent = this.parseInlineFormatting(content, { disableEffects: ['color'] });
+
+                    token = {
+                        type: 'container',
+                        style: {
+                            color: colorValue,
                         },
                         children: nestedContent.tokens,
                         isAnimated: nestedContent.isAnimated,
@@ -339,7 +396,7 @@ export class RichTextRenderer {
      */
     draw(ctx, text, x, y, width, height, options = {}) {
         const {
-            font = '16px "Rodin", sans-serif',
+            font = this._getDefaultFont(),
             fontSize,
             color = this.app.cssVars['--ds-text'] || '#EAEAEA',
             hAlign = 'left',
@@ -372,6 +429,91 @@ export class RichTextRenderer {
         if (this.renderedEffects.size > 0) {
             console.log('Rendered effects:', Array.from(this.renderedEffects).join(', '));
         }
+    }
+
+    /**
+     * Gets the default font, considering i18n font configuration if available.
+     * @private
+     * @returns {string} CSS font string
+     */
+    _getDefaultFont() {
+        // Try to get font from i18n configuration
+        if (this.app.i18n?.current?._meta?.font) {
+            const fontConfig = this.app.i18n.current._meta.font;
+            const fontFamily = `"${fontConfig.primary}", ${fontConfig.fallback}`;
+            return `16px ${fontFamily}`;
+        }
+        
+        // Check if Chinese language is being used
+        const userLanguage = this.app.language || localStorage.getItem("userLanguage") || "en-US";
+        if (userLanguage === 'zh-Hans-CN' || userLanguage === 'zh-Hant' || userLanguage === 'x-debug-zh-Hans-CN') {
+            // Use Chinese font if available
+            if (this.app.chineseFontLoaded) {
+                return '16px "DFPHeiW5-GB", "Microsoft YaHei", "SimHei", sans-serif';
+            }
+        }
+        
+        // Comprehensive fallback stack for maximum character support
+        const fallbackStack = [
+            '"Rodin"',
+            '"FOT-RodinNTLG Pro DB"',
+            'Arial',
+            '"Segoe UI"',
+            '"Helvetica Neue"',
+            'Helvetica',
+            '"Liberation Sans"',
+            '"Nimbus Sans L"',
+            'sans-serif'
+        ].join(', ');
+        
+        return `16px ${fallbackStack}`;
+    }
+
+    _getFontFamily() {
+        // First, try to get font from i18n current configuration
+        if (this.app.i18n?.current?._meta?.font) {
+            const fontConfig = this.app.i18n.current._meta.font;
+            return `"${fontConfig.primary}", ${fontConfig.fallback}`;
+        }
+        
+        // Fallback to app.translations (legacy support)
+        if (this.app.translations?._meta?.font) {
+            const fontConfig = this.app.translations._meta.font;
+            return `"${fontConfig.primary}", ${fontConfig.fallback}`;
+        }
+        
+        // Check if Chinese language is being used
+        const userLanguage = this.app.language || localStorage.getItem("userLanguage") || "en-US";
+        if (userLanguage === 'zh-Hans-CN' || userLanguage === 'zh-Hant' || userLanguage === 'x-debug-zh-Hans-CN') {
+            // Use Chinese font if available
+            if (this.app.chineseFontLoaded) {
+                return '"DFPHeiW5-GB", "Microsoft YaHei", "SimHei", sans-serif';
+            } else {
+                // Fallback to system Chinese fonts
+                return '"Microsoft YaHei", "SimHei", "Heiti SC", "PingFang SC", sans-serif';
+            }
+        }
+
+        return '"FOT-RodinNTLG Pro DB", Rodin, Arial, "Segoe UI", "Helvetica Neue", Helvetica, "Liberation Sans", "Nimbus Sans L", sans-serif';
+    }
+
+    _getFontScale() {
+        // First, try to get scale from i18n current configuration
+        if (this.app.i18n?.current?._meta?.font?.scale) {
+            return this.app.i18n.current._meta.font.scale;
+        }
+        
+        // Fallback to app.translations (legacy support)
+        if (this.app.translations?._meta?.font?.scale) {
+            return this.app.translations._meta.font.scale;
+        }
+        
+        // Fallback for Chinese if scale not in meta (legacy support)
+        const userLanguage = this.app.language || localStorage.getItem("userLanguage") || "en-US";
+        if (userLanguage === 'zh-Hans-CN' || userLanguage === 'zh-Hant' || userLanguage === 'x-debug-zh-Hans-CN') {
+            return 1.15;
+        }
+        return 1.0;
     }
 
     /**
@@ -419,7 +561,9 @@ export class RichTextRenderer {
         let currentX = x;
         let currentY = y;
         const baseFontSize = parseInt(baseFont);
-        const fontFamily = baseFont.substring(baseFont.indexOf("px") + 3).trim();
+        
+        // Use configured font family that includes Chinese support
+        const fontFamily = this._getFontFamily();
 
         const metrics = this.measurer.measureText("M", baseFont);
         const baseLineHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
@@ -512,8 +656,14 @@ export class RichTextRenderer {
 
             if (typeof token.text === 'undefined') continue;
 
-            // Split text into words for fine-grained word wrapping.
-            const words = token.text.split(/(\s+|(?<=[.,;!?]))/g).filter(w => w);
+            // Check if text contains Chinese characters for word splitting
+            const userLanguage = this.app.language || localStorage.getItem("userLanguage") || "en-US";
+            const isChinese = userLanguage === 'zh-Hans-CN' || userLanguage === 'zh-Hant';
+            
+            // Split text appropriately based on language
+            const words = isChinese 
+                ? token.text.split('') // Split by characters for Chinese
+                : token.text.split(/(\s+|(?<=[.,;!?]))/g).filter(w => w);
 
             for (const word of words) {
                 if (word === "") continue;
@@ -577,12 +727,20 @@ export class RichTextRenderer {
         const originalFont = ctx.font;
         const originalFill = ctx.fillStyle;
 
-        const fontParts = originalFont.match(/^(italic\s)?(bold\s)?([\d.]+)(px|pt|em|rem|%|vw|vh)\s(.+)$/i) || [];
+        const fontParts = originalFont.match(/^(italic\s)?(bold\s)?([\d.]+)(px|pt|em|%|vw|vh)\s(.+)$/i) || [];
         let fontStyle = token.style.italic ? 'italic ' : (fontParts[1] || '');
         let fontWeight = (token.style.bold === 'native' || token.style.bold === 'auto') ? 'bold ' : (fontParts[2] || '');
-        const fontSize = fontParts[3] ? parseFloat(fontParts[3]) : baseFontSize;
+        let fontSize = fontParts[3] ? parseFloat(fontParts[3]) : baseFontSize;
         const fontUnit = fontParts[4] || 'px';
-        const fontFamily = fontParts[5] || 'sans-serif';
+
+        // Apply dynamic font scaling from config
+        const scale = this._getFontScale();
+        if (scale !== 1.0) {
+            fontSize = Math.round(fontSize * scale);
+        }
+
+        // Use configured font family (with Chinese support)
+        const fontFamily = this._getFontFamily();
 
         let newFontSize = fontSize;
         let yOffset = 0;
@@ -602,6 +760,12 @@ export class RichTextRenderer {
 
 
         ctx.font = `${fontStyle}${fontWeight}${newFontSize}${fontUnit} ${fontFamily}`.trim();
+        
+        // Force canvas to reload font by setting it twice (workaround for font loading issues)
+        const finalFont = ctx.font;
+        ctx.font = 'italic 1px sans-serif';  // Dummy to force re-parse
+        ctx.font = finalFont;
+        
         ctx.fillStyle = token.style.color || (token.style.link ? (this.app.cssVars['--link-color'] || '#007bff') : (baseColor || originalFill));
         if(token.style.color) this.renderedEffects.add('color');
         if(token.style.link) this.renderedEffects.add('link');
@@ -621,11 +785,13 @@ export class RichTextRenderer {
         if (usePseudoBold) {
             ctx.save();
             ctx.fillStyle = token.style.color || baseColor || originalFill;
-            // Fake bold by drawing the text multiple times with slight offsets.
-            const offsets = [[0, 0], [0.5, 0], [0, 0.5], [0.5, 0.5]];
-            for (const [dx, dy] of offsets) {
-                ctx.fillText(text, x + dx, y + yOffset + dy);
-            }
+            // Enhanced pseudo-bold: multiple offsets for stronger bold effect
+            // Original subtle bold (0.3px offset)
+            ctx.fillText(text, x, y + yOffset);
+            // Stronger bold with multiple offsets
+            ctx.fillText(text, x + 0.5, y + yOffset);
+            ctx.fillText(text, x + 1.0, y + yOffset);
+            ctx.fillText(text, x, y + yOffset + 0.3);
             ctx.restore();
         } else {
             ctx.fillText(text, x, y + yOffset);

@@ -1,0 +1,16 @@
+import { esES as occxWeek15Info } from '../OCCXweek15-info/i18n/es-ES.js';
+import { esES as occxWeek15InfoCredits } from '../OCCXweek15-info/credits/i18n/es-ES.js';
+import { esES as welcomeV2 } from '../welcome-v2/i18n/es-ES.js';
+import { esES as welcomeV2Credits } from '../welcome-v2/credits/i18n/es-ES.js';
+import { esES as xgrm2hc1 } from '../xgrm-2hc-1/i18n/es-ES.js';
+import { esES as xgrm2hc1Credits } from '../xgrm-2hc-1/credits/i18n/es-ES.js';
+
+export const esES = [
+  // Import articles from dedicated folders
+  welcomeV2,
+  welcomeV2Credits,
+  xgrm2hc1,
+  xgrm2hc1Credits,
+  occxWeek15Info,
+  occxWeek15InfoCredits
+];

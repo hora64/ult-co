@@ -592,12 +592,12 @@ function initializeLanguage() {
             { value: 'ja-JP', display: '日本語' },
             { value: 'ko-KR', display: '한국어' },
             { value: 'pt-BR', display: 'Português' },
-            { value: 'pi-RR', display: 'Pirate' },
-            { value: 'ma-RS', display: 'Martian' },
-            { value: 'dr-AC', display: 'Clanker' },
-            { value: 'uw-UU', display: 'UwU Speak' },
-            { value: 'le-ET', display: '1337 Sp34k' },
-            { value: 'va-LY', display: 'Valley Girl' }
+            { value: 'x-pirate', display: 'Pirate' },
+            { value: 'x-martian', display: 'Martian' },
+            { value: 'x-droid', display: 'Clanker' },
+            { value: 'x-uwu', display: 'UwU Speak' },
+            { value: 'x-leet', display: '1337 Sp34k' },
+            { value: 'x-valley', display: 'Valley Girl' }
         ];
 
         // Get browser language

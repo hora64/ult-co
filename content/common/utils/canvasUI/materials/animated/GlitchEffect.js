@@ -1,13 +1,19 @@
 import { Material } from "../Material.js";
 
 export class GlitchEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.isAnimated = true;
         this.intensity = this.options.intensity || 5;
     }
 
     apply(ctx, x, y, width, height, text) {
+        ctx.save();
+        
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+        
         const sliceCount = 10;
 
         ctx.fillText(text, x, y);
@@ -23,5 +29,7 @@ export class GlitchEffect extends Material {
 
             ctx.drawImage(ctx.canvas, x, y + sliceY, width, sliceHeight, x + offsetX, y + sliceY, width, sliceHeight);
         }
+        
+        ctx.restore();
     }
 }

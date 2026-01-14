@@ -14,8 +14,8 @@ import { Material } from "../Material.js";
  * Example: {textshadow3d:angle=90,depth=3,shadowColor=#333|Subtle Shadow}
  */
 export class TextShadow3DEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'textshadow3d';
         // This regex captures the optional parameter string (group 1) and the text (group 2).
         this.regex = /\{textshadow3d(?::([^|]+))?\|([^}]+?)\}/gi;
@@ -58,6 +58,10 @@ export class TextShadow3DEffect extends Material {
     apply(ctx, text, x, y, token, baseFontSize, rendererBaseColor) {
         ctx.save();
 
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+
         const {
             angle,
             depth,
@@ -76,7 +80,12 @@ export class TextShadow3DEffect extends Material {
             currentFontSize *= 0.8;
             yOffset = -baseFontSize * 0.3;
         }
-        ctx.font = ctx.font.replace(/\d+px/, `${currentFontSize}px`);
+        
+        // Update font size while preserving font family (including Chinese font if applied)
+        const currentFont = this._getContextFont(ctx);
+        const fontWithNewSize = currentFont.replace(/\d+px/, `${currentFontSize}px`);
+        this._setContextFont(ctx, fontWithNewSize);
+        
         const finalY = y + yOffset;
 
         // Convert angle from degrees to radians for JS trig functions

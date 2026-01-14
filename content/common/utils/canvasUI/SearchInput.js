@@ -1,4 +1,4 @@
-﻿import { UIComponent } from "/content/common/utils/UIComponent.js";
+import { UIComponent } from "/content/common/utils/UIComponent.js";
 
 export class SearchInput extends UIComponent {
     constructor(options) {

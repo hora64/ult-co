@@ -1,0 +1,318 @@
+/**
+ * Retro/8-bit Theme for Home Screen
+ * Pixel-perfect nostalgia with chiptune sounds
+ * 
+ * To use: <html data-theme="retro">
+ */
+
+[data-theme="retro"] {
+    /* ========================================
+     * RETRO THEME - UNOPENED APPS
+     * ======================================== */
+    
+    /* 8-bit mystery box */
+    --hs-unopened-icon: '/content/themes/retro/assets/mystery_box_8bit_48px.png';
+    
+    /* Pixel art banner module */
+    --hs-unopened-banner-module: '/content/themes/retro/banners/pixel_banner.js';
+    
+    /* Chiptune power-up jingle */
+    --hs-unopened-jingle: '/content/themes/retro/audio/powerup_chime_8bit.wav';
+    
+    
+    /* ========================================
+     * RETRO THEME - 8-BIT SOUND EFFECTS
+     * ======================================== */
+    
+    /* Classic blip sound */
+    --hs-sound-click: '/content/themes/retro/audio/blip.ogg';
+    
+    /* Navigation beep */
+    --hs-sound-select: '/content/themes/retro/audio/beep.ogg';
+    
+    /* Warp sound for launch */
+    --hs-sound-launch: '/content/themes/retro/audio/warp.ogg';
+    
+    /* Level up sound */
+    --hs-sound-size-up: '/content/themes/retro/audio/levelup.ogg';
+    
+    /* Level down sound */
+    --hs-sound-size-down: '/content/themes/retro/audio/leveldown.ogg';
+    
+    /* Coin collection sound */
+    --hs-sound-open-box: '/content/themes/retro/audio/coin.ogg';
+    
+    
+    /* ========================================
+     * RETRO THEME - PIXEL ART UI SPRITES
+     * ======================================== */
+    
+    /* Pixelated selection glow */
+    --hs-selection-glow-sprite: url('/content/themes/retro/sprites/pixel_glow_128px.png');
+    
+    /* 8-bit scrollbar */
+    --hs-scrollbar-middle-sprite: '/content/themes/retro/sprites/pixel_scrollbar_middle.png';
+    --hs-scrollbar-side-sprite: '/content/themes/retro/sprites/pixel_scrollbar_side.png';
+    
+    /* Pixelated button sprites */
+    --hs-size-increase-sprite: '/content/themes/retro/sprites/plus_pixel_64px.png';
+    --hs-size-decrease-sprite: '/content/themes/retro/sprites/minus_pixel_64px.png';
+    
+    
+    /* ========================================
+     * RETRO THEME - DEFAULT ICONS
+     * ======================================== */
+    
+    /* Pixelated default app icon */
+    --hs-default-app-icon: '/content/themes/retro/assets/default_app_8bit.png';
+}
+
+
+/**
+ * RETRO VISUAL STYLING
+ */
+
+[data-theme="retro"] {
+    /* Classic arcade color palette */
+    --primary-color: #00ff00; /* Phosphor green */
+    --secondary-color: #ff00ff; /* Magenta */
+    --accent-color: #ffff00; /* Yellow */
+    --background-color: #000033; /* Deep blue-black */
+    --text-color: #00ff00;
+    
+    /* Pixel-perfect font */
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* CRT scanline effect */
+[data-theme="retro"]::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    animation: scanlines 10s linear infinite;
+}
+
+@keyframes scanlines {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(4px);
+    }
+}
+
+/* CRT screen curvature effect */
+[data-theme="retro"] body {
+    background: radial-gradient(ellipse at center, #000033 0%, #000011 100%);
+    perspective: 1000px;
+}
+
+[data-theme="retro"] .app-grid {
+    background: rgba(0, 255, 0, 0.05);
+    border: 2px solid var(--primary-color);
+    box-shadow: 
+        inset 0 0 20px rgba(0, 255, 0, 0.2),
+        0 0 30px rgba(0, 255, 0, 0.3);
+    image-rendering: pixelated;
+}
+
+/* Pixel art icons */
+[data-theme="retro"] .app-button canvas {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* Glowing pixel effect on hover */
+[data-theme="retro"] .app-button:hover {
+    animation: pixelGlow 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes pixelGlow {
+    from {
+        filter: drop-shadow(0 0 2px var(--primary-color));
+    }
+    to {
+        filter: drop-shadow(0 0 8px var(--primary-color));
+    }
+}
+
+/* 8-bit selection effect */
+[data-theme="retro"] .app-icon.selected {
+    animation: pixelPulse 0.5s steps(4) infinite;
+}
+
+@keyframes pixelPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Retro text shadow */
+[data-theme="retro"] .app-label {
+    text-shadow: 
+        2px 2px 0 #000,
+        -2px -2px 0 var(--primary-color);
+    letter-spacing: 2px;
+}
+
+/* Arcade cabinet border effect */
+[data-theme="retro"] .top-screen {
+    border: 4px solid var(--primary-color);
+    box-shadow: 
+        inset 0 0 20px rgba(0, 255, 0, 0.3),
+        0 0 30px rgba(0, 255, 0, 0.5);
+}
+
+/* Game over style for unopened apps */
+[data-theme="retro"] .app-icon-container[data-unopened="true"] {
+    animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink {
+    0%, 49% {
+        opacity: 1;
+    }
+    50%, 100% {
+        opacity: 0.7;
+    }
+}
+
+/* Pixel-perfect scrollbar */
+[data-theme="retro"] .slim-scroll-indicator {
+    filter: drop-shadow(0 0 3px var(--primary-color));
+    image-rendering: pixelated;
+}
+
+/* Button press effect */
+[data-theme="retro"] .app-button:active {
+    transform: scale(0.95);
+    box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+
+/**
+ * ACCESSIBILITY ENHANCEMENTS
+ */
+
+/* Reduce flashing for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="retro"]::after,
+    [data-theme="retro"] .app-icon.selected,
+    [data-theme="retro"] .app-icon-container[data-unopened="true"],
+    [data-theme="retro"] .app-button:hover {
+        animation: none !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    [data-theme="retro"] {
+        --primary-color: #00ff00;
+        --text-color: #ffffff;
+    }
+    
+    [data-theme="retro"]::after {
+        display: none; /* Remove scanlines in high contrast */
+    }
+}
+
+
+/**
+ * RESPONSIVE ADJUSTMENTS
+ */
+
+/* Mobile - reduce effects */
+@media (max-width: 768px) {
+    [data-theme="retro"]::after {
+        opacity: 0.3; /* Lighter scanlines on mobile */
+    }
+    
+    [data-theme="retro"] {
+        font-size: 0.8em; /* Smaller pixel font */
+    }
+}
+
+/* Tablet - balanced */
+@media (min-width: 769px) and (max-width: 1024px) {
+    [data-theme="retro"] {
+        font-size: 0.9em;
+    }
+}
+
+
+/**
+ * PRINT STYLES
+ */
+
+@media print {
+    [data-theme="retro"]::after,
+    [data-theme="retro"] .top-screen {
+        box-shadow: none !important;
+        border: 1px solid black !important;
+    }
+    
+    [data-theme="retro"] {
+        --primary-color: #000000;
+        --text-color: #000000;
+    }
+}
+
+
+/**
+ * THEME ACTIVATION ANIMATION
+ */
+
+[data-theme="retro"] .app-grid {
+    animation: bootUp 0.5s steps(10);
+}
+
+@keyframes bootUp {
+    0% {
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scaleY(1) scaleX(0.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(1);
+    }
+}
+
+/* Power-on flash */
+[data-theme="retro"] body {
+    animation: powerOn 1s ease-out;
+}
+
+@keyframes powerOn {
+    0% {
+        background: white;
+    }
+    10% {
+        background: var(--background-color);
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}

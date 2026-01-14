@@ -6,8 +6,8 @@ import { Material } from "../Material.js";
  * Example: {mirror:20|Reflection}
  */
 export class MirrorEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'mirror';
         this.regex = /{mirror:([^|]+)\|([^}]+)}/g;
         this.isAnimated = false;
@@ -32,6 +32,12 @@ export class MirrorEffect extends Material {
     }
 
     apply(ctx, x, y, width, height, text) {
+        ctx.save();
+        
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+        
         const baseFontSize = parseInt(ctx.font);
         const finalOffsetY = this.offsetY || (baseFontSize * 1.5);
         
@@ -41,6 +47,8 @@ export class MirrorEffect extends Material {
         ctx.scale(1, -1);
         ctx.globalAlpha = 0.3;
         ctx.fillText(text, x, -(y + finalOffsetY + baseFontSize));
+        ctx.restore();
+        
         ctx.restore();
     }
 }

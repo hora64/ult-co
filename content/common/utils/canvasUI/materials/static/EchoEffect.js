@@ -17,8 +17,8 @@ import { Material } from "../Material.js";
  * Example: {echo:color=#FF000080,offsetX=1,offsetY=1,count=5|Fading Away...}
  */
 export class EchoEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'echo';
         // The regex supports {echo:...} and captures parameters.
         this.regex = /\{echo(?::([^|]+))?\|([^}]+?)\}/gi;
@@ -61,6 +61,10 @@ export class EchoEffect extends Material {
 
         ctx.save();
 
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+
         // Adjust font size and vertical position for subscript/superscript.
         let currentFontSize = baseFontSize;
         let yOffset = 0;
@@ -71,7 +75,13 @@ export class EchoEffect extends Material {
             currentFontSize *= 0.8;
             yOffset = -baseFontSize * 0.3;
         }
-        ctx.font = ctx.font.replace(/\d+px/, `${currentFontSize}px`);
+        
+        // Update font size if needed for subscript/superscript
+        if (subscript || superscript) {
+            const fontWithNewSize = originalFont.replace(/\d+px/, `${currentFontSize}px`);
+            this._setContextFont(ctx, fontWithNewSize);
+        }
+        
         const finalY = y + yOffset;
 
         // Set the fill style for the echo copies.

@@ -6,8 +6,8 @@ import { Material } from "../Material.js";
  * Example: {rainbow|Rainbow Text}
  */
 export class RainbowEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'rainbow';
         this.regex = /\{(static)?rainbow\|([^}]+?)\}/g;
         this.currentTime = 0;
@@ -54,6 +54,10 @@ export class RainbowEffect extends Material {
     apply(ctx, text, x, y, token, baseFontSize) {
         ctx.save();
 
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+
         const { static: isStatic, subscript, superscript } = token.style;
         const textWidth = ctx.measureText(text).width;
 
@@ -66,7 +70,12 @@ export class RainbowEffect extends Material {
             currentFontSize *= 0.8;
             yOffset = -baseFontSize * 0.3;
         }
-        ctx.font = ctx.font.replace(/\d+px/, `${currentFontSize}px`);
+
+        // Update font size while preserving font family (including Chinese font if applied)
+        const currentFont = this._getContextFont(ctx);
+        const fontWithNewSize = currentFont.replace(/\d+px/, `${currentFontSize}px`);
+        this._setContextFont(ctx, fontWithNewSize);
+
         const finalY = y + yOffset;
 
         if (isStatic) {

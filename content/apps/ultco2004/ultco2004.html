@@ -260,6 +260,37 @@ body {
 }
 </style>
 <script type="text/javascript">
+// Page Navigation System
+var currentPage = 'home';
+
+function showPage(pageName) {
+  // Hide all pages
+  var pages = document.getElementsByClassName('page');
+  for (var i = 0; i < pages.length; i++) {
+    pages[i].style.display = 'none';
+  }
+  
+  // Show selected page
+  document.getElementById(pageName + 'Page').style.display = 'block';
+  currentPage = pageName;
+  
+  // Update active nav button
+  var navLinks = document.getElementsByClassName('nav-link');
+  for (var i = 0; i < navLinks.length; i++) {
+    navLinks[i].style.backgroundColor = '#001100';
+    navLinks[i].style.color = '#00ff00';
+  }
+  
+  var activeLink = document.getElementById(pageName + 'Nav');
+  if (activeLink) {
+    activeLink.style.backgroundColor = '#003300';
+    activeLink.style.color = '#ffff00';
+  }
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
 function startDownload() {
   document.getElementById('downloadBtn').style.display = 'none';
   document.getElementById('progressContainer').style.display = 'block';
@@ -292,23 +323,24 @@ function startDownload() {
 </div>
 
 <div class="navbar">
-  <a href="#">HOME</a>
-  <a href="#">ABOUT</a>
-  <a href="#">CONTESTS</a>
-  <a href="#">DOWNLOADS</a>
-  <a href="#">CONTACT</a>
+  <a href="#" id="homeNav" class="nav-link" onclick="showPage('home'); return false;">HOME</a>
+  <a href="#" id="contestsNav" class="nav-link" onclick="showPage('contests'); return false;">CONTESTS</a>
+  <a href="#" id="downloadsNav" class="nav-link" onclick="showPage('downloads'); return false;">DOWNLOADS</a>
+  <a href="#" id="creditsNav" class="nav-link" onclick="showPage('credits'); return false;">CREDITS</a>
 </div>
 
+<!-- HOME PAGE -->
+<div id="homePage" class="page">
 <div class="content">
   
   <div class="marquee-container">
     <marquee behavior="scroll" direction="left" scrollamount="3">
-      <span style="color: #00ff00;">*** ONE CLIP CONTEST X WEEK 15 NOW LIVE *** $75 PRIZE POOL *** FREE CLIPS AVAILABLE *** SUBMISSIONS OPEN ***</span>
+      <span style="color: #00ff00;">*** ONE CLIP CONTEST X WEEK 15 NOW LIVE *** $100 PRIZE POOL *** FREE CLIPS AVAILABLE *** DEADLINE: JAN 22 11:59 PM EST ***</span>
     </marquee>
   </div>
 
   <div class="tagline">
-    [ Powered by Ult & Co. and Hollow Artistry ]
+    [ Powered by Ult & Co. and Hollow Artistry | Sponsored by hora64_ and Ein ]
   </div>
 
   <div class="ultec-box">
@@ -316,7 +348,7 @@ function startDownload() {
     <div style="font-size: 18px; color: #00cc00; margin-bottom: 15px;">Week 15</div>
     <div class="ultec-desc">
       <p>
-        <a href="https://discord.gg/v6BeM68xxw">Ult & Co. Discord</a> | <a href="https://discord.gg/Qvc3VVJ8Ng">Hollow Artistry Discord</a>
+        <a href="https://discord.gg/Ayzcu8JUZb">HLW Discord</a> | <a href="https://discord.gg/Tve8gVhkYW">Ult & Co. Discord</a>
       </p>
       <div class="blink-text">
         DOWNLOAD CLIPS BELOW
@@ -331,21 +363,26 @@ function startDownload() {
         <div class="news-item">
           <font color="#00ff00"><b>Contest Now Live</b></font><br>
           <font color="#00cc00" size="2">
-            One Clip Contest X Week 15 is now accepting submissions. Finish your edits within the timeframe and fill out all forms correctly.
+            One Clip Contest X Week 15 is now accepting submissions. All teams must finish their edits within the required timeframe and fill out all forms correctly.
           </font>
         </div>
 
         <div class="news-item">
           <font color="#00ff00"><b>Contest Rules</b></font><br>
           <font color="#00cc00" size="2">
-            1. All teams must finish within required timeframe<br>
-            2. Troll edits will not be judged - show effort<br>
-            3. Have fun :)
+            1. All teams must finish within required timeframe & All forms must be filled out correctly<br>
+            2. Troll edits will not be judged - Submissions must show effort<br>
+            3. Intro and Logo are required for submission<br>
+            4. You must use at least one of the mandatory logos provided<br>
+            5. You may use any frag contained in the demos/prerecs
           </font>
         </div>
 
-        <div style="text-align: center; margin: 30px 0;">
-          <font color="#00ff00" size="3"><b>- ALL CLIPS FREE OF CHARGE -</b></font><br>
+        <div class="news-item">
+          <font color="#00ff00"><b>Deadline</b></font><br>
+          <font color="#00cc00" size="2">
+            <b>All submissions must be completed and submitted by January 22nd, 2026 at 11:59 PM EST</b>
+          </font>
         </div>
 
       </td>
@@ -358,11 +395,18 @@ function startDownload() {
             <font color="#ffff00">1st Place:</font> <font color="#ffd700">$50</font>
           </div>
           <div class="prize-item">
-            <font color="#ffff00">2nd Place:</font> <font color="#c0c0c0">$25</font>
+            <font color="#ffff00">2nd Place:</font> <font color="#c0c0c0">$30</font>
+          </div>
+          <div class="prize-item">
+            <font color="#ffff00">3rd Place:</font> <font color="#cd7f32">$20</font>
           </div>
           <br>
           <font color="#00cc00" size="2">
-            Total: <font color="#00ff00">$75</font>
+            Total: <font color="#00ff00">$100</font><br>
+            <br>
+            <font color="#ffff00" size="1">Sponsored by:</font><br>
+            <font size="1">hora64_ - $75</font><br>
+            <font size="1">Ein - $25</font>
           </font>
         </div>
 
@@ -377,11 +421,11 @@ function startDownload() {
         </div>
 
         <div class="sidebar-box">
-          <div class="sidebar-title">PREVIOUS WINNERS</div>
+          <div class="sidebar-title">QUICK LINKS</div>
           <font color="#00cc00" size="2">
-            View our hall of fame archive<br>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSclpGAdNOXMkStSuG9o0IlQUbKHHIYDXBMI1kYS3_n0BT_H6g/viewform" target="_blank" style="color: #00ff00; font-size: 11px;">[Submit Your Entry]</a><br>
             <br>
-            <a href="#" style="color: #00ff00; font-size: 11px;">[Click here to see lists]</a>
+            <a href="#" style="color: #00ff00; font-size: 11px;" onclick="showPage('downloads'); return false;">[Download Clips]</a>
           </font>
         </div>
 
@@ -398,54 +442,228 @@ function startDownload() {
   </div>
 
 </div>
+</div>
 
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
+<!-- CONTESTS PAGE -->
+<div id="contestsPage" class="page" style="display: none;">
+<div class="content">
+  <div class="ultec-box">
+    <div class="ultec-title">CONTEST SUBMISSION</div>
+    <div style="font-size: 18px; color: #00cc00; margin-bottom: 15px;">Week 15</div>
+  </div>
 
-<div class="download-section">
-  <button id="downloadBtn" class="download-btn" onclick="startDownload()">
-    -= FREE DOWNLOAD =-
-  </button>
-  
-  <div id="progressContainer" class="progress-container">
-    <div class="progress-label">DOWNLOADING FILES...</div>
-    <div class="progress-bar-bg">
-      <div id="progressFill" class="progress-bar-fill"></div>
+  <div class="sidebar-box">
+    <div class="sidebar-title">SUBMIT YOUR ENTRY</div>
+    
+    <div style="text-align: center; padding: 20px;">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSclpGAdNOXMkStSuG9o0IlQUbKHHIYDXBMI1kYS3_n0BT_H6g/viewform" target="_blank" style="display: inline-block; background: #00ff00; color: #000000; font-weight: bold; padding: 15px 40px; border: 2px solid #00ff00; cursor: pointer; text-decoration: none; font-size: 18px;">SUBMIT ENTRY (OFFICIAL FORM)</a>
+      <br><br>
+      <font color="#00cc00" size="2">
+        Click above to submit your contest entry via the official Google Form
+      </font>
     </div>
-    <div id="progressText" class="progress-text">Initializing download...</div>
+  </div>
+
+  <div class="sidebar-box">
+    <div class="sidebar-title">REQUIRED LOGOS</div>
+    <font color="#00cc00" size="2">
+      <p>
+        You must use at least one of these mandatory logos in your submission:
+      </p>
+      <div class="stat-box">
+        <font color="#00ff00"><b>HLW Logos</b></font><br>
+        <a href="https://drive.google.com/drive/folders/1iGzn6xef6_7jZbB1nYLkU3z1rcfL9BWN" target="_blank" style="color: #00ff00; font-size: 11px;">[Download from Google Drive]</a>
+      </div>
+
+      <div class="stat-box">
+        <font color="#00ff00"><b>Ult Logos</b></font><br>
+        <a href="https://drive.google.com/drive/folders/1DF-A6UU4xTBrjfPu6N5nWsuox0ZZO2Uo?usp=drive_link" target="_blank" style="color: #00ff00; font-size: 11px;">[Download from Google Drive]</a>
+      </div>
+
+      <div class="stat-box">
+        <font color="#00ff00"><b>OCC X Logos</b></font><br>
+        <a href="https://www.dropbox.com/scl/fo/6ztu9ra9r2i5nn3ys8wli/AHM8pvLxeDQERv1Qi2diFRQ?rlkey=gk60kvnbsyk8cn9y2snfeiijw&e=1&st=iprbtyoc&dl=0" target="_blank" style="color: #00ff00; font-size: 11px;">[Download from Dropbox]</a>
+      </div>
+    </font>
+  </div>
+
+  <div class="sidebar-box">
+    <div class="sidebar-title">RULES & GUIDELINES</div>
+    <font color="#00cc00" size="2">
+      <p>
+        <font color="#00ff00"><b>1. Submission Deadline</b></font><br>
+        All submissions must be completed and submitted by January 22nd, 2026 at 11:59 PM EST.
+      </p>
+      <p>
+        <font color="#00ff00"><b>2. Original Work & Effort</b></font><br>
+        Troll edits will not be judged. Submissions must show genuine effort.
+      </p>
+      <p>
+        <font color="#00ff00"><b>3. Required Elements</b></font><br>
+        Intro and Logo are required for submission. You must use at least one of the mandatory logos.
+      </p>
+      <p>
+        <font color="#00ff00"><b>4. Frag Usage</b></font><br>
+        You may use any frag contained in the demos/prerecs provided.
+      </p>
+      <p>
+        <font color="#00ff00"><b>5. Form Completion</b></font><br>
+        All teams must fill out all forms correctly to be eligible.
+      </p>
+    </font>
   </div>
 </div>
-
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-<div class="disclaimer">
-  Copyright ULT&CO Digital Media. All rights reserved.<br>
-  Best viewed in Internet Explorer 5.0+
 </div>
 
-</body>
-</html>
+<!-- DOWNLOADS PAGE -->
+<div id="downloadsPage" class="page" style="display: none;">
+<div class="content">
+  <div class="ultec-box">
+    <div class="ultec-title">FREE CLIP DOWNLOADS</div>
+    <div style="font-size: 18px; color: #00cc00; margin-bottom: 15px;">Week 15 Assets</div>
+  </div>
+
+  <div class="sidebar-box">
+    <div class="sidebar-title">AVAILABLE DOWNLOADS</div>
+    <font color="#00cc00" size="2">
+      
+      <div class="stat-box">
+        <font color="#00ff00"><b>Demos & Prerecs Pack</b></font><br>
+        Complete contest clip package<br>
+        <a href="https://drive.google.com/file/d/1ylLmmCCorG29Mi0N-xBScaKX5qx3nm4t/view?usp=sharing" target="_blank" style="color: #00ff00;">[Download from Google Drive]</a>
+      </div>
+
+      <div class="stat-box">
+        <font color="#00ff00"><b>HLW Logos</b></font><br>
+        Official Hollow Artistry logos<br>
+        <a href="https://drive.google.com/drive/folders/1iGzn6xef6_7jZbB1nYLkU3z1rcfL9BWN" target="_blank" style="color: #00ff00;">[Google Drive]</a>
+      </div>
+
+      <div class="stat-box">
+        <font color="#00ff00"><b>Ult Logos</b></font><br>
+        Official Ult & Co. logos<br>
+        <a href="https://drive.google.com/drive/folders/1DF-A6UU4xTBrjfPu6N5nWsuox0ZZO2Uo?usp=drive_link" target="_blank" style="color: #00ff00;">[Google Drive]</a>
+      </div>
+
+      <div class="stat-box">
+        <font color="#00ff00"><b>OCC X Logos</b></font><br>
+        One Clip Contest X branding<br>
+        <a href="https://www.dropbox.com/scl/fo/6ztu9ra9r2i5nn3ys8wli/AHM8pvLxeDQERv1Qi2diFRQ?rlkey=gk60kvnbsyk8cn9y2snfeiijw&e=1&st=iprbtyoc&dl=0" target="_blank" style="color: #00ff00;">[Dropbox]</a>
+      </div>
+
+    </font>
+  </div>
+
+  <div class="sidebar-box">
+    <div class="sidebar-title">USAGE TERMS</div>
+    <font color="#00cc00" size="2">
+      <p>
+        All clips are provided <font color="#00ff00"><b>FREE OF CHARGE</b></font> for use in contest submissions.
+      </p>
+      <p>
+        You may use these clips in your contest entry and personal portfolio.
+        Commercial use outside of the contest requires permission.
+      </p>
+      <p>
+        By downloading these assets, you agree to follow contest rules and give proper credit to Ult & Co.
+      </p>
+    </font>
+  </div>
+
+  <div class="sidebar-box">
+    <div class="sidebar-title">FAQ</div>
+    <font color="#00cc00" size="2">
+      <p>
+        <font color="#00ff00"><b>Q: Clips running slow?</b></font><br>
+        Use <a href="https://github.com/gmzorz/prerecs" target="_blank" style="color: #00ff00;">gmzorz' tool</a> to convert to ProRes for better performance.
+      </p>
+      <p>
+        <font color="#00ff00"><b>Q: Is this affiliated with the original OneClipContest?</b></font><br>
+        No, OCC-X is not affiliated with the original OneClipContest.
+      </p>
+    </font>
+  </div>
+
+  <div style="text-align: center; margin: 30px 0;">
+    <font color="#006600" size="2">
+      <i>All downloads are virus-free and optimized for editing software</i>
+    </font>
+  </div>
+</div>
+</div>
+
+<!-- CREDITS PAGE -->
+<div id="creditsPage" class="page" style="display: none;">
+<div class="content">
+  <div class="ultec-box">
+    <div class="ultec-title">CONTEST CREDITS</div>
+    <div style="font-size: 18px; color: #00cc00; margin-bottom: 15px;">Week 15 - Thank You!</div>
+  </div>
+
+  <div class="sidebar-box">
+    <div class="sidebar-title">FUNDING & ORGANIZATION</div>
+    <font color="#00cc00" size="2">
+      
+      <div class="stat-box">
+        <font color="#00ff00"><b>Prize Pool</b></font><br>
+        • hora64_ - $75 Prize Pool<br>
+        • Ein - $25 Prize Pool<br>
+        <br>
+        <font color="#ffff00">Total Prize Pool: $100</font>
+      </div>
+
+      <div class="stat-box">
+        <font color="#00ff00"><b>Organization</b></font><br>
+        • hora64_ - Backend Management<br>
+        • Ein - Event Coordination<br>
+        • Hollow Artistry - Event Coordination
+      </div>
+
+    </font>
+  </div>
+
+  <div class="sidebar-box">
+    <div class="sidebar-title">HOSTS & STAFF</div>
+    <font color="#00cc00" size="2">
+      
+      <div class="stat-box">
+        <font color="#00ff00"><b>Contest Hosts</b></font><br>
+        • Ein - Co-Host<br>
+        • Hollow Artistry - Co-Host
+      </div>
+
+    </font>
+  </div>
+
+  <div class="sidebar-box">
+    <div class="sidebar-title">CREATIVE CONTRIBUTORS</div>
+    <font color="#00cc00" size="2">
+      
+      <div class="stat-box">
+        <font color="#00ff00"><b>Demos & Recording</b></font><br>
+        • FNC - Demo creation and clip recording
+      </div>
+
+      <div class="stat-box">
+        <font color="#00ff00"><b>Design</b></font><br>
+        • Toronto - Contest Thumbnail Design
+      </div>
+
+    </font>
+  </div>
+
+  <div class="ultec-box">
+    <div class="ultec-desc">
+      <font color="#ffff00" size="4"><b>GOOD LUCK TO ALL PARTICIPANTS!</b></font>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin: 30px 0;">
+    <font color="#006600" size="2">
+      <i>This contest was made possible by the dedicated efforts of many individuals and communities</i>
+    </font>
+  </div>
+</div>
+</div>
+
+<div class="disclaimer">

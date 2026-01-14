@@ -19,6 +19,11 @@ export class TextCanvasMeasurer {
         };
     }
 
+    measureTextWidth(text, font) {
+        this._ctx.font = font;
+        return this._ctx.measureText(text).width;
+    }
+
     estimateWrappedTextHeight(text, font, maxWidth, lineSpacingFactor = 1.0) {
         this._ctx.font = font;
         const tempMetrics = this._ctx.measureText(text);

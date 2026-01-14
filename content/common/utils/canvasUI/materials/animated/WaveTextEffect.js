@@ -6,8 +6,8 @@ import { Material } from "../Material.js";
  * Example: {waveText:5,0.05,100|Wavy Text}
  */
 export class WaveTextEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'waveText';
         this.regex = /{waveText:([^,]+),([^,]+),([^|]+)\|([^}]+)}/g;
         this.isAnimated = true;
@@ -37,6 +37,12 @@ export class WaveTextEffect extends Material {
     }
 
     apply(ctx, x, y, width, height, text) {
+        ctx.save();
+        
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+        
         let currentXOffset = 0;
         for (let i = 0; i < text.length; i++) {
             const char = text[i];
@@ -46,6 +52,8 @@ export class WaveTextEffect extends Material {
             ctx.fillText(char, charX, charY);
             currentXOffset += charWidth;
         }
+        
+        ctx.restore();
     }
 
     update(deltaTime) {

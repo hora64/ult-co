@@ -2,6 +2,10 @@
 // This file is kept for backwards compatibility
 // Users clicking on DigiShop will be redirected to UltShop
 
+console.log('[DigiShop App] Module loading...');
+
+import { loadTranslation, getSupportedLanguages } from './i18n/index.js';
+
 export const app = {
     "id": "digishop",
     "icon": "/content/apps/digishop/banner/store_48px.png",
@@ -59,6 +63,11 @@ export const app = {
       "height": 480,
       "scale": "fit"
     },
+    "i18n": {
+      "loadTranslation": loadTranslation,
+      "getSupportedLanguages": getSupportedLanguages
+    },
+    // Legacy locale support - will be loaded from i18n folder dynamically
     "locales": {
       "en-US": {
         "label": "DigiShop (→ UltShop)",
@@ -74,7 +83,7 @@ export const app = {
       },
       "de-DE": {
         "label": "DigiShop (→ UltShop)",
-        "description": "Mit UltShop zusammengeführt. Klicken Sie, um UltShop zu öffnen."
+        "description": "Mit UltShop fusioniert. Klicken Sie, um UltShop zu öffnen."
       },
       "ja-JP": {
         "label": "DigiShop (→ UltShop)",
@@ -82,23 +91,39 @@ export const app = {
       },
       "ko-KR": {
         "label": "DigiShop (→ UltShop)",
-        "description": "UltShop에 병합되었습니다. UltShop을 열려면 클릭하세요."
+        "description": "UltShop에 통합되었습니다. 클릭하여 UltShop을 엽니다."
       },
       "pt-BR": {
         "label": "DigiShop (→ UltShop)",
-        "description": "Mesclado com UltShop. Clique para abrir o UltShop."
+        "description": "Fundido com UltShop. Clique para abrir UltShop."
       },
-      "pi-RR": {
+      "zh-Hans-CN": {
+        "label": "DigiShop (→ UltShop)",
+        "description": "已合并到UltShop。单击以打开UltShop。"
+      },
+      "zh-Hant": {
+        "label": "DigiShop (→ UltShop)",
+        "description": "已合併到UltShop。點擊以開啟UltShop。"
+      },
+      "x-pirate": {
         "label": "DigiShop (→ UltShop)",
         "description": "Merged into UltShop, arr! Click to open the treasure cove!"
       },
-      "ma-RS": {
-        "label": "DigiShop (→ UltShop)",
-        "description": "Merged into Keph'UltShop. Click to open."
+      "x-uwu": {
+        "label": "DigiShop (→ UwtShop)",
+        "description": "Merged into UwtShop, uwu~ Cwick to open!"
       },
-      "dr-AC": {
+      "x-valley": {
         "label": "DigiShop (→ UltShop)",
-        "description": "Consolidated into UltShop requisition. Click to access."
+        "description": "Like, merged into UltShop. Click to open, you know?"
+      },
+      "x-debug-en-US": {
+        "label": "[DEBUG] DigiShop (→ UltShop)",
+        "description": "[DEBUG] Merged into UltShop. Click to open UltShop."
+      },
+      "x-debug-zh-Hans-CN": {
+        "label": "[调试] DigiShop (→ UltShop)",
+        "description": "[调试] 已合并到UltShop。单击以打开UltShop。"
       }
     },
     "manualArticle": {
@@ -108,15 +133,11 @@ export const app = {
       "author": "UltShop Team",
       "date": "2024-01-20T12:00:00Z",
       "image": "https://placehold.co/400x240/ff9800/ffffff?text=DigiShop",
-      "locales": {
-        "en-US": {
-          "title": "DigiShop → UltShop",
-          "content": "DigiShop has been merged into UltShop!\n\nAll DigiShop functionality is now available in the upgraded UltShop app. Click on DigiShop to be automatically redirected to UltShop.\n\n**Why the merge?**\n• Unified shopping experience\n• Better performance\n• More features\n• Consistent UI\n\nAll your purchases and account data remain intact!"
-        },
-        "es-ES": {
-          "title": "DigiShop → UltShop",
-          "content": "¡DigiShop se ha fusionado con UltShop!\n\nToda la funcionalidad de DigiShop ahora está disponible en la aplicación mejorada UltShop. Haz clic en DigiShop para ser redirigido automáticamente a UltShop.\n\n**¿Por qué la fusión?**\n• Experiencia de compra unificada\n• Mejor rendimiento\n• Más funciones\n• UI consistente\n\n¡Todas tus compras y datos de cuenta permanecen intactos!"
-        }
-      }
+      // Locales will be loaded from i18n folder dynamically
+      "locales": {}
     }
-}
+};
+
+console.log('[DigiShop App] Module loaded successfully');
+console.log('[DigiShop App] Configuration:', app);
+console.log('[DigiShop App] Supported languages:', getSupportedLanguages());

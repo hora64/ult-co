@@ -2,15 +2,15 @@ import { Material } from "../Material.js";
 
 /**
  * Applies a static hologram effect to text.
- * Syntax: {hologram:color|your text}
+ * Syntax: {statichologram|text} or {statichologram:color|text}
  * Supported colors: red, green, blue, yellow, pink, purple, cyan
- * Example: {hologram:blue|Holographic Text}
+ * Example: {statichologram:blue|Holographic Text}
  */
 export class StaticHologramEffect extends Material {
-    constructor(options = {}) {
-        super(options);
-        this.name = "hologram";
-        this.regex = /\{hologram:(.*?)\|(.*?)\}/g;
+    constructor(app, options = {}) {
+        super(app, options);
+        this.name = "statichologram";
+        this.regex = /\{statichologram(?::([a-z]+))?\|([^}]+)\}/g;
         this.isAnimated = false;
         this.colorMap = {
             red: { base: 'rgba(255, 0, 0, 0.7)', glow: 'rgba(255, 100, 100, 0.9)' },
@@ -24,21 +24,30 @@ export class StaticHologramEffect extends Material {
     }
 
     parse(match) {
-        const color = match[1].toLowerCase();
+        // match[0] is the full string {statichologram:blue|text}
+        // match[1] is the color (optional), e.g. "blue" or undefined
+        // match[2] is the text content, e.g. "Holographic Text"
+        
+        const color = match[1] || 'cyan'; // Default to cyan
         const text = match[2];
+        
         return {
             text: text,
             style: {
-                [this.name]: this.colorMap[color] ? color : 'blue', // Default to blue if color is invalid
+                [this.name]: color, 
             },
         };
     }
 
     apply(ctx, text, x, y, token) {
-        const colorName = token.style[this.name] || 'blue';
-        const colors = this.colorMap[colorName];
+        const colorName = token.style[this.name] || 'cyan';
+        const colors = this.colorMap[colorName] || this.colorMap.cyan;
 
         ctx.save();
+
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
 
         // 1. Set the main glow effect
         ctx.shadowColor = colors.glow;

@@ -6,8 +6,8 @@ import { Material } from "../Material.js";
  * Example: {neon:cyan,15|NEON}
  */
 export class NeonEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'neon';
         this.regex = /{neon:([^,]+),([^|]+)\|([^}]+)}/g;
         this.isAnimated = false;
@@ -34,6 +34,12 @@ export class NeonEffect extends Material {
     }
 
     apply(ctx, x, y, width, height, text) {
+        ctx.save();
+        
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+        
         ctx.shadowColor = this.color;
         ctx.shadowBlur = this.blur;
         ctx.fillStyle = this.color;
@@ -41,5 +47,7 @@ export class NeonEffect extends Material {
         // Reset shadow for subsequent drawing
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
+        
+        ctx.restore();
     }
 }

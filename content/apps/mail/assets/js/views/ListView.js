@@ -24,6 +24,14 @@ export class ListView extends UIComponent {
         this._initDOM();
     }
 
+    _getFontFamily() {
+        if (this.app.translations && this.app.translations._meta && this.app.translations._meta.font) {
+            const fontConfig = this.app.translations._meta.font;
+            return `"${fontConfig.primary}", ${fontConfig.fallback}`;
+        }
+        return '"FOT-RodinNTLG Pro DB", Rodin, Arial, "Segoe UI", "Helvetica Neue", Helvetica, "Liberation Sans", "Nimbus Sans L", sans-serif';
+    }
+
     _initDOM() {
         this.backgroundCanvas = this.createElement("canvas", "view-background");
         this.backgroundCanvas.width = 320;
@@ -93,13 +101,14 @@ export class ListView extends UIComponent {
             text: this.app.t("footer.exit"),
             width: 320,
             height: 40,
-            font: 'bold 16px "Rodin", sans-serif',
+            font: `bold 16px ${this._getFontFamily()}`,
             textColor: "black",
             onClick: () => this.onClose(true),
             className: "exit-button",
             backgroundColor: "#F0EAD6",
             activeBackgroundColor: "#D8D3C1",
             borderRadius: [12, 12, 0, 0],
+            appInstance: this.app, // Pass app instance for Chinese font support
         });
         listFooter.appendChild(this.exitButton.element);
 
@@ -135,7 +144,7 @@ export class ListView extends UIComponent {
                 this.app.t("noResults"),
                 noResultsCanvas.width / 2,
                 noResultsCanvas.height / 2,
-                '14px "Rodin", sans-serif',
+                `14px ${this._getFontFamily()}`,
                 "black",
                 "center",
                 "middle"
@@ -158,9 +167,21 @@ export class ListView extends UIComponent {
 
     async _drawHeaderBackground() {
         const canvas = this.headerBackgroundCanvas;
+        if (!canvas) return;
+        
         const ctx = canvas.getContext("2d");
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
+        if (!ctx) return;
+        
+        // Get actual rendered size from the DOM
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+            // Canvas not visible yet, retry
+            requestAnimationFrame(() => this._drawHeaderBackground());
+            return;
+        }
+        
+        canvas.width = rect.width;
+        canvas.height = rect.height;
         ctx.imageSmoothingEnabled = false;
 
         const generator = new LightPaper();
@@ -183,11 +204,15 @@ export class ListView extends UIComponent {
 
     async _drawViewBackground() {
         const canvas = this.backgroundCanvas;
+        if (!canvas) return;
+        
         const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        
         ctx.imageSmoothingEnabled = false;
 
         const generator = new StandardPaper();
-        const paperCanvas = await generator.canvasBackgroundGenerator(canvas.width, canvas.height);
+        const paperCanvas = generator.canvasBackgroundGenerator(canvas.width, canvas.height);
 
         if (paperCanvas) {
             ctx.drawImage(paperCanvas, 0, 0, canvas.width, canvas.height);
@@ -196,9 +221,21 @@ export class ListView extends UIComponent {
 
     async _drawListBodyBackground() {
         const canvas = this.listBodyCanvas;
+        if (!canvas) return;
+        
         const ctx = canvas.getContext("2d");
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
+        if (!ctx) return;
+        
+        // Get actual rendered size from the DOM
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+            // Canvas not visible yet, retry
+            requestAnimationFrame(() => this._drawListBodyBackground());
+            return;
+        }
+        
+        canvas.width = rect.width;
+        canvas.height = rect.height;
         ctx.imageSmoothingEnabled = false;
 
         const generator = new LightPaper();
@@ -207,7 +244,7 @@ export class ListView extends UIComponent {
         if (paperCanvas) {
             ctx.save();
             ctx.fillStyle = ctx.createPattern(paperCanvas, "repeat");
-            ctx.fill();
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.restore();
         }
     }
@@ -257,7 +294,7 @@ export class ListView extends UIComponent {
             ctx.clip();
 
             if (!this.marqueeData[ann.slug]) {
-                ctx.font = 'bold 14px "Rodin", sans-serif';
+                ctx.font = `bold 14px ${this._getFontFamily()}`;
                 const textWidth = ctx.measureText(ann.title).width;
                 this.marqueeData[ann.slug] = {
                     x: 0,
@@ -278,9 +315,9 @@ export class ListView extends UIComponent {
                 if (marquee.x < -(marquee.textWidth + 60)) marquee.x = 0;
             }
 
-            this.app._drawTextOnCanvas(ctx, ann.title, textRenderX, titleY, 'bold 14px "Rodin", sans-serif', "black", "left", "middle");
+            this.app._drawTextOnCanvas(ctx, ann.title, textRenderX, titleY, `bold 14px ${this._getFontFamily()}`, "black", "left", "middle");
             if (marquee.shouldScroll) {
-                this.app._drawTextOnCanvas(ctx, ann.title, textRenderX + marquee.textWidth + 60, titleY, 'bold 14px "Rodin", sans-serif', "black", "left", "middle");
+                this.app._drawTextOnCanvas(ctx, ann.title, textRenderX + marquee.textWidth + 60, titleY, `bold 14px ${this._getFontFamily()}`, "black", "left", "middle");
             }
             ctx.restore();
 
@@ -299,17 +336,27 @@ export class ListView extends UIComponent {
             ctx.fillRect(titleX + titleW - fadeWidth, 0, fadeWidth, h);
 
             const annDateTime = luxon.DateTime.fromISO(ann.date);
-            this.app._drawTextOnCanvas(ctx, annDateTime.toFormat("D"), w - 42, h / 2 - 6, '11px "Rodin", sans-serif', "#333", "center", "middle");
-            this.app._drawTextOnCanvas(ctx, annDateTime.toFormat("hh:mm a"), w - 42, h / 2 + 8, '11px "Rodin", sans-serif', "#333", "center", "middle");
+            this.app._drawTextOnCanvas(ctx, annDateTime.toFormat("D"), w - 42, h / 2 - 6, `11px ${this._getFontFamily()}`, "#333", "center", "middle");
+            this.app._drawTextOnCanvas(ctx, annDateTime.toFormat("hh:mm a"), w - 42, h / 2 + 8, `11px ${this._getFontFamily()}`, "#333", "center", "middle");
 
-            if (!ann.read) {
-                const indicatorOptions = ann.unreadIndicator || {};
-                const unreadIndicator = new UnreadIndicator(indicatorOptions);
+            // Draw indicator if unread OR if 'always' flag is true
+            const indicatorOptions = ann.unreadIndicator || {};
+            const shouldShowIndicator = !ann.read || ann.alwaysShowIndicator === true;
+            
+            if (shouldShowIndicator && indicatorOptions.type) {
+                // Pass timeRange if available from article
+                const unreadIndicatorOptions = {
+                    ...indicatorOptions,
+                    timeRange: ann.timeRange || indicatorOptions.timeRange || null
+                };
+                const unreadIndicator = new UnreadIndicator(unreadIndicatorOptions);
                 const iconX = 15;
                 const iconY = (h - 24) / 2;
                 const sparkleOffsetX = 0;
                 const sparkleOffsetY = 4;
-                unreadIndicator.draw(ctx, iconX + sparkleOffsetX, iconY + sparkleOffsetY, time);
+                // Pass isRead parameter to enable read/unread visual states
+                const isRead = ann.read || false;
+                unreadIndicator.draw(ctx, iconX + sparkleOffsetX, iconY + sparkleOffsetY, time, isRead);
             }
         });
     }

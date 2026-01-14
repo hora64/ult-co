@@ -20,8 +20,8 @@ import { Material } from "../Material.js";
  * Example: {fire:waveAmplitude=3|Flickering Text}
  */
 export class FireEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = 'fire';
         this.regex = /\{(staticfire|fire)(?::([^|]+))?\|([^}]+?)\}/gi;
         this.currentTime = 0;
@@ -93,6 +93,10 @@ export class FireEffect extends Material {
     apply(ctx, text, x, y, token, baseFontSize) {
         ctx.save();
 
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
+
         const {
             static: isStatic,
             type,
@@ -113,7 +117,12 @@ export class FireEffect extends Material {
         let yOffset = 0;
         if (subscript) currentFontSize *= 0.8, yOffset = baseFontSize * 0.2;
         if (superscript) currentFontSize *= 0.8, yOffset = -baseFontSize * 0.3;
-        ctx.font = ctx.font.replace(/\d+px/, `${currentFontSize}px`);
+        
+        // Update font size while preserving font family (including Chinese font if applied)
+        const currentFont = this._getContextFont(ctx);
+        const fontWithNewSize = currentFont.replace(/\d+px/, `${currentFontSize}px`);
+        this._setContextFont(ctx, fontWithNewSize);
+        
         const finalY = y + yOffset;
         const metrics = ctx.measureText(text);
         const textWidth = metrics.width;

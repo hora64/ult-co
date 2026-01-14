@@ -94,8 +94,8 @@ const gemstoneColors = {
 };
 
 export class StaticGemstoneEffect extends Material {
-    constructor(options = {}) {
-        super(options);
+    constructor(app, options = {}) {
+        super(app, options);
         this.name = "staticgemstone";
         this.regex = /\{staticgemstone:([^|]+?)\|([^}]+?)\}/g;
         this.isAnimated = false;
@@ -117,6 +117,10 @@ export class StaticGemstoneEffect extends Material {
         const colors = gemstoneColors[gemType] || gemstoneColors.diamond;
         
         ctx.save();
+
+        // Get and apply the correct font (with Chinese support if needed)
+        const originalFont = this._getContextFont(ctx);
+        this._setContextFont(ctx, originalFont);
 
         const textMetrics = ctx.measureText(text);
         const textWidth = textMetrics.width;

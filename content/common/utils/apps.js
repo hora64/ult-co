@@ -1,4 +1,4 @@
-﻿// uiElements/apps.js
+// uiElements/apps.js
 
 // Ensure anime.js is loaded, typically via a <script> tag in your HTML.
 // For example: import anime from 'animejs'; (if using a bundler)

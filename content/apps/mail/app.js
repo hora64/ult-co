@@ -1,3 +1,7 @@
+console.log('[Mail App] Module loading...');
+
+import { loadTranslation, getSupportedLanguages } from './i18n/index.js';
+
 export const app = {
   "id": "mail",
   "version": "1.1.0", // Incremented for cache invalidation
@@ -30,7 +34,7 @@ export const app = {
   
   "onClick": "(app) => { if (window.parent !== window) { window.parent.postMessage({ type: 'launchApp', appId: app.id, label: app.label, location: app.fileLocation, permissions: app.permissions, resolution: app.resolution }, '*'); } }",
   "route": {
-    "regex": "^\\/mail(?:\\/([a-zA-Z0-9_-]+))?$",
+    "regex": "^\\/mail(?:\\/([a-zA-Z0-9_-]+))?(?:\\/(en-US|es-ES|fr-FR|de-DE|zh-Hans-CN|zh-Hant|ja-JP|ko-KR|pt-BR|pi-RR|ma-RS|dr-AC|uw-UU|le-ET|va-LY))?$",
     "enabled": true
   },
   "permissions": {
@@ -50,26 +54,16 @@ export const app = {
     "alwaysOpened": true
   },
   
-  "articles": [
-    {
-      "permissionLevel": 2,
-      "slug": "admin-configuration",
-      "publisher": "Ult & Co.",
-      "author": "Admin Team",
-      "date": "2024-01-25T12:00:00Z",
-      "locales": {
-        "en-US": {
-          "title": "Mail System Administration",
-          "content": "This article covers administrative configuration and management of the mail system.\n\n{style:bold|Admin Features:}\n• Server configuration\n• User management\n• Security settings\n• System monitoring\n• Backup and restore\n\n{style:bold|Warning:}\nThese features should only be accessed by system administrators."
-        }
-      }
-    }
-  ],
   "resolution": {
     "width": 400,
     "height": 480,
     "scale": "fit"
   },
+  "i18n": {
+    "loadTranslation": loadTranslation,
+    "getSupportedLanguages": getSupportedLanguages
+  },
+  // Legacy locale support - will be loaded from i18n folder dynamically
   "locales": {
     "en-US": {
       "label": "Mail",
@@ -99,43 +93,52 @@ export const app = {
       "label": "Correio",
       "description": "Enviar e receber mensagens"
     },
-    "pi-RR": {
+    "zh-Hans-CN": {
+      "label": "邮件",
+      "description": "发送和接收消息"
+    },
+    "zh-Hant": {
+      "label": "郵件",
+      "description": "發送和接收消息"
+    },
+    "x-pirate": {
       "label": "Messages",
       "description": "Send messages across the seven seas"
     },
-    "ma-RS": {
-      "label": "Zeph'mor",
-      "description": "Keph'messaging system"
+    "x-uwu": {
+      "label": "Maiw OwO",
+      "description": "Send and weceive messages, uwu~"
     },
-    "dr-AC": {
-      "label": "Mainframe",
-      "description": "Central messaging protocol"
+    "x-valley": {
+      "label": "Mail, Like",
+      "description": "Send and receive messages, you know?"
+    },
+    "x-debug-en-US": {
+      "label": "[DEBUG] Mail",
+      "description": "[DEBUG] Send and receive messages"
+    },
+    "x-debug-zh-Hans-CN": {
+      "label": "[调试] 邮件",
+      "description": "[调试] 发送和接收消息"
     }
   },
+  "articles": [],
   "manualArticle": {
     "permissionLevel": 0,
     "slug": "mail-manual",
     "publisher": "Ult & Co.",
     "author": "Communications Team",
-    "locales": {
-      "en-US": {
-        "title": "Mail App - User Guide",
-        "content": "Welcome to the Mail app – your central hub for all communications!\n\n{style:bold|Getting Started}\nThe Mail app lets you send and receive messages, check your inbox, and compose new emails with ease.\n\n{style:bold|Key Features:}\n• View your inbox with all received messages\n• Compose new messages with rich formatting\n• Reply to and forward messages\n• Organize messages with labels\n• Search through your message history\n\n{style:bold|Tips:}\nUse the search bar to quickly find specific messages. You can also organize your inbox using custom labels for better message management.\n\nFor additional help, contact support through the settings menu."
-      },
-      "es-ES": {
-        "title": "Correo - Guía del Usuario",
-        "content": "¡Bienvenido a la aplicación de Correo – tu centro principal para todas las comunicaciones!\n\n{style:bold|Primeros Pasos}\nLa aplicación de Correo te permite enviar y recibir mensajes, revisar tu bandeja de entrada y redactar nuevos correos con facilidad.\n\n{style:bold|Características Principales:}\n• Ver tu bandeja de entrada con todos los mensajes recibidos\n• Redactar nuevos mensajes con formato enriquecido\n• Responder y reenviar mensajes\n• Organizar mensajes con etiquetas\n• Buscar en tu historial de mensajes"
-      },
-      "de-DE": {
-        "title": "Mail - Benutzerhandbuch",
-        "content": "Willkommen bei der Mail-App – Ihre zentrale Anlaufstelle für alle Kommunikationen!\n\n{style:bold|Erste Schritte}\nDie Mail-App ermöglicht es Ihnen, Nachrichten zu senden und zu empfangen, Ihren Posteingang zu überprüfen und neue E-Mails mit Leichtigkeit zu verfassen."
-      }
-    },
-    "image": "https://placehold.co/400x240/007bff/ffffff?text=Mail",
     "date": "2024-01-15T12:00:00Z",
+    "image": "https://placehold.co/400x240/007bff/ffffff?text=Mail",
     "iconPath": "/content/common/assets/icons/message_64px.png",
     "tags": ["Communication", "Mail", "Messaging"],
     "visible": true,
-    "debugArticle": false
+    "debugArticle": false,
+    // Locales will be loaded from i18n folder dynamically
+    "locales": {}
   }
-}
+};
+
+console.log('[Mail App] Module loaded successfully');
+console.log('[Mail App] Configuration:', app);
+console.log('[Mail App] Supported languages:', getSupportedLanguages());

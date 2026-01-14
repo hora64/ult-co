@@ -1,3 +1,7 @@
+console.log('[Settings App] Module loading...');
+
+import { loadTranslation, getSupportedLanguages } from './i18n/index.js';
+
 export const app = {
     "id": "settings",
     "version": "1.1.0", // Incremented for cache invalidation
@@ -35,46 +39,66 @@ export const app = {
       "height": 480,
       "scale": "fit"
     },
+    "i18n": {
+      "loadTranslation": loadTranslation,
+      "getSupportedLanguages": getSupportedLanguages
+    },
     "locales": {
       "en-US": {
         "label": "Settings",
-        "description": "Customize website settings"
+        "description": "Configure system preferences"
       },
       "es-ES": {
         "label": "Ajustes",
-        "description": "Personaliza la configuración del sitio web"
+        "description": "Configurar las preferencias del sistema"
       },
       "fr-FR": {
         "label": "Paramètres",
-        "description": "Personnalisez les paramètres du site web"
+        "description": "Configurer les préférences du système"
       },
       "de-DE": {
         "label": "Einstellungen",
-        "description": "Passen Sie die Website-Einstellungen an"
+        "description": "Systemeinstellungen konfigurieren"
       },
       "ja-JP": {
         "label": "設定",
-        "description": "ウェブサイトの設定をカスタマイズします"
+        "description": "システム設定を構成する"
       },
       "ko-KR": {
         "label": "설정",
-        "description": "웹사이트 설정을 사용자 정의합니다"
+        "description": "시스템 기본 설정 구성"
       },
       "pt-BR": {
         "label": "Configurações",
-        "description": "Personalize as configurações do site"
+        "description": "Configurar preferências do sistema"
       },
-      "pi-RR": {
+      "zh-Hans-CN": {
+        "label": "设置",
+        "description": "配置系统偏好设置"
+      },
+      "zh-Hant": {
+        "label": "設定",
+        "description": "配置系統偏好設定"
+      },
+      "x-pirate": {
         "label": "Ship's Wheel",
-        "description": "Customize yer ship's settings, savvy"
+        "description": "Adjust the ship's settings, arrr!"
       },
-      "ma-RS": {
-        "label": "Vel'config",
-        "description": "Customize Zeph'site vel'settings"
+      "x-uwu": {
+        "label": "Settings uwu",
+        "description": "Configuwe system pwefewences, uwu~"
       },
-      "dr-AC": {
-        "label": "Config",
-        "description": "Access and modify core system parameters"
+      "x-valley": {
+        "label": "Settings, like",
+        "description": "Like, configure system stuff, whatever"
+      },
+      "x-debug-en-US": {
+        "label": "[DEBUG] Settings",
+        "description": "[DEBUG] Configure system preferences"
+      },
+      "x-debug-zh-Hans-CN": {
+        "label": "[调试] 设置",
+        "description": "[调试] 配置系统偏好设置"
       }
     },
     "manualArticle": {
@@ -84,19 +108,11 @@ export const app = {
       "author": "System Team",
       "date": "2024-01-01T12:00:00Z",
       "image": "https://placehold.co/400x240/6c757d/ffffff?text=Settings",
-      "locales": {
-        "en-US": {
-          "title": "System Settings - User Guide",
-          "content": "Customize your DS experience with the Settings app!\n\n{style:bold|Available Settings:}\n• Audio volume and sound effects\n• Language and localization\n• Theme and appearance\n• Debug mode and developer options\n• App grid layout preferences\n\n{style:bold|How to Use:}\nNavigate through the different setting categories using the menu. Changes are saved automatically when you adjust settings.\n\n{style:bold|Developer Mode:}\nEnable debug mode to access additional apps and features designed for testing and development.\n\n{style:bold|Note:}\nSome features might be disabled as they are still in development and will be available in future updates."
-        },
-        "es-ES": {
-          "title": "Configuración del Sistema - Guía del Usuario",
-          "content": "¡Personaliza tu experiencia DS con la aplicación de Configuración!\n\n{style:bold|Configuraciones Disponibles:}\n• Volumen de audio y efectos de sonido\n• Idioma y localización\n• Tema y apariencia\n• Modo de depuración y opciones de desarrollador\n• Preferencias de diseño de cuadrícula de aplicaciones\n\n{style:bold|Cómo Usar:}\nNavega a través de las diferentes categorías de configuración usando el menú. Los cambios se guardan automáticamente cuando ajustas la configuración.\n\n{style:bold|Modo Desarrollador:}\nHabilita el modo de depuración para acceder a aplicaciones y funciones adicionales diseñadas para pruebas y desarrollo.\n\n{style:bold|Nota:}\nEs posible que algunas funciones estén desactivadas, ya que aún están en desarrollo y estarán disponibles en actualizaciones futuras."
-        },
-        "de-DE": {
-          "title": "Systemeinstellungen - Benutzerhandbuch",
-          "content": "Passen Sie Ihr DS-Erlebnis mit der Einstellungen-App an!\n\n{style:bold|Verfügbare Einstellungen:}\n• Lautstärke und Soundeffekte\n• Sprache und Lokalisierung\n• Design und Aussehen\n• Debug-Modus und Entwickleroptionen\n• App-Gitterlayout-Präferenzen\n\n{style:bold|So verwenden Sie es:}\nNavigieren Sie mit dem Menü durch die verschiedenen Einstellungskategorien. Änderungen werden automatisch gespeichert, wenn Sie die Einstellungen anpassen.\n\n{style:bold|Entwicklermodus:}\nAktivieren Sie den Debug-Modus, um auf zusätzliche Apps und Funktionen zuzugreifen, die für Test- und Entwicklungszwecke entwickelt wurden.\n\n{style:bold|Hinweis:}\nEinige Funktionen sind möglicherweise deaktiviert, da sie sich noch in der Entwicklungsphase befinden und in zukünftigen Updates verfügbar sein werden."
-        }
-      }
+      // Locales will be loaded from i18n folder dynamically
+      "locales": {}
     }
-  }
+  };
+
+console.log('[Settings App] Module loaded successfully');
+console.log('[Settings App] Configuration:', app);
+console.log('[Settings App] Supported languages:', getSupportedLanguages());
