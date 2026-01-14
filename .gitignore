@@ -4,3 +4,13 @@
 
 /testPages
 /content/apps/mail/assets/sfx/part-time human.mp3
+/.vs
+/bin
+/obj
+/scripts
+/.editorconfig
+/.gitattributes
+/routeConfig.json
+/ult-co.sln
+/Web.config
+/.gitignore
