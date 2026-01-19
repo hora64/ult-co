@@ -1,4 +1,4 @@
-export const zhHansCN = {
+export const zhHant = {
     "_meta": {
         "font": {
             "primary": "DFPHeiW5-GB",
